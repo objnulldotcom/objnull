@@ -1,0 +1,21 @@
+﻿@{ 
+    Layout = null;
+    CurrentUser CurrentUser = ViewBag.User as CurrentUser;
+}
+@if (CurrentUser != null)
+{
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="min-width:160px">
+            <img src="@CurrentUser.AvatarUrl&s=20" height="20" width="20" />
+            @CurrentUser.Name &nbsp;&nbsp;<span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="@Url.Action("UserUpdate", "OAuth")">刷新个人信息</a></li>
+            <li><a href="@Url.Action("LogOut", "Demo")">退出</a></li>
+        </ul>
+    </li>
+}
+else
+{
+    <li><a href="https://github.com/login/oauth/authorize?client_id=b89774f9a3a874e349ce&redirect_uri=http://objnull.com/OAuth/GitHubLogin&scope=user,public_repo&state=12345" target="_blank">登录</a></li>
+}
