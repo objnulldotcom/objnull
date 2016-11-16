@@ -52,5 +52,10 @@ namespace MVCWeb.Model.Models
         /// 添加日期
         /// </summary>
         public DateTime InsertDate { get; set; }
+
+        /// <summary>
+        /// 招募集合
+        /// </summary>
+        public virtual ICollection<Recruit> Recruits { get; set; }
     }
 }

@@ -1,0 +1,151 @@
+﻿
+@{
+    ViewBag.Title = ViewBag.PostName + " - 象空";
+    Layout = "~/Views/Shared/_LayoutMain.cshtml";
+}
+
+@section head{
+    <!--fileupload-->
+    <script src="~/Scripts/FileUpload/vendor/jquery.ui.widget.js"></script>
+    <script src="~/Scripts/FileUpload/jquery.iframe-transport.js"></script>
+    <script src="~/Scripts/FileUpload/jquery.fileupload.js"></script>
+    <!--highlight.js-->
+    <link href="~/Scripts/HighlightJs/default.min.css" rel="stylesheet" />
+    <script src="~/Scripts/HighlightJs/highlight.min.js"></script>
+    <!--marked-->
+    <script src="~/Scripts/Marked/marked.js"></script>
+    <script>
+        //更新MDV
+        function UpateMDV() {
+            $("#MDValue").html("");
+            $("#MDValue").html(marked($("#TxtMD").val()));
+        }
+
+        //textare当前位置插入
+        function InsertAtCaret(id, val) {
+            var $txt = jQuery("#" + id);
+            var caretPos = $txt[0].selectionStart;
+            var textAreaTxt = $txt.val();
+            $txt.val(textAreaTxt.substring(0, caretPos) + val + textAreaTxt.substring(caretPos));
+        }
+
+        $(function () {
+            //【Markdown】
+            //代码高亮插件
+            marked.setOptions({
+                highlight: function (code) {
+                    return hljs.highlightAuto(code).value;
+                }
+            });
+            //实时更新
+            $("#TxtTitle").bind("input propertychange", function () {
+                $("#MDTitle").html($("#TxtTitle").val());
+            });
+            $("#TxtMD").bind("input propertychange", function () {
+                UpateMDV();
+            });
+
+            //点击图片时再重新加载viewer
+            $("#MDValue").click(function () {
+                SetViewer("MDValue");
+            });
+
+            //阻止全局拖拽，使自定义区域拖拽上传生效
+            $(document).bind("drop dragover", function (e) {
+                e.preventDefault();
+            });
+            //拖拽上传
+            var allowExt = [".jpg", ".png", ".bmp", ".gif"];
+            $("#JqueryUpload").fileupload({
+                dropZone: $("#TxtMD"),
+                add: function (e, data) {
+                    var ext = data.files[0].name.substr(data.files[0].name.lastIndexOf("."));
+                    if (data.files[0].size > 1024 * 1024 * 3) {
+                        swal("文件最大为3M");
+                    } else if (allowExt.indexOf(ext) < 0) {
+                        swal("格式不允许");
+                    } else {
+                        data.submit();
+                    }
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $("#UpPercent").html("已上传" + progress + "%");
+                },
+                dataType: "json",
+                done: function (e, data) {
+                    $("#UpPercent").html("");
+                    if (data.result.error != "") {
+                        alert(data.result.error);
+                    } else {
+                        var link = "![](http://" + window.location.host + "@Url.Action("DownloadImg", "File", new { pt = ViewBag.PostType })" + "&path=" + data.result.path + ")";
+                        InsertAtCaret("TxtMD", link);
+                        UpateMDV();
+                    }
+                },
+                fail: function (e, data) {
+                    $("#UpPercent").html("");
+                    swal("上传失败");
+                }
+            });
+
+            //获取字节数
+            function getBt(str) {
+                var char = str.replace(/[^\x00-\xff]/g, '**');
+                return char.length;
+            }
+
+            //发布
+            $("#BtnConfirm").click(function () {
+                var title = $("#TxtTitle").val();
+                if (title.length == 0) {
+                    swal("请填写标题");
+                    return;
+                }
+                if (getBt(title) > 90) {
+                    swal("标题最多90字节，当前" + getBt(title) + "字节");
+                    return;
+                }
+                var mdTxt = $("#TxtMD").val();
+                if (mdTxt.length == 0) {
+                    swal("内容不能为空");
+                    return;
+                }
+                $.ajax({
+                    url: "@Url.Action("PostNew", "Home")",
+                    data: { pt: "@ViewBag.PostType", title: title, mdTxt: mdTxt, mdValue: marked(mdTxt) },
+                    type: "post",
+                    success: function (result) {
+                        if (result.msg == "done") {
+                            window.location.href = result.url;
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}
+<div class="row">
+    <div class="col-md-12" style="font-family:'microsoft yahei',simhei,sans-serif; color: #184ac1">
+        <h3 id="MDTitle"></h3>
+    </div>
+    <div id="MDValue" class="col-md-12 mdv">
+        
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <input id="TxtTitle" type="text" class="form-control" placeholder="标题" />
+    </div>
+    <div class="col-md-12">
+        <span>查看&nbsp;<a href="@Url.Action("MarkDownSyntax", "Demo")" target="_blank">MarkDown语法</a>&nbsp;,&nbsp;</span>
+        <input id="JqueryUpload" class="uploader" type="file" name="upFile" data-url="@Url.Action("JqueryUploadImg", "File", new { pt = ViewBag.PostType })" style="opacity:0;position:absolute;width:60px; left:280px; top: 0px">
+        <span>拖拽图片至文本框或<a href="javascript:;">选择文件</a>上传 &nbsp;&nbsp;&nbsp;</span>
+        <span id="UpPercent" style="color:#ff6a00"></span>
+        <textarea id="TxtMD" class="form-control" rows="15" style="resize:vertical;"></textarea>
+    </div>
+    <div class="col-md-12 text-center" style="margin-top: 20px">
+        <button id="BtnConfirm" class="btn btn-default">确定</button>
+    </div>
+</div>

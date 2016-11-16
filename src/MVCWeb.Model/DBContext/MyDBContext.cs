@@ -1,6 +1,5 @@
 ﻿using System.Data.Entity;
 using MVCWeb.Model.Models;
-using MVCWeb.Model.ModelMapping;
 
 namespace MVCWeb.Model.DBContext
 {
@@ -8,11 +7,12 @@ namespace MVCWeb.Model.DBContext
     {
         //实体集
         public IDbSet<NullUser> Users { get; set; }
+        public IDbSet<Recruit> Recruits { get; set; }
 
         public MyDBContext() : base("MySQLConnection")
         {
-            //Database.SetInitializer(new MyDBInitializer());
-            Database.SetInitializer<MyDBContext>(null);
+            Database.SetInitializer(new MyDBInitializer());
+            //Database.SetInitializer<MyDBContext>(null);
 
             //延迟加载开关，默认开启，注意实体中集合属性必须是virtual类型才生效
             //Configuration.LazyLoadingEnabled = false;
@@ -25,6 +25,7 @@ namespace MVCWeb.Model.DBContext
 
             //表映射
             modelBuilder.Configurations.Add(new NullUserMapping());
+            modelBuilder.Configurations.Add(new RecruitMapping());
         }
     }
 }

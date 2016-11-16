@@ -56,12 +56,14 @@ namespace MVCWeb.Controllers
                     user.Name = githubUser.name;
                     user.AvatarUrl = githubUser.avatar_url;
                     user.GitHubLogin = githubUser.login;
+                    user.GitHubID = githubUser.id;
                     NullUserDataSvc.Add(user);
                 }
                 else
                 {
                     user.Name = githubUser.name;
                     user.AvatarUrl = githubUser.avatar_url;
+                    user.GitHubID = githubUser.id;
                     user.GitHubLogin = githubUser.login;
                     user.GitHubAccessToken = token;
                     NullUserDataSvc.Update(user);

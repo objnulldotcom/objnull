@@ -51,7 +51,8 @@
   <ItemGroup>
     <Compile Include="DBContext\MyDBContext.cs" />
     <Compile Include="DBContext\MyDBInitializer.cs" />
-    <Compile Include="ModelMapping\NullUserMapping.cs" />
+    <Compile Include="DBContext\MyDBMapping.cs" />
+    <Compile Include="Models\Recruit.cs" />
     <Compile Include="Models\NullUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

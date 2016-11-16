@@ -210,6 +210,9 @@
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\SimplePagination\jquery.simplePagination.js" />
     <Content Include="Scripts\SimplePagination\simplePagination.css" />
+    <Content Include="Scripts\SweetAlert\sweetalert-dev.js" />
+    <Content Include="Scripts\SweetAlert\sweetalert.css" />
+    <Content Include="Scripts\SweetAlert\sweetalert.min.js" />
     <Content Include="Scripts\Viewerjs\viewer.css" />
     <Content Include="Scripts\Viewerjs\viewer.js" />
     <Content Include="Scripts\Viewerjs\viewer.min.css" />
@@ -229,6 +232,7 @@
     <Compile Include="Assist\Principals.cs" />
     <Compile Include="Assist\Extensions.cs" />
     <Compile Include="Assist\Utils.cs" />
+    <Compile Include="Controllers\FileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\OAuthController.cs" />
     <Compile Include="Global.asax.cs">
@@ -245,6 +249,8 @@
     <Content Include="Views\Shared\_LayoutMain.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\OAuth\UserInfo.cshtml" />
+    <Content Include="Views\Home\PostNew.cshtml" />
+    <Content Include="Views\Home\BCar.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -254,6 +260,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\File\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MVCWeb.DataSvc\MVCWeb.DataSvc.csproj">

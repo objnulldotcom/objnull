@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\BaseDataSvc.cs" />
+    <Compile Include="Svc\RecruitDataSvc.cs" />
     <Compile Include="Svc\NullUserDataSvc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

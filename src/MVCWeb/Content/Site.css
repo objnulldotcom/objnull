@@ -16,3 +16,9 @@ textarea {
     /*max-width: 280px;*/
 }
 
+.mdv img {
+    cursor: pointer;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+}
