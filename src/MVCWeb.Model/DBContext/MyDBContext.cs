@@ -7,7 +7,7 @@ namespace MVCWeb.Model.DBContext
     {
         //实体集
         public IDbSet<NullUser> Users { get; set; }
-        public IDbSet<Recruit> Recruits { get; set; }
+        public IDbSet<Blog> Blogs { get; set; }
 
         public MyDBContext() : base("MySQLConnection")
         {
@@ -25,7 +25,7 @@ namespace MVCWeb.Model.DBContext
 
             //表映射
             modelBuilder.Configurations.Add(new NullUserMapping());
-            modelBuilder.Configurations.Add(new RecruitMapping());
+            modelBuilder.Configurations.Add(new BlogMapping());
         }
     }
 }

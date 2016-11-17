@@ -1,6 +1,7 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -21,4 +22,14 @@ textarea {
     max-width: 100%;
     width: auto;
     height: auto;
+}
+
+.fs1{
+    font-size:20px;
+    font-weight:600;
+    font-family:'Microsoft YaHei';
+}
+
+.fs2{
+    font-size: 12px;
 }

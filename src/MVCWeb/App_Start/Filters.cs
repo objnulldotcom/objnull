@@ -66,22 +66,36 @@ namespace MVCWeb
             string controller = filterContext.HttpContext.Request.RequestContext.RouteData.Values["controller"].ToString();
             string action = filterContext.HttpContext.Request.RequestContext.RouteData.Values["action"].ToString();
             ActionRule rule = MyRedisDB.GetSet<ActionRule>(MyRedisKeys.ActionRules).Where(r => r.Controller.ToLower() == controller.ToLower() && r.Action.ToLower() == action.ToLower()).FirstOrDefault();
-            if(rule != null)
+            //当前action有rule
+            if (rule != null)
             {
-                //CurrentManager
-                string id = filterContext.HttpContext.ReadEncodeCookie("MID");
-                if (id == "")
+                if(string.IsNullOrEmpty(rule.AllowRoles))//allowrole为空 限制未登录用户
                 {
-                    filterContext.HttpContext.Response.RedirectToRoute(new { controller = "Demo", action = "Error" });
-                    return;
+                    if (string.IsNullOrEmpty(loginType))//未登录
+                    {
+                        filterContext.HttpContext.Response.RedirectToRoute(new { controller = "Home", action = "Error" });
+                        return;
+                    }
                 }
-                Manager manager = MyRedisDB.GetSet<Manager>(MyRedisKeys.Managers).Where(m => m.ID == Guid.Parse(id)).FirstOrDefault();
-                if (!rule.AllowRoles.Contains(manager.Role))
+                else//allowrole不为空 修改当前用户为CurrentManager
                 {
-                    filterContext.HttpContext.Response.RedirectToRoute(new { controller = "Demo", action = "Error" });
-                    return;
+                    //CurrentManager
+                    string mRole = "";
+                    string mid = filterContext.HttpContext.ReadEncodeCookie("MID");
+                    if (!string.IsNullOrEmpty(mid))
+                    {
+                        Manager manager = MyRedisDB.GetSet<Manager>(MyRedisKeys.Managers).Where(m => m.ID == Guid.Parse(mid)).FirstOrDefault();
+                        filterContext.HttpContext.User = new CurrentManager() { ID = Guid.Parse(mid), key = manager.Key, Role = manager.Role };
+                        mRole = manager.Role;
+                    }
+
+                    if (string.IsNullOrEmpty(mRole) || !rule.AllowRoles.Contains(mRole))
+                    {
+                        //不是管理员且不是允许角色 不允许访问
+                        filterContext.HttpContext.Response.RedirectToRoute(new { controller = "Home", action = "Error" });
+                        return;
+                    }
                 }
-                filterContext.HttpContext.User = new CurrentManager() { ID = Guid.Parse(id), key = manager.Key, Role = manager.Role };
             }
         }
     }

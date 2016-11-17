@@ -5,9 +5,9 @@ using System.Text;
 
 namespace MVCWeb.Model.Models
 {
-    public class Recruit
+    public class Blog
     {
-        public Recruit()
+        public Blog()
         {
             ID = Guid.NewGuid();
             InsertDate = DateTime.Now;
@@ -17,7 +17,12 @@ namespace MVCWeb.Model.Models
         /// 标识
         /// </summary>
         public Guid ID { get; set; }
-        
+
+        /// <summary>
+        /// 类型
+        /// </summary>
+        public int Type { get; set; }
+
         /// <summary>
         /// 添加日期
         /// </summary>

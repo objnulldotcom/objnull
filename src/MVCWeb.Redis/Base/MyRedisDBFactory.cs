@@ -12,7 +12,7 @@ namespace MVCWeb.Redis.Base
         private static ConnectionMultiplexer GetConnection()
         {
             ConfigurationOptions option = new ConfigurationOptions();
-            option.EndPoints.Add("127.0.0.1:6380");
+            option.EndPoints.Add("127.0.0.1:6399");
             option.Password = "@simple0";
             option.ConnectTimeout = 10 * 1000;
             option.SyncTimeout = 10 * 1000;

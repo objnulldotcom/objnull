@@ -9,12 +9,12 @@ using MVCWeb.DataSvc.Base;
 namespace MVCWeb.DataSvc.Svc
 {
     //继承基础操作接口获得基础操作
-    public interface IRecruitDataSvc : IBaseDataSvc<Recruit>
+    public interface IBlogDataSvc : IBaseDataSvc<Blog>
     {
     }
 
     //继承基础操作实现
-    public class RecruitDataSvc : BaseDataSvc<Recruit>, IRecruitDataSvc
+    public class BlogDataSvc : BaseDataSvc<Blog>, IBlogDataSvc
     {
 
     }

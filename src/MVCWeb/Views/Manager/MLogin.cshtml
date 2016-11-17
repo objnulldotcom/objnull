@@ -1,0 +1,20 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutM.cshtml";
+    ViewBag.Title = "管理登录 - 象空";
+}
+<h3>登录</h3>
+<div class="row">
+    <form action="@Url.Action("MLogin", "Manager")" method="post">
+        <div class="col-md-4">
+            <input name="key" class="form-control" type="text" placeholder="key" />
+        </div>
+        <div class="col-md-4">
+            <input name="value" class="form-control" type="password" placeholder="value" />
+        </div>
+        <div class="col-md-2">
+            <input class="btn btn-default" type="submit" value="Login" />
+        </div>
+    </form>
+</div>
+
+

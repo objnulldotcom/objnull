@@ -18,26 +18,23 @@ namespace MVCWeb.Controllers
                 return Json(new { error = "文件太大" });
             }
             string upPath = "";
-            if (pt < 1 || pt > 5)
+            if (pt < 1 || pt > 4)
             {
-                pt = 5;
+                pt = 2;
             }
             switch (pt)
             {
                 case 1:
-                    upPath = ConfigurationManager.AppSettings["RecruitFilePath"];
+                    upPath = ConfigurationManager.AppSettings["BlogFilePath"];
                     break;
                 case 2:
-                    upPath = ConfigurationManager.AppSettings["NoteFilePath"];
+                    upPath = ConfigurationManager.AppSettings["NewBeeFilePath"];
                     break;
                 case 3:
                     upPath = ConfigurationManager.AppSettings["QuestionFilePath"];
                     break;
                 case 4:
-                    upPath = ConfigurationManager.AppSettings["KnowledgeFilePath"];
-                    break;
-                case 5:
-                    upPath = ConfigurationManager.AppSettings["TreeNewBeeFilePath"];
+                    upPath = ConfigurationManager.AppSettings["NoteFilePath"];
                     break;
             }
             string date = DateTime.Now.ToString("yyyy-MM-dd");
@@ -55,26 +52,23 @@ namespace MVCWeb.Controllers
         public ActionResult DownloadImg(string path, int pt)
         {
             string fPath = "";
-            if (pt < 1 || pt > 5)
+            if (pt < 1 || pt > 4)
             {
-                pt = 5;
+                pt = 2;
             }
             switch (pt)
             {
                 case 1:
-                    fPath = ConfigurationManager.AppSettings["RecruitFilePath"];
+                    fPath = ConfigurationManager.AppSettings["BlogFilePath"];
                     break;
                 case 2:
-                    fPath = ConfigurationManager.AppSettings["NoteFilePath"];
+                    fPath = ConfigurationManager.AppSettings["NewBeeFilePath"];
                     break;
                 case 3:
                     fPath = ConfigurationManager.AppSettings["QuestionFilePath"];
                     break;
                 case 4:
-                    fPath = ConfigurationManager.AppSettings["KnowledgeFilePath"];
-                    break;
-                case 5:
-                    fPath = ConfigurationManager.AppSettings["TreeNewBeeFilePath"];
+                    fPath = ConfigurationManager.AppSettings["NoteFilePath"];
                     break;
             }
             fPath = fPath + path.Replace(":", "\\");

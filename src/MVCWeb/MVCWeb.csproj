@@ -227,6 +227,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="Assist\BaseController.cs" />
+    <Compile Include="Assist\Enum\EnumBlogType.cs" />
     <Compile Include="Assist\OAuth\GitHubAccessToken.cs" />
     <Compile Include="Assist\OAuth\GitHubUser.cs" />
     <Compile Include="Assist\Principals.cs" />
@@ -234,6 +235,7 @@
     <Compile Include="Assist\Utils.cs" />
     <Compile Include="Controllers\FileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ManagerController.cs" />
     <Compile Include="Controllers\OAuthController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -249,8 +251,13 @@
     <Content Include="Views\Shared\_LayoutMain.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\OAuth\UserInfo.cshtml" />
-    <Content Include="Views\Home\PostNew.cshtml" />
-    <Content Include="Views\Home\BCar.cshtml" />
+    <Content Include="Views\Home\NewBlog.cshtml" />
+    <Content Include="Views\Home\BlogList.cshtml" />
+    <Content Include="Views\Shared\_LayoutM.cshtml" />
+    <Content Include="Views\Manager\MLogin.cshtml" />
+    <Content Include="Views\Manager\Manage.cshtml" />
+    <Content Include="Views\Home\Error.cshtml" />
+    <Content Include="Views\Home\BlogPage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -260,7 +267,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\File\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MVCWeb.DataSvc\MVCWeb.DataSvc.csproj">

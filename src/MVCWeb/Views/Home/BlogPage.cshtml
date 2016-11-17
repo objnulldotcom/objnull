@@ -1,0 +1,37 @@
+﻿@using MVCWeb.Model.Models;
+@using System.Text.RegularExpressions;
+@{
+    Layout = null;
+    List<Blog> BlogList = ViewBag.BlogList as List<Blog>;
+}
+
+@foreach (Blog blog in BlogList)
+{
+    <div class="media">
+        <div class="media-left" href="#" style="padding-top: 10px">
+            <a><img src="@blog.Owner.AvatarUrl&s=48" alt="@blog.Owner.Name"></a>
+        </div>
+        <div class="media-body">
+            <div class="media-heading fs1"><a>@blog.Title</a></div>
+            @{ 
+                Regex reg = new Regex("<p>.+</p>");
+                MatchCollection mc = reg.Matches(blog.MDValue.Replace("<br>", " "));
+                string result = "";
+                for(int i = 0; i < mc.Count; i++)
+                {
+                    result += mc[i].Value.Replace("<p>","").Replace("</p>", "") + " ";
+                }
+                if(result.Length > 220)
+                {
+                    result = result.Substring(0, 220);
+                }
+            }
+            <div class="fs2" style="max-height: 35px; overflow: hidden">@Html.Raw("<p>" + result + "</p>")</div> 
+        </div>
+        <div>
+            <a>@blog.Owner.Name</a>
+        </div>
+    </div>
+    <hr />
+}
+<input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />

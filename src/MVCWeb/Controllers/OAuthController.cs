@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Net.Http;
 using Newtonsoft.Json;
-using MVCWeb.Assist;
 using MVCWeb.DataSvc.Svc;
 using MVCWeb.Model.Models;
 
@@ -23,12 +22,6 @@ namespace MVCWeb.Controllers
             }
             return PartialView();
         }
-
-        public ActionResult UserUpdate()
-        {
-            UpdateUserInfo(CurrentUser.LoginType, CurrentUser.GitHubAccessToken);
-            return RedirectToAction("Index", "Home");
-        }
         
         public ActionResult LogOut()
         {
@@ -42,11 +35,15 @@ namespace MVCWeb.Controllers
         }
 
         //更新当前用户信息
-        public void UpdateUserInfo(string loginType, string token)
+        public bool UpdateUserInfo(string loginType, string token)
         {
             if(loginType == "github")
             {
                 GitHubUser githubUser = GetGitHubUser(token);
+                if(githubUser.id == 0)
+                {
+                    return false;
+                }
                 NullUser user = NullUserDataSvc.GetByCondition(u => u.GitHubID == githubUser.id).FirstOrDefault();
                 if (user == null)
                 {
@@ -76,6 +73,7 @@ namespace MVCWeb.Controllers
                 HttpContext.WriteCookie("GLogin", githubUser.login, DateTime.Now.AddYears(3));
                 HttpContext.WriteCookie("GToken", user.GitHubAccessToken, DateTime.Now.AddYears(3));
             }
+            return true;
         }
 
         #region GitHub

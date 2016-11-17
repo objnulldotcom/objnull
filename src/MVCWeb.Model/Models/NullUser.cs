@@ -56,6 +56,6 @@ namespace MVCWeb.Model.Models
         /// <summary>
         /// 招募集合
         /// </summary>
-        public virtual ICollection<Recruit> Recruits { get; set; }
+        public virtual ICollection<Blog> Blogs { get; set; }
     }
 }

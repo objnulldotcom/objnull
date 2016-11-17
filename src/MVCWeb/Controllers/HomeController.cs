@@ -10,76 +10,50 @@ namespace MVCWeb.Controllers
 {
     public class HomeController : BaseController
     {
-        public IRecruitDataSvc RecruitDataSvc { get; set; }
+        public IBlogDataSvc BlogDataSvc { get; set; }
 
         public ActionResult Index()
         {
             return View();
         }
 
-        public ActionResult PostNew(int pt)
+        public ActionResult NewBlog()
         {
-            if(pt < 1 || pt > 5)
-            {
-                pt = 5;
-            }
-            switch (pt)
-            {
-                case 1:
-                    ViewBag.PostName = "发车";
-                    break;
-                case 2:
-                    ViewBag.PostName = "发车";
-                    break;
-                case 3:
-                    ViewBag.PostName = "发车";
-                    break;
-                case 4:
-                    ViewBag.PostName = "发车";
-                    break;
-                case 5:
-                    ViewBag.PostName = "MyTree";
-                    break;
-            }
-            ViewBag.PostType = pt;
             return View();
         }
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult PostNew(int pt, string title, string mdTxt, string mdValue)
+        public ActionResult NewBlog(int type, string title, string mdTxt, string mdValue)
         {
-            switch (pt)
-            {
-                case 1:
-                    Recruit rec = new Recruit();
-                    rec.Title = title;
-                    rec.MDText = mdTxt;
-                    rec.MDValue = mdValue;
-                    rec.OwnerID = CurrentUser.ID;
-                    RecruitDataSvc.Add(rec);
-                    break;
-                case 2:
-                    ViewBag.PostName = "发车";
-                    break;
-                case 3:
-                    ViewBag.PostName = "发车";
-                    break;
-                case 4:
-                    ViewBag.PostName = "发车";
-                    break;
-                case 5:
-                    ViewBag.PostName = "MyTree";
-                    break;
-            }
-            return Json(new { msg = "done", url = Url.Action("BCar") });
+            Blog nblog = new Blog();
+            nblog.Type = type;
+            nblog.Title = title;
+            nblog.MDText = mdTxt;
+            nblog.MDValue = mdValue;
+            nblog.OwnerID = CurrentUser.ID;
+            BlogDataSvc.Add(nblog);
+            return Json(new { msg = "done", url = Url.Action("BlogList") });
         }
 
-        public ActionResult BCar()
+        public ActionResult BlogList()
         {
+            ViewBag.Login = CurrentUser != null;
+            return View();
+        }
+        
+        [HttpPost]
+        public ActionResult BlogPage(int pageSize, int pageNum = 1)
+        {
+            int totalCount;
+            ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => true, u => u.InsertDate, true, out totalCount).ToList();
+            ViewBag.TotalCount = totalCount;
             return View();
         }
 
-
+        public ActionResult Error()
+        {
+            return View();
+        }
     }
 }

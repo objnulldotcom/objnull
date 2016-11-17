@@ -12,14 +12,14 @@ namespace MVCWeb.Model.DBContext
         }
     }
 
-    public class RecruitMapping : EntityTypeConfiguration<Recruit>
+    public class BlogMapping : EntityTypeConfiguration<Blog>
     {
-        public RecruitMapping()
+        public BlogMapping()
         {
-            ToTable("Recruit");
+            ToTable("Blog");
             HasKey(r => r.ID);
 
-            HasRequired(r => r.Owner).WithMany(n => n.Recruits).HasForeignKey(r => r.OwnerID);
+            HasRequired(r => r.Owner).WithMany(n => n.Blogs).HasForeignKey(r => r.OwnerID);
         }
     }
 }

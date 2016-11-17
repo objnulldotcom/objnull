@@ -1,0 +1,95 @@
+﻿@using MVCWeb.Redis.Models;
+@{
+    Layout = "~/Views/Shared/_LayoutM.cshtml";
+    ViewBag.Title = "Manage";
+    IEnumerable<ActionRule> Rules = ViewBag.ActionRules as IEnumerable<ActionRule>;
+    IEnumerable<Manager> Managers = ViewBag.Managers as IEnumerable<Manager>;
+}
+<h3>ActionRule</h3>
+<div class="row">
+    <form action="@Url.Action("AddActionRule", "Manager")" method="post">
+        <div class="col-md-4">
+            <input name="controller" class="form-control" type="text" placeholder="controller" />
+        </div>
+        <div class="col-md-4">
+            <input name="action" class="form-control" type="text" placeholder="action" />
+        </div>
+        <div class="col-md-3">
+            <input name="allow" class="form-control" type="text" placeholder="allow" />
+        </div>
+        <div class="col-md-1">
+            <input class="btn btn-default" type="submit" value="Add" />
+        </div>
+    </form>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Controller</th>
+                    <th>Action</th>
+                    <th>AllowRole</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            @if (Rules != null)
+            {
+                foreach (ActionRule rule in Rules)
+                {
+                    <tr>
+                        <td>@rule.Controller</td>
+                        <td>@rule.Action</td>
+                        <td>@rule.AllowRoles</td>
+                        <td><a href="@Url.Action("DeleteActionRule", "Manager", new { id = rule.ID.ToString() })">Delete</a></td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</div>
+<hr />
+<h3>Manager</h3>
+<div class="row">
+    <form action="@Url.Action("AddManager", "Manager")" method="post">
+        <div class="col-md-4">
+            <input name="key" class="form-control" type="text" placeholder="key" />
+        </div>
+        <div class="col-md-4">
+            <input name="value" class="form-control" type="text" placeholder="value" />
+        </div>
+        <div class="col-md-3">
+            <input name="role" class="form-control" type="text" placeholder="role" />
+        </div>
+        <div class="col-md-1">
+            <input class="btn btn-default" type="submit" value="Add" />
+        </div>
+    </form>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th>Role</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            @if (Managers != null)
+            {
+                foreach (Manager manager in Managers)
+                {
+                    <tr>
+                        <td>@manager.Key</td>
+                        <td>@manager.Value</td>
+                        <td>@manager.Role</td>
+                        <td><a href="@Url.Action("DeleteManager", "Manager", new { id = manager.ID.ToString() })">Delete</a></td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</div>
+

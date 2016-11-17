@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace MVCWeb.Assist
+namespace MVCWeb
 {
     public class GitHubAccessToken
     {
