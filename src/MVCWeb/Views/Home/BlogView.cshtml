@@ -1,0 +1,41 @@
+﻿@using MVCWeb.Model.Models
+@{
+    Blog Blog = ViewBag.Blog as Blog;
+    ViewBag.Title = Blog.Title + " - 象空";
+    Layout = "~/Views/Shared/_LayoutMain.cshtml";
+}
+@section head{
+    <script>
+        $(function () {
+            SetViewer("MDValue");
+        });
+    </script>
+    }
+<div class="row" style="padding-top: 15px">
+    <div id="MDTitle" class="col-md-10 fs1">
+        @Blog.Title
+    </div>
+    <div class="col-md-2 text-right">
+        @switch (Blog.Type)
+        {
+            case (int)EnumBlogType.姿势:
+                <span class="label label-primary" style="font-weight: 400">姿势</span>
+                break;
+            case (int)EnumBlogType.宣传:
+                <span class="label label-danger" style="font-weight: 400">宣传</span>
+                break;
+            case (int)EnumBlogType.心得:
+                <span class="label label-info" style="font-weight: 400">心得</span>
+                break;
+            case (int)EnumBlogType.科普:
+                <span class="label label-success" style="font-weight: 400">科普</span>
+                break;
+            case (int)EnumBlogType.搬运:
+                <span class="label label-warning" style="font-weight: 400">搬运</span>
+                break;
+        }
+    </div>
+    <div id="MDValue" class="col-md-12 mdv" style="padding-top: 15px">
+        @Html.Raw(Blog.MDValue)
+    </div>
+</div>

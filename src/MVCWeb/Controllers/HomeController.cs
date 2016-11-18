@@ -51,6 +51,12 @@ namespace MVCWeb.Controllers
             return View();
         }
 
+        public ActionResult BlogView(Guid id)
+        {
+            ViewBag.Blog = BlogDataSvc.GetByID(id);
+            return View();
+        }
+
         public ActionResult Error()
         {
             return View();

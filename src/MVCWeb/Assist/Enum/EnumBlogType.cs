@@ -7,7 +7,7 @@ namespace MVCWeb
 {
     public enum EnumBlogType
     {
-        无 = 0,
+        姿势 = 0,
         宣传 = 1,
         心得 = 2,
         科普 = 3,

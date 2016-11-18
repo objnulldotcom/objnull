@@ -258,6 +258,7 @@
     <Content Include="Views\Manager\Manage.cshtml" />
     <Content Include="Views\Home\Error.cshtml" />
     <Content Include="Views\Home\BlogPage.cshtml" />
+    <Content Include="Views\Home\BlogView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

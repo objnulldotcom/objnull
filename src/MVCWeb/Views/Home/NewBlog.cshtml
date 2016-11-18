@@ -45,11 +45,6 @@
                 UpateMDV();
             });
 
-            //点击图片时再重新加载viewer
-            $("#MDValue").click(function () {
-                SetViewer("MDValue");
-            });
-
             //阻止全局拖拽，使自定义区域拖拽上传生效
             $(document).bind("drop dragover", function (e) {
                 e.preventDefault();
@@ -81,6 +76,7 @@
                         var link = "![](http://" + window.location.host + "@Url.Action("DownloadImg", "File", new { pt = 2 })" + "&path=" + data.result.path + ")";
                         InsertAtCaret("TxtMD", link);
                         UpateMDV();
+                        SetViewer("MDValue");
                     }
                 },
                 fail: function (e, data) {
@@ -123,37 +119,63 @@
                     }
                 });
             });
+
+            //选择类型
+            $("#SltType").change(function () {
+                var selectText = $("#SltType").find("option:selected").text();
+                $("#LblBType").html(selectText);
+                var type = $("#SltType").val();
+                switch (type) {
+                    case "0":
+                        $("#LblBType").attr("class", "label label-primary");
+                        break;
+                    case "1":
+                        $("#LblBType").attr("class", "label label-danger");
+                        break;
+                    case "2":
+                        $("#LblBType").attr("class", "label label-info");
+                        break;
+                    case "3":
+                        $("#LblBType").attr("class", "label label-success");
+                        break;
+                    case "4":
+                        $("#LblBType").attr("class", "label label-warning");
+                        break;
+                }
+            });
         });
 
         function OpenFile() {
             $("#JqueryUpload").click();
         }
+
     </script>
 }
-<div class="row">
-    <div class="col-md-12">
-        <h3 id="MDTitle"></h3>
+<div class="row" style="padding-top: 15px">
+    <div id="MDTitle" class="col-md-10 fs1">
     </div>
-    <div id="MDValue" class="col-md-12 mdv">
-        
+    <div class="col-md-2 text-right">
+        <span id="LblBType" class="label label-primary" style="font-weight: 400">姿势</span>
+    </div>
+    <div id="MDValue" class="col-md-12 mdv" style="padding-top: 15px">
     </div>
 </div>
 <hr />
 <div class="row">
+    <div class="col-md-10">
+        <input id="TxtTitle" type="text" class="form-control" placeholder="标题" />
+    </div>
     <div class="col-md-2">
         <select id="SltType" class="form-control">
-            <option value="0" selected="selected">无</option>
+            <option value="0" selected="selected">姿势</option>
             <option value="1">宣传</option>
             <option value="2">心得</option>
             <option value="3">科普</option>
             <option value="4">搬运</option>
         </select>
     </div>
-    <div class="col-md-10">
-        <input id="TxtTitle" type="text" class="form-control" placeholder="标题" />
-    </div>
     <div class="col-md-12">
-        <span>查看&nbsp;<a href="" target="_blank">MarkDown语法</a>&nbsp;,&nbsp;</span>
+        <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法</a>&nbsp;,&nbsp;</span>
         <input id="JqueryUpload" class="uploader" type="file" name="upFile" data-url="@Url.Action("JqueryUploadImg", "File", new { pt = 2 })" style="display:none">
         <span>拖拽图片至文本框或<a href="javascript:;" onclick="OpenFile()">选择文件</a>上传 &nbsp;&nbsp;&nbsp;</span>
         <span id="UpPercent" style="color:#ff6a00"></span>

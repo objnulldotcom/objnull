@@ -1,4 +1,5 @@
-﻿@using MVCWeb.Model.Models;
+﻿@using MVCWeb;
+@using MVCWeb.Model.Models;
 @using System.Text.RegularExpressions;
 @{
     Layout = null;
@@ -8,30 +9,58 @@
 @foreach (Blog blog in BlogList)
 {
     <div class="media">
-        <div class="media-left" href="#" style="padding-top: 10px">
-            <a><img src="@blog.Owner.AvatarUrl&s=48" alt="@blog.Owner.Name"></a>
+        <div class="media-left">
+            <div style="height: 35px;padding-top: 2px;text-align: center;">
+                @{
+                    switch (blog.Type)
+                    {
+                        case (int)EnumBlogType.姿势:
+                            <span class="label label-primary" style="font-weight: 400">姿势</span>
+                            break;
+                        case (int)EnumBlogType.宣传:
+                            <span class="label label-danger" style="font-weight: 400">宣传</span>
+                            break;
+                        case (int)EnumBlogType.心得:
+                            <span class="label label-info" style="font-weight: 400">心得</span>
+                            break;
+                        case (int)EnumBlogType.科普:
+                            <span class="label label-success" style="font-weight: 400">科普</span>
+                            break;
+                        case (int)EnumBlogType.搬运:
+                            <span class="label label-warning" style="font-weight: 400">搬运</span>
+                            break;
+                    }
+                }
+            </div>
+            <a><img src="@blog.Owner.AvatarUrl&s=48" alt="@blog.Owner.Name" title="@blog.Owner.Name"></a>
         </div>
         <div class="media-body">
-            <div class="media-heading fs1"><a>@blog.Title</a></div>
-            @{ 
+            <div class="media-heading fs1"><a href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank">@blog.Title</a></div>
+            @{
+                Regex img = new Regex("<img.+>");
+                blog.MDValue = img.Replace(blog.MDValue, "");
                 Regex reg = new Regex("<p>.+</p>");
                 MatchCollection mc = reg.Matches(blog.MDValue.Replace("<br>", " "));
                 string result = "";
-                for(int i = 0; i < mc.Count; i++)
+                for (int i = 0; i < mc.Count; i++)
                 {
-                    result += mc[i].Value.Replace("<p>","").Replace("</p>", "") + " ";
-                }
-                if(result.Length > 220)
-                {
-                    result = result.Substring(0, 220);
+                    string ptxt = mc[i].Value.Replace("<p>", "").Replace("</p>", "");
+                    if (System.Text.Encoding.Default.GetBytes(result + ptxt).Length > 380)
+                    {
+                        result = result.TrimEnd() + "……";
+                        break;
+                    }
+                    result += ptxt + " ";
                 }
             }
-            <div class="fs2" style="max-height: 35px; overflow: hidden">@Html.Raw("<p>" + result + "</p>")</div> 
-        </div>
-        <div>
-            <a>@blog.Owner.Name</a>
+            <div class="fs2" style="height: 35px; overflow: hidden">@Html.Raw("<p>" + result + "</p>")</div>
+            <div class="fs2" style="padding-top:2px">
+                <span class="glyphicon glyphicon-time"></span>@blog.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;
+                <span class="glyphicon glyphicon-eye-open"></span>123&nbsp;
+                <span class="glyphicon glyphicon-comment"></span>54 post by&nbsp;
+                <a>@blog.Owner.Name</a>
+            </div>
         </div>
     </div>
-    <hr />
-}
+                }
 <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
