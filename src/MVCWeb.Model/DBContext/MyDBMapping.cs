@@ -8,7 +8,7 @@ namespace MVCWeb.Model.DBContext
         public NullUserMapping()
         {
             ToTable("NullUser");
-            HasKey(n => n.ID);
+            HasKey(that => that.ID);
         }
     }
 
@@ -17,9 +17,33 @@ namespace MVCWeb.Model.DBContext
         public BlogMapping()
         {
             ToTable("Blog");
-            HasKey(r => r.ID);
+            HasKey(it => it.ID);
 
-            HasRequired(r => r.Owner).WithMany(n => n.Blogs).HasForeignKey(r => r.OwnerID);
+            HasRequired(it => it.Owner).WithMany(that => that.Blogs).HasForeignKey(it => it.OwnerID);
+        }
+    }
+
+    public class BlogCommentMapping : EntityTypeConfiguration<BlogComment>
+    {
+        public BlogCommentMapping()
+        {
+            ToTable("BlogComment");
+            HasKey(it => it.ID);
+
+            HasRequired(it => it.Owner).WithMany(that => that.BlogComments).HasForeignKey(it => it.OwnerID);
+            HasRequired(it => it.Blog).WithMany(that => that.BlogComments).HasForeignKey(it => it.BlogID);
+        }
+    }
+
+    public class BlogCommentReplyMapping : EntityTypeConfiguration<BlogCommentReply>
+    {
+        public BlogCommentReplyMapping()
+        {
+            ToTable("BlogCommentReply");
+            HasKey(it => it.ID);
+
+            HasRequired(it => it.Owner).WithMany(that => that.BlogCommentReplys).HasForeignKey(it => it.OwnerID);
+            HasRequired(it => it.BlogComment).WithMany(that => that.BlogCommentReplys).HasForeignKey(it => it.BlogCommentID);
         }
     }
 }

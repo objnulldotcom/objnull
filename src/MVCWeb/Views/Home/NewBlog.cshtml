@@ -85,12 +85,6 @@
                 }
             });
 
-            //获取字节数
-            function getBt(str) {
-                var char = str.replace(/[^\x00-\xff]/g, '**');
-                return char.length;
-            }
-
             //发布
             $("#BtnConfirm").click(function () {
                 var title = $("#TxtTitle").val();

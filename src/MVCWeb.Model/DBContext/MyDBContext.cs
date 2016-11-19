@@ -26,6 +26,8 @@ namespace MVCWeb.Model.DBContext
             //表映射
             modelBuilder.Configurations.Add(new NullUserMapping());
             modelBuilder.Configurations.Add(new BlogMapping());
+            modelBuilder.Configurations.Add(new BlogCommentMapping());
+            modelBuilder.Configurations.Add(new BlogCommentReplyMapping());
         }
     }
 }

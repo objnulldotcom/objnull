@@ -54,8 +54,18 @@ namespace MVCWeb.Model.Models
         public DateTime InsertDate { get; set; }
 
         /// <summary>
-        /// 招募集合
+        /// 姿势集合
         /// </summary>
         public virtual ICollection<Blog> Blogs { get; set; }
+
+        /// <summary>
+        /// 姿势评论集合
+        /// </summary>
+        public virtual ICollection<BlogComment> BlogComments { get; set; }
+
+        /// <summary>
+        /// 姿势评论回复集合
+        /// </summary>
+        public virtual ICollection<BlogCommentReply> BlogCommentReplys { get; set; }
     }
 }

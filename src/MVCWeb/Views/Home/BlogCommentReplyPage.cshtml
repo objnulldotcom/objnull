@@ -1,0 +1,31 @@
+﻿@using MVCWeb.Model.Models
+@{
+    List<BlogCommentReply> CommentReplyList = ViewBag.BlogCommentReplyList as List<BlogCommentReply>;
+}
+
+@if (CommentReplyList.Count > 0)
+{
+    foreach (BlogCommentReply reply in CommentReplyList)
+    {
+        <div class="ReplyBar col-md-12">
+            <div class="col-md-12">
+                <a><img src="@reply.Owner.AvatarUrl&s=32" alt="@reply.Owner.Name" title="@reply.Owner.Name"></a>
+                <p>@reply.Content</p>
+            </div>
+            <div class="col-md-12">
+                <a>@reply.Owner.Name</a>
+                <span class="fs2"> at <span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToString("yyyy-MM-dd HH:MM")</span>
+                <button id="BtnReply" type="button" class="btn btn-default btn-xs" style="display:none">
+                    <span class="glyphicon glyphicon-comment"></span> 回复
+                </button>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="col-md-12 text-center">
+        添加回复
+    </div>
+}
+<input type="hidden" id="CommentTotalCount" value="@ViewBag.TotalCount" />

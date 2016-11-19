@@ -50,6 +50,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\BaseDataSvc.cs" />
+    <Compile Include="Svc\BlogCommentDataSvc.cs" />
+    <Compile Include="Svc\BlogCommentReplyDataSvc.cs" />
     <Compile Include="Svc\BlogDataSvc.cs" />
     <Compile Include="Svc\NullUserDataSvc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

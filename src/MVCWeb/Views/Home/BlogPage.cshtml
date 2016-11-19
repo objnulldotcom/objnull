@@ -35,9 +35,9 @@
             <a><img src="@blog.Owner.AvatarUrl&s=48" alt="@blog.Owner.Name" title="@blog.Owner.Name"></a>
         </div>
         <div class="media-body">
-            <div class="media-heading fs1"><a href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank">@blog.Title</a></div>
+            <div class="media-heading fs1"><a href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank" style="text-decoration:none">@blog.Title</a></div>
             @{
-                Regex img = new Regex("<img.+>");
+                Regex img = new Regex("<img.+>\n*");
                 blog.MDValue = img.Replace(blog.MDValue, "");
                 Regex reg = new Regex("<p>.+</p>");
                 MatchCollection mc = reg.Matches(blog.MDValue.Replace("<br>", " "));
@@ -55,12 +55,13 @@
             }
             <div class="fs2" style="height: 35px; overflow: hidden">@Html.Raw("<p>" + result + "</p>")</div>
             <div class="fs2" style="padding-top:2px">
+                <a>@blog.Owner.Name</a> post at&nbsp;
                 <span class="glyphicon glyphicon-time"></span>@blog.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;
                 <span class="glyphicon glyphicon-eye-open"></span>123&nbsp;
-                <span class="glyphicon glyphicon-comment"></span>54 post by&nbsp;
-                <a>@blog.Owner.Name</a>
+                <span class="glyphicon glyphicon-comment"></span>54&nbsp;
+                <span class="glyphicon glyphicon-thumbs-up"></span>10
             </div>
         </div>
     </div>
-                }
+}
 <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
