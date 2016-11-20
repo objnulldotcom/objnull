@@ -88,11 +88,27 @@ namespace MVCWeb.Controllers
         }
 
         [HttpPost]
+        public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt)
+        {
+            BlogCommentReply reply = new BlogCommentReply();
+            reply.BlogCommentID = commentID;
+            reply.Content = txt;
+            reply.ToUserID = toUserID;
+            reply.OwnerID = CurrentUser.ID;
+            BlogCommentReplyDataSvc.Add(reply);
+            BlogComment comment = BlogCommentDataSvc.GetByID(commentID);
+            comment.ReplyCount += 1;
+            BlogCommentDataSvc.Update(comment);
+            return Json(new { msg = "done" });
+        }
+
+        [HttpPost]
         public ActionResult BlogCommentReplyPage(Guid commentID, int pageSize, int pageNum = 1)
         {
             int totalCount;
             ViewBag.BlogCommentReplyList = BlogCommentReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogCommentID == commentID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
+            ViewBag.CommentID = commentID;
             return View();
         }
 

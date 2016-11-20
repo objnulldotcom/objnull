@@ -98,6 +98,9 @@
                         $("html,body").animate({ scrollTop: $("#Status").offset().top }, 300)
                     }
                     FirstLoad = false;
+                    if ($("#CommentTotalCount").val() == "0") {
+                        return;
+                    }
                     $("#Pager").pagination({
                         items: $("#CommentTotalCount").val(),
                         itemsOnPage: pageSize,
@@ -114,13 +117,101 @@
             });
         }
 
-        //$(".ReplyBar").each(function () {
-        //    $(this).hover(function () {
-        //        $(this).find("button").show();
-        //    }, function () {
-        //        $(this).find("button").hide();
-        //    });
-        //});
+        //显示回复
+        function ShowReply(id) {
+            if ($("#ShowReply" + id).html() == "收起回复") {
+                $("#ReplyBox" + id).hide();
+                var recount = $("#ShowReply" + id).attr("recount");
+                if (recount == "0") {
+                    $("#ShowReply" + id).html("回复");
+                } else {
+                    $("#ShowReply" + id).html(recount + "条回复");
+                }
+            } else {
+                $("#ReplyBox" + id).show();
+                $("#ShowReply" + id).html("收起回复");
+                if ($("#Replys" + id).html() == "") {
+                    GetCommentReplyPage(1, id);
+                }
+            }
+        }
+
+        //添加回复
+        function AddReply(id) {
+            var txt = $("#ReplyTxt" + id).val();
+            var toUser = $("#ReplyTxt" + id).attr("touser");
+            if (txt.length == 0) {
+                swal("请填写回复内容");
+                return;
+            }
+            if (getBt(txt) > 400) {
+                swal("评论最多400字节，当前" + getBt(txt) + "字节");
+                return;
+            }
+            $.ajax({
+                url: "@Url.Action("AddBlogCommentReply", "Home")",
+                data: { commentID: id, toUserID: toUser, txt: txt },
+                type: "post",
+                success: function (result) {
+                    if (result.msg == "done") {
+                        GetCommentReplyPage(99999, id);
+                        $("#ReplyTxt" + id).val("");
+                    } else {
+                        swal(result.msg);
+                    }
+                }
+            });
+        }
+
+        //获取评论回复
+        function GetCommentReplyPage(index, commentID) {
+            var pageSize = 5;
+            var postData = { commentID: commentID, pageSize: pageSize, pageNum: index }
+            $.ajax({
+                url: "@Url.Action("BlogCommentReplyPage", "Home")",
+                type: "Post",
+                data: postData,
+                success: function (result) {
+                    $("#Replys" + commentID).html(result);
+                    if ($("#ReplyTotalCount" + commentID).val() == "0") {
+                        return;
+                    }
+                    $(".ReplyBar").each(function () {
+                        $(this).hover(function () {
+                            $(this).find("#BtnReply").show();
+                        }, function () {
+                            $(this).find("#BtnReply").hide();
+                        });
+                    });
+                    $("#ReplyPager" + commentID).pagination({
+                        items: $("#ReplyTotalCount" + commentID).val(),
+                        itemsOnPage: pageSize,
+                        currentPage: index,
+                        prevText: "<",
+                        nextText: ">",
+                        listStyle: "pagination pagination-sm",
+                        hrefTextPrefix: "javascript:;",
+                        onPageClick: function (pageNumber, event) {
+                            GetCommentReplyPage(pageNumber, commentID);
+                        }
+                    });
+                }
+            });
+        }
+
+        //回复指定用户
+        function ReplyToUser(commentID, userName, userID) {
+            $("#ReplyToUser" + commentID).html("@@" + userName);
+            $("#ReplyTxt" + commentID).attr("touser", userID);
+            $("#DefaultUser" + commentID).show();
+        }
+
+        //回复默认用户
+        function ReplyDefault(commentID, defaultName, defaultID) {
+            $("#ReplyToUser" + commentID).html("@@" + defaultName);
+            $("#ReplyTxt" + commentID).attr("touser", defaultID);
+            $("#DefaultUser" + commentID).hide();
+        }
     </script>
 }
 <div class="row" style="padding-top: 15px">

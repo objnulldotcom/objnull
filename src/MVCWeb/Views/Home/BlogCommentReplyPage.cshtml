@@ -3,29 +3,19 @@
     List<BlogCommentReply> CommentReplyList = ViewBag.BlogCommentReplyList as List<BlogCommentReply>;
 }
 
-@if (CommentReplyList.Count > 0)
+@foreach (BlogCommentReply reply in CommentReplyList)
 {
-    foreach (BlogCommentReply reply in CommentReplyList)
-    {
-        <div class="ReplyBar col-md-12">
-            <div class="col-md-12">
-                <a><img src="@reply.Owner.AvatarUrl&s=32" alt="@reply.Owner.Name" title="@reply.Owner.Name"></a>
-                <p>@reply.Content</p>
-            </div>
-            <div class="col-md-12">
-                <a>@reply.Owner.Name</a>
-                <span class="fs2"> at <span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToString("yyyy-MM-dd HH:MM")</span>
-                <button id="BtnReply" type="button" class="btn btn-default btn-xs" style="display:none">
-                    <span class="glyphicon glyphicon-comment"></span> 回复
-                </button>
-            </div>
+    <div class="ReplyBar col-md-12 fs2">
+        <div style="float:left;">
+            <a><img src="@reply.Owner.AvatarUrl&s=32" alt="@reply.Owner.Name" title="@reply.Owner.Name"></a>
         </div>
-    }
-}
-else
-{
-    <div class="col-md-12 text-center">
-        添加回复
+        <div style="padding-left:40px">
+            <span>
+                <a>@reply.Owner.Name</a>回复<a>@reply.ToUser.Name</a> at @reply.InsertDate.ToString("yyyy-MM-dd HH:mm")
+                <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser('@reply.BlogCommentID', '@reply.Owner.Name', '@reply.Owner.ID')">回复</a>
+            </span>
+            <p>@reply.Content</p>
+        </div>
     </div>
 }
-<input type="hidden" id="CommentTotalCount" value="@ViewBag.TotalCount" />
+<input type="hidden" id="ReplyTotalCount@(ViewBag.CommentID)" value="@ViewBag.TotalCount" />
