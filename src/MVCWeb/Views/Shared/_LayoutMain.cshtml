@@ -20,6 +20,9 @@
     <!--SweetAlert-->
     <link href="~/Scripts/SweetAlert/sweetalert.css" rel="stylesheet" />
     <script src="~/Scripts/SweetAlert/sweetalert.min.js"></script>
+    <!--SignalR-->
+    <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script src="~/signalr/hubs"></script>
     <script>
         var viewer;
         //设置图片查看器
@@ -34,6 +37,42 @@
             var char = str.replace(/[^\x00-\xff]/g, '**');
             return char.length;
         }
+        //更新消息数量
+        function UpdateMsgCount() {
+            $.ajax({
+                url: "@Url.Action("GetMsgCount", "Home")",
+                type: "get",
+                data: { userID: $("#CurrentUserID").val() },
+                success: function (result) {
+                    $("#MsgCount").html(result);
+                }
+            });
+        }
+        //发送更新消息
+        function SendNewMsg(id) {
+            MsgHub.server.sendToUser(id, "NewMsg");
+        }
+
+        var MsgHub;
+        //SignalR
+        $(function () {
+            if ($("#CurrentUserID") == null) {
+                return;
+            }
+            MsgHub = $.connection.MsgHub;
+            MsgHub.client.addNewMessage = function (message) {
+                if (message == "NewMsg") {
+                    UpdateMsgCount();
+                }
+            };
+            $.connection.hub.start().done(function () {
+                
+            });
+
+            $("#BtnMsg").click(function () {
+
+            });
+        });
     </script>
     @RenderSection("head", false)
 </head>
@@ -53,7 +92,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="@Url.Action("BlogList", "Home")">涨姿势</a></li>
-                    <li><a href="@Url.Action("BCar", "Home")">TreeNewBee</a></li>
+                    @*<li><a href="@Url.Action("BCar", "Home")">TreeNewBee</a></li>*@
                     @*<li><a href="@Url.Action("BCar", "Home")">问答</a></li>
                     <li><a href="@Url.Action("BCar", "Home")">笔记</a></li>*@
                 </ul>

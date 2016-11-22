@@ -11,7 +11,7 @@
                 @Html.Raw(comment.MDValue)
             </div>
             <div class="col-md-12" style="line-height: 32px;margin-top: -10px">
-                <a><img src="@comment.Owner.AvatarUrl&s=32" alt="@comment.Owner.Name" title="@comment.Owner.Name"></a>
+                <a><img src="@comment.Owner.AvatarUrl&s=32" style="max-width: 32px" alt="@comment.Owner.Name" title="@comment.Owner.Name"></a>
                 <a>@comment.Owner.Name</a>
                 <span class="fs2"> at <span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToString("yyyy-MM-dd HH:MM")</span>
                 <a id="ShowReply@(comment.ID)" href="javascript:;" style="text-decoration:none" onclick="ShowReply('@comment.ID')" recount="@comment.ReplyCount">

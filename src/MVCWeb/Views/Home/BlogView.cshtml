@@ -75,6 +75,7 @@
                             $("#CmtTxt").val("");
                             $("#BtnCmt").click();
                             $("#CommentBox").hide();
+                            SendNewMsg("@Blog.OwnerID");
                         } else {
                             swal(result.msg);
                         }
@@ -165,7 +166,7 @@
 
         //获取评论回复
         function GetCommentReplyPage(index, commentID) {
-            var pageSize = 5;
+            var pageSize = 10;
             var postData = { commentID: commentID, pageSize: pageSize, pageNum: index }
             $.ajax({
                 url: "@Url.Action("BlogCommentReplyPage", "Home")",

@@ -52,6 +52,8 @@
     <Compile Include="Base\MyRedisDB.cs" />
     <Compile Include="Base\MyRedisDBFactory.cs" />
     <Compile Include="Base\MyRedisKeys.cs" />
+    <Compile Include="Models\NewBCRMsg.cs" />
+    <Compile Include="Models\NewBCMsg.cs" />
     <Compile Include="Models\Manager.cs" />
     <Compile Include="Models\ActionRule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

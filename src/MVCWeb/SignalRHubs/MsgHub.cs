@@ -7,12 +7,17 @@ using Microsoft.AspNet.SignalR.Hubs;
 
 namespace MVCWeb.SignalRHubs
 {
-    [HubName("ChatHub")]
-    public class ChatHub : Hub
+    [HubName("MsgHub")]
+    public class MsgHub : Hub
     {
         public void Send(string msg)
         {
             Clients.All.addNewMessage(msg);
+        }
+
+        public void SendToUser(string userID, string msg)
+        {
+            Clients.User(userID).addNewMessage(msg);
         }
     }
 }

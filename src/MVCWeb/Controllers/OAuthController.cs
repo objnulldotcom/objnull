@@ -7,18 +7,22 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using MVCWeb.DataSvc.Svc;
 using MVCWeb.Model.Models;
+using MVCWeb.Redis.Base;
+using MVCWeb.Redis.Models;
 
 namespace MVCWeb.Controllers
 {
     public class OAuthController : BaseController
     {
         public INullUserDataSvc NullUserDataSvc { get; set; }
+        public IMyRedisDB MyRedisDB { get; set; }
 
         public ActionResult UserInfo()
         {
             if (CurrentUser != null)
             {
                 ViewBag.User = CurrentUser;
+                ViewBag.MsgCount = MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID) + MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_NewBCRMsg + CurrentUser.ID);
             }
             return PartialView();
         }
@@ -34,12 +38,12 @@ namespace MVCWeb.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //更新当前用户信息
+        //添加用户或更新用户信息
         public bool UpdateUserInfo(string loginType, string token)
         {
             if(loginType == "github")
             {
-                GitHubUser githubUser = GetGitHubUser(token);
+                GitHubUser githubUser = GitHub.GetGitHubUser(token);
                 if(githubUser.id == 0)
                 {
                     return false;
@@ -102,18 +106,6 @@ namespace MVCWeb.Controllers
             UpdateUserInfo("github", token.access_token);
 
             return RedirectToAction("Index", "Home");
-        }
-
-        public GitHubUser GetGitHubUser(string token)
-        {
-            string userInfo;
-            using (HttpClient hc = new HttpClient())
-            {
-                hc.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko");
-                HttpResponseMessage response = hc.GetAsync("https://api.github.com/user?access_token=" + token).Result;
-                userInfo = response.Content.ReadAsStringAsync().Result;
-            }
-            return JsonConvert.DeserializeObject<GitHubUser>(userInfo);
         }
 
         #endregion

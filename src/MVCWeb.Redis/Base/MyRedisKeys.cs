@@ -10,7 +10,7 @@ namespace MVCWeb.Redis.Base
     {
         public const string ActionRules = "ActionRules";
         public const string Managers = "Managers";
-        public const string HtmlAbout = "HtmlAbout";
-        public const string MDAbout = "MDAbout";
+        public const string Pre_NewBCMsg = "NewBCMsg";
+        public const string Pre_NewBCRMsg = "NewBCRMsg";
     }
 }

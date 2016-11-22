@@ -5,17 +5,30 @@ using System.Web;
 using System.Web.Mvc;
 using MVCWeb.Model.Models;
 using MVCWeb.DataSvc.Svc;
+using MVCWeb.Redis.Base;
+using MVCWeb.Redis.Models;
 
 namespace MVCWeb.Controllers
 {
     public class HomeController : BaseController
     {
+        public INullUserDataSvc NullUserDataSvc { get; set; }
         public IBlogDataSvc BlogDataSvc { get; set; }
         public IBlogCommentDataSvc BlogCommentDataSvc { get; set; }
         public IBlogCommentReplyDataSvc BlogCommentReplyDataSvc { get; set; }
+        public IMyRedisDB MyRedisDB { get; set; }
 
         public ActionResult Index()
         {
+            return View();
+        }
+
+        public ActionResult UserProfile(string id = null)
+        {
+            Guid userID = id == null ? CurrentUser.ID : Guid.Parse(id);
+            NullUser user = NullUserDataSvc.GetByID(userID);
+            ViewBag.GitHubUser = GitHub.GetGitHubUserByName(user.GitHubLogin);
+            ViewBag.Token = CurrentUser.GitHubAccessToken;
             return View();
         }
 
@@ -75,6 +88,26 @@ namespace MVCWeb.Controllers
             Blog blog = BlogDataSvc.GetByID(blogID);
             blog.CommentCount += 1;
             BlogDataSvc.Update(blog);
+
+            string key = MyRedisKeys.Pre_NewBCMsg + blog.OwnerID;
+            NewBCMsg bcmsg = MyRedisDB.GetSet<NewBCMsg>(key).Where(m => m.BlogID == blogID).FirstOrDefault();
+            if(bcmsg != null)
+            {
+                MyRedisDB.SetRemove(key, bcmsg);
+                bcmsg.Count += 1;
+                MyRedisDB.SetAdd(key, bcmsg);
+            }
+            else
+            {
+                bcmsg = new NewBCMsg();
+                bcmsg.BlogID = blogID;
+                bcmsg.Count = 1;
+                bcmsg.Date = DateTime.Now;
+                bcmsg.Page = blog.CommentCount % 10 + 1;
+                bcmsg.Title = blog.Title.Substring(0, 20);
+                MyRedisDB.SetAdd(key, bcmsg);
+            }
+
             return Json(new { msg = "done" });
         }
 
@@ -113,6 +146,11 @@ namespace MVCWeb.Controllers
         }
 
         #endregion
+
+        public string GetMsgCount()
+        {
+            return (MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID) + MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_NewBCRMsg + CurrentUser.ID)).ToString();
+        }
 
         public ActionResult Error()
         {

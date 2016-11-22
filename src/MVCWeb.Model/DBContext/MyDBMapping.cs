@@ -44,6 +44,7 @@ namespace MVCWeb.Model.DBContext
 
             HasRequired(it => it.Owner).WithMany(that => that.BlogCommentReplys).HasForeignKey(it => it.OwnerID);
             HasRequired(it => it.BlogComment).WithMany(that => that.BlogCommentReplys).HasForeignKey(it => it.BlogCommentID);
+            HasRequired(it => it.ToUser).WithMany(that => that.ReceivedBlogCommentReplys).HasForeignKey(it => it.ToUserID);
         }
     }
 }

@@ -49,5 +49,6 @@ namespace MVCWeb.Redis.Base
         {
             RedisDB.SetRemove(key, JsonConvert.SerializeObject(obj));
         }
+        
     }
 }

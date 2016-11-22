@@ -29,7 +29,7 @@ namespace MVCWeb
         public string blog { get; set; }
         public string location { get; set; }
         public string email { get; set; }
-        public bool hireable { get; set; }
+        public bool? hireable { get; set; }
         public string bio { get; set; }
         public int public_repos { get; set; }
         public int public_gists { get; set; }

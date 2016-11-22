@@ -228,6 +228,7 @@
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="Assist\BaseController.cs" />
     <Compile Include="Assist\Enum\EnumBlogType.cs" />
+    <Compile Include="Assist\OAuth\GitHub.cs" />
     <Compile Include="Assist\OAuth\GitHubAccessToken.cs" />
     <Compile Include="Assist\OAuth\GitHubUser.cs" />
     <Compile Include="Assist\Principals.cs" />
@@ -241,7 +242,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SignalRHubs\ChatHub.cs" />
+    <Compile Include="SignalRHubs\MsgHub.cs" />
+    <Compile Include="SignalRHubs\MyUserIdProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />
@@ -261,6 +263,7 @@
     <Content Include="Views\Home\BlogView.cshtml" />
     <Content Include="Views\Home\BlogCommentPage.cshtml" />
     <Content Include="Views\Home\BlogCommentReplyPage.cshtml" />
+    <Content Include="Views\Home\UserProfile.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

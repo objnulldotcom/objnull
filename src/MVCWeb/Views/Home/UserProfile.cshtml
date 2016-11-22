@@ -1,0 +1,53 @@
+﻿@using MVCWeb;
+@{
+    ViewBag.Title = "我的主页 - 象空";
+    Layout = "~/Views/Shared/_LayoutMain.cshtml";
+    GitHubUser guser = ViewBag.GitHubUser as GitHubUser;
+}
+@section head{
+    <script>
+        $(function () {
+            $("#BtnFollow").click(function () {
+                var atype = "";
+                if ($("#BtnFollow").html() == "关注") {
+                    atype = "put";
+                } else {
+                    atype = "delete";
+                }
+                $("#BtnFollow").attr("disabled", true);
+                $.ajax({
+                    url: "https://api.github.com/user/following/@(guser.login)?access_token=@(ViewBag.Token)",
+                    type: atype,
+                    success: function (result) {
+                        if ($("#BtnFollow").html() == "关注") {
+                            $("#BtnFollow").html("取消关注");
+                        } else {
+                            $("#BtnFollow").html("关注");
+                        }
+                        $("#BtnFollow").attr("disabled", false);
+                    }
+                });
+            });
+        });
+    </script>
+}
+<div class="row" style="margin-top: 24px">
+    <div class="col-md-3 mdv">
+        <a><img src="@guser.avatar_url&s=300" class="img-rounded" /></a>
+        <div class="fs1" style="margin-top: 16px; font-size:26px">@guser.name</div>
+        <div style="font-size:20px; color:#666">@guser.login</div>
+        <div style="margin-top: 16px; color:#666">@guser.bio</div>
+        <div style="margin-top: 16px; border-top:1px solid #e5e5e5">
+            <a class="btn btn-default" href="@guser.html_url" target="_blank">查看Github</a>
+            <button id="BtnFollow" class="btn btn-default">关注</button>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <ul class="nav nav-pills nav-justified">
+            <li role="presentation" class="active"><a href="#">总览</a></li>
+            <li role="presentation"><a href="#">Word 姿势</a></li>
+            <li role="presentation"><a href="#">Word NewBee</a></li>
+            <li role="presentation"><a href="#">Word 收藏</a></li>
+        </ul>
+    </div>
+</div>
