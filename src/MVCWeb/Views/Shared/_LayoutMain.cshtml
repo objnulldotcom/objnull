@@ -23,20 +23,6 @@
     <!--SignalR-->
     <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
     <script src="~/signalr/hubs"></script>
-    <style>
-        .msgBox {
-            width: 300px;
-            height: 300px;
-            position: absolute;
-            top: 52px;
-            left: -225px;
-            background-color: #fff;
-            border-left: 1px solid #e7e7e7;
-            border-right: 1px solid #e7e7e7;
-            border-bottom: 1px solid #e7e7e7;
-            display:none;
-        }
-    </style>
     <script>
         var viewer;
         //设置图片查看器
@@ -98,7 +84,7 @@
         //SignalR
         $(function () {
             //未登录不初始化signalr及消息相关事件
-            if ($("#CurrentUserID") == "") {
+            if ($("#CurrentUserID").val() == "") {
                 return;
             }
             MsgHub = $.connection.MsgHub;

@@ -225,7 +225,7 @@
     <Compile Include="App_Start\Autofac.cs" />
     <Compile Include="App_Start\Filters.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="App_Start\Startup.cs" />
+    <Compile Include="SignalRHubs\Startup.cs" />
     <Compile Include="Assist\BaseController.cs" />
     <Compile Include="Assist\Enum\EnumBlogType.cs" />
     <Compile Include="Assist\OAuth\GitHub.cs" />

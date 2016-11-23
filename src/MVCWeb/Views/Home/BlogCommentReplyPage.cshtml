@@ -12,11 +12,11 @@
         <div style="padding-left:40px">
             <span>
                 <a>@reply.Owner.Name</a>回复<a>@reply.ToUser.Name</a> at @reply.InsertDate.ToString("yyyy-MM-dd HH:mm")
-                <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser('@reply.BlogCommentID', '@reply.Owner.Name', '@reply.Owner.ID')">回复</a>
+                <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.Floor, '@reply.Owner.Name', '@reply.Owner.ID')">回复</a>
             </span>
             <p>@reply.Content</p>
         </div>
     </div>
 }
-<input type="hidden" id="ReplyTotalCount@(ViewBag.CommentID)" value="@ViewBag.TotalCount" />
-<input type="hidden" id="ReplyCurrentPage@(ViewBag.CommentID)" value="@ViewBag.CurrentPage" />
+<input type="hidden" id="ReplyTotalCount@(ViewBag.Floor)" value="@ViewBag.TotalCount" />
+<input type="hidden" id="ReplyCurrentPage@(ViewBag.Floor)" value="@ViewBag.CurrentPage" />

@@ -4,17 +4,19 @@
 }
 @if (CommentList.Count > 0)
 {
+    int i = 1;
     foreach (BlogComment comment in CommentList)
     {
+        string userName = string.IsNullOrEmpty(comment.Owner.Name) ? comment.Owner.GitHubLogin : comment.Owner.Name;
         <div class="row">
-            <div id="Comment@(comment.ID)" class="col-md-12">
+            <div id="Comment@(i)" class="col-md-12" cmid="@comment.ID">
                 @Html.Raw(comment.MDValue)
             </div>
             <div class="col-md-12" style="line-height: 32px;margin-top: -10px">
-                <a><img src="@comment.Owner.AvatarUrl&s=32" style="max-width: 32px" alt="@comment.Owner.Name" title="@comment.Owner.Name"></a>
-                <a>@comment.Owner.Name</a>
+                <a><img src="@comment.Owner.AvatarUrl&s=32" style="max-width: 32px" alt="@userName"></a>
+                <a>@userName</a>
                 <span class="fs2"> at <span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToString("yyyy-MM-dd HH:mm")</span>
-                <a id="ShowReply@(comment.ID)" href="javascript:;" style="text-decoration:none" onclick="ShowReply('@comment.ID', 1)" recount="@comment.ReplyCount">
+                <a id="ShowReply@(i)" href="javascript:;" style="text-decoration:none" onclick="ShowReply('@i', 1)" recount="@comment.ReplyCount">
                     @if (comment.ReplyCount > 0)
                     { @Html.Raw(comment.ReplyCount + "条回复") }
                     else
@@ -22,21 +24,21 @@
                 </a>
             </div>
         </div>
-        <div id="ReplyBox@(comment.ID)" class="row" style="padding-left: 40px; display:none;margin-top:10px">
-            <div id="Replys@(comment.ID)"></div>
-            <div id="ReplyPager@(comment.ID)" class="col-md-12 text-center" style="margin: -15px 0px">
+        <div id="ReplyBox@(i)" class="row" style="padding-left: 40px; display:none;margin-top:10px">
+            <div id="Replys@(i)"></div>
+            <div id="ReplyPager@(i)" class="col-md-12 text-center" style="margin: -15px 0px">
             </div>
             <div class="col-md-11">
                 <div class="input-group">
                     <div class="input-group-addon">
-                        <span id="ReplyToUser@(comment.ID)">@@@comment.Owner.Name </span>
-                        <a id="DefaultUser@(comment.ID)" href="javascript:;" style="display:none" onclick="ReplyDefault('@comment.ID','@comment.Owner.Name','@comment.Owner.ID')"><span class="badge">x</span></a>
+                        <span id="ReplyToUser@(i)">@@@comment.Owner.Name </span>
+                        <a id="DefaultUser@(i)" href="javascript:;" style="display:none" onclick="ReplyDefault(@i,'@comment.Owner.Name','@comment.Owner.ID')"><span class="badge">x</span></a>
                     </div>
-                    <input id="ReplyTxt@(comment.ID)" type="text" class="form-control" touser="@comment.OwnerID" />
+                    <input id="ReplyTxt@(i)" type="text" class="form-control" touser="@comment.OwnerID" />
                 </div>
             </div>
             <div class="col-md-1">
-                <button class="btn btn-default" onclick="AddReply('@comment.ID')">确定</button>
+                <button class="btn btn-default" onclick="AddReply(@i)">确定</button>
             </div>
         </div>
         <div class="row">
@@ -44,6 +46,7 @@
                 <hr style="border: 1px dotted #eee; margin: 10px" />
             </div>
         </div>
+        i++;
     }
 }
 else

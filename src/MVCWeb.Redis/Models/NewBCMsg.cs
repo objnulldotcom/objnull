@@ -16,6 +16,8 @@ namespace MVCWeb.Redis.Models
 
         public int Page { get; set; }
 
+        public int Floor { get; set; }
+
         public DateTime Date { get; set; }
     }
 }

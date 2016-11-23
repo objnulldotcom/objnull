@@ -25,12 +25,13 @@
             {
                 @Html.Raw("FirstLoad = false;\n")
                 @Html.Raw("GetCommentPage(" + ViewBag.Cmpage + ");\n")
+                @Html.Raw("$(\"html,body\").animate({ scrollTop: $(\"#Comment" + ViewBag.Cmfloor + "\").offset().top }, 300);\n")
             }
 
-            @if (ViewBag.Cmid != "")
+            @if (ViewBag.Cmrpage != 0)
             {
-                @Html.Raw("ShowReply('" + ViewBag.Cmid + "', " + ViewBag.Cmrpage + ");\n")
-                @Html.Raw("$(\"html,body\").animate({ scrollTop: $(\"#Comment" + ViewBag.Cmid + "\").offset().top }, 300);\n")
+                @Html.Raw("ShowReply(" + ViewBag.Cmfloor + ", " + ViewBag.Cmrpage + ");\n")
+                @Html.Raw("$(\"html,body\").animate({ scrollTop: $(\"#ReplyBox" + ViewBag.Cmfloor + "\").offset().top }, 300);\n")
             }
 
             //代码高亮插件
@@ -134,28 +135,29 @@
         }
 
         //显示回复
-        function ShowReply(id, index) {
-            if ($("#ShowReply" + id).html() == "收起回复") {
-                $("#ReplyBox" + id).hide();
-                var recount = $("#ShowReply" + id).attr("recount");
+        function ShowReply(floor, index) {
+            if ($("#ShowReply" + floor).html() == "收起回复") {
+                $("#ReplyBox" + floor).hide();
+                var recount = $("#ShowReply" + floor).attr("recount");
                 if (recount == "0") {
-                    $("#ShowReply" + id).html("回复");
+                    $("#ShowReply" + floor).html("回复");
                 } else {
-                    $("#ShowReply" + id).html(recount + "条回复");
+                    $("#ShowReply" + floor).html(recount + "条回复");
                 }
             } else {
-                $("#ReplyBox" + id).show();
-                $("#ShowReply" + id).html("收起回复");
-                if ($("#Replys" + id).html() == "") {
-                    GetCommentReplyPage(index, id);
+                $("#ReplyBox" + floor).show();
+                $("#ShowReply" + floor).html("收起回复");
+                if ($("#Replys" + floor).html() == "") {
+                    GetCommentReplyPage(index, floor);
                 }
             }
         }
 
         //添加回复
-        function AddReply(id) {
-            var txt = $("#ReplyTxt" + id).val();
-            var toUser = $("#ReplyTxt" + id).attr("touser");
+        function AddReply(floor) {
+            var txt = $("#ReplyTxt" + floor).val();
+            var toUser = $("#ReplyTxt" + floor).attr("touser");
+            var cmid = $("#Comment" + floor).attr("cmid");
             if (txt.length == 0) {
                 swal("请填写回复内容");
                 return;
@@ -166,12 +168,12 @@
             }
             $.ajax({
                 url: "@Url.Action("AddBlogCommentReply", "Home")",
-                data: { commentID: id, toUserID: toUser, txt: txt, cmpage: $("#CommentCurrentPage").val() },
+                data: { commentID: cmid, toUserID: toUser, txt: txt, cmpage: $("#CommentCurrentPage").val(), cmfloor: floor },
                 type: "post",
                 success: function (result) {
                     if (result.msg == "done") {
-                        GetCommentReplyPage(99999, id);
-                        $("#ReplyTxt" + id).val("");
+                        GetCommentReplyPage(99999, floor);
+                        $("#ReplyTxt" + floor).val("");
                         SendNewMsg(toUser);
                     } else {
                         swal(result.msg);
@@ -181,16 +183,17 @@
         }
 
         //获取评论回复
-        function GetCommentReplyPage(index, commentID) {
+        function GetCommentReplyPage(index, floor) {
             var pageSize = 10;
-            var postData = { commentID: commentID, pageSize: pageSize, pageNum: index }
+            var cmid = $("#Comment" + floor).attr("cmid");
+            var postData = { commentID: cmid, floor: floor, pageSize: pageSize, pageNum: index }
             $.ajax({
                 url: "@Url.Action("BlogCommentReplyPage", "Home")",
                 type: "Post",
                 data: postData,
                 success: function (result) {
-                    $("#Replys" + commentID).html(result);
-                    if ($("#ReplyTotalCount" + commentID).val() == "0") {
+                    $("#Replys" + floor).html(result);
+                    if ($("#ReplyTotalCount" + floor).val() == "0") {
                         return;
                     }
                     $(".ReplyBar").each(function () {
@@ -200,16 +203,16 @@
                             $(this).find("#BtnReply").hide();
                         });
                     });
-                    $("#ReplyPager" + commentID).pagination({
-                        items: $("#ReplyTotalCount" + commentID).val(),
+                    $("#ReplyPager" + floor).pagination({
+                        items: $("#ReplyTotalCount" + floor).val(),
                         itemsOnPage: pageSize,
-                        currentPage: $("#ReplyCurrentPage" + commentID).val(),
+                        currentPage: $("#ReplyCurrentPage" + floor).val(),
                         prevText: "<",
                         nextText: ">",
                         listStyle: "pagination pagination-sm",
                         hrefTextPrefix: "javascript:;",
                         onPageClick: function (pageNumber, event) {
-                            GetCommentReplyPage(pageNumber, commentID);
+                            GetCommentReplyPage(pageNumber, floor);
                         }
                     });
                 }
@@ -217,17 +220,17 @@
         }
 
         //回复指定用户
-        function ReplyToUser(commentID, userName, userID) {
-            $("#ReplyToUser" + commentID).html("@@" + userName);
-            $("#ReplyTxt" + commentID).attr("touser", userID);
-            $("#DefaultUser" + commentID).show();
+        function ReplyToUser(floor, userName, userID) {
+            $("#ReplyToUser" + floor).html("@@" + userName);
+            $("#ReplyTxt" + floor).attr("touser", userID);
+            $("#DefaultUser" + floor).show();
         }
 
         //回复默认用户
-        function ReplyDefault(commentID, defaultName, defaultID) {
-            $("#ReplyToUser" + commentID).html("@@" + defaultName);
-            $("#ReplyTxt" + commentID).attr("touser", defaultID);
-            $("#DefaultUser" + commentID).hide();
+        function ReplyDefault(floor, defaultName, defaultID) {
+            $("#ReplyToUser" + floor).html("@@" + defaultName);
+            $("#ReplyTxt" + floor).attr("touser", defaultID);
+            $("#DefaultUser" + floor).hide();
         }
     </script>
 }

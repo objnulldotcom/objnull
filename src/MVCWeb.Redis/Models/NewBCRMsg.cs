@@ -10,13 +10,13 @@ namespace MVCWeb.Redis.Models
     {
         public Guid BlogID { get; set; }
 
-        public Guid CommentID { get; set; }
-
         public string Title { get; set; }
 
         public string From { get; set; }
 
         public int CMPage { get; set; }
+
+        public int CMFloor { get; set; }
 
         public int CMRPage { get; set; }
 

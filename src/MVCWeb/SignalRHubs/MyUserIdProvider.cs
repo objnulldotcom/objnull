@@ -9,10 +9,9 @@ namespace MVCWeb.SignalRHubs
 {
     public class MyUserIdProvider : IUserIdProvider
     {
-        //使用用户ID作为signalr客户端标识
+        //使用cookie中的用户ID作为signalr客户端标识
         public string GetUserId(IRequest request)
         {
-            //cookie
             return request.Cookies["UID"].Value;
         }
     }

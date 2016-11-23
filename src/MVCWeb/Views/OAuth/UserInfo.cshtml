@@ -23,9 +23,9 @@
             <li><a href="@Url.Action("LogOut", "OAuth")">退出</a></li>
         </ul>
     </li>
-    <input id="CurrentUserID" type="hidden" value="@CurrentUser.ID" />
 }
 else
 {
     <li><a href="https://github.com/login/oauth/authorize?client_id=b89774f9a3a874e349ce&redirect_uri=http://objnull.com/OAuth/GitHubLogin&scope=user,public_repo&state=12345" >登录</a></li>
 }
+<input id="CurrentUserID" type="hidden" value="@(CurrentUser == null ? "" : CurrentUser.ID.ToString())" />

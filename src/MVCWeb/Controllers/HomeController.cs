@@ -17,12 +17,12 @@ namespace MVCWeb.Controllers
         public IBlogCommentDataSvc BlogCommentDataSvc { get; set; }
         public IBlogCommentReplyDataSvc BlogCommentReplyDataSvc { get; set; }
         public IMyRedisDB MyRedisDB { get; set; }
-
+        
         public ActionResult Index()
         {
             return View();
         }
-
+        
         public ActionResult UserProfile(string id = null)
         {
             Guid userID = id == null ? CurrentUser.ID : Guid.Parse(id);
@@ -58,7 +58,7 @@ namespace MVCWeb.Controllers
             ViewBag.Login = CurrentUser != null;
             return View();
         }
-        
+
         [HttpPost]
         public ActionResult BlogPage(int pageSize, int pageNum = 1)
         {
@@ -69,17 +69,17 @@ namespace MVCWeb.Controllers
             return View();
         }
 
-        public ActionResult BlogView(Guid id, string cmid = "", int cmpage = 0, int cmrpage = 0)
+        public ActionResult BlogView(Guid id, int cmpage = 0, int cmfloor = 0, int cmrpage = 0)
         {
             ViewBag.Blog = BlogDataSvc.GetByID(id);
             ViewBag.Login = CurrentUser != null;
 
-            ViewBag.Cmid = cmid;
             ViewBag.Cmpage = cmpage;
+            ViewBag.Cmfloor = cmfloor;
             ViewBag.Cmrpage = cmrpage;
             return View();
         }
-        
+
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult AddBlogComment(Guid blogID, string mdTxt, string mdValue)
@@ -96,7 +96,7 @@ namespace MVCWeb.Controllers
 
             string key = MyRedisKeys.Pre_NewBCMsg + blog.OwnerID;
             NewBCMsg bcmsg = MyRedisDB.GetSet<NewBCMsg>(key).Where(m => m.BlogID == blogID).FirstOrDefault();
-            if(bcmsg != null)
+            if (bcmsg != null)
             {
                 MyRedisDB.SetRemove(key, bcmsg);
                 bcmsg.Count += 1;
@@ -109,6 +109,7 @@ namespace MVCWeb.Controllers
                 bcmsg.Count = 1;
                 bcmsg.Date = DateTime.Now;
                 bcmsg.Page = blog.CommentCount / 10 + 1;
+                bcmsg.Floor = blog.CommentCount % 10 == 0 ? 10 : blog.CommentCount % 10;
                 bcmsg.Title = blog.Title.Length > 15 ? blog.Title.Substring(0, 15) + "……" : blog.Title;
                 MyRedisDB.SetAdd(key, bcmsg);
             }
@@ -127,7 +128,7 @@ namespace MVCWeb.Controllers
         }
 
         [HttpPost]
-        public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt, int cmpage)
+        public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt, int cmpage, int cmfloor)
         {
             BlogCommentReply reply = new BlogCommentReply();
             reply.BlogCommentID = commentID;
@@ -138,14 +139,14 @@ namespace MVCWeb.Controllers
             BlogComment comment = BlogCommentDataSvc.GetByID(commentID);
             comment.ReplyCount += 1;
             BlogCommentDataSvc.Update(comment);
-            
+
             string key = MyRedisKeys.Pre_NewBCRMsg + toUserID;
             NewBCRMsg bcrmsg = new NewBCRMsg();
             bcrmsg.BlogID = comment.BlogID;
-            bcrmsg.CommentID = comment.ID;
             bcrmsg.Date = DateTime.Now;
-            bcrmsg.From = CurrentUser.UserName; 
+            bcrmsg.From = CurrentUser.UserName;
             bcrmsg.CMPage = cmpage;
+            bcrmsg.CMFloor = cmfloor;
             bcrmsg.CMRPage = comment.ReplyCount / 10 + 1;
             bcrmsg.Title = txt.Length > 10 ? txt.Substring(0, 10) + "……" : txt;
             MyRedisDB.SetAdd(key, bcrmsg);
@@ -154,13 +155,13 @@ namespace MVCWeb.Controllers
         }
 
         [HttpPost]
-        public ActionResult BlogCommentReplyPage(Guid commentID, int pageSize, int pageNum = 1)
+        public ActionResult BlogCommentReplyPage(Guid commentID, int floor, int pageSize, int pageNum = 1)
         {
             int totalCount;
             ViewBag.BlogCommentReplyList = BlogCommentReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogCommentID == commentID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
-            ViewBag.CommentID = commentID;
+            ViewBag.Floor = floor;
             return View();
         }
 

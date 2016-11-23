@@ -7,12 +7,12 @@
     @foreach (NewBCMsg msg in NewComments)
     {
         <div>@(msg.Count) 条评论 <span style="float:right">@msg.Date.ToString("MM-dd HH:mm")</span></div>
-        <div style="border-bottom: 1px solid #eee"><a href="@Url.Action("BlogView", "Home", new { id = msg.BlogID, cmpage = msg.Page })">@msg.Title</a></div>
+        <div style="border-bottom: 1px solid #eee"><a href="@Url.Action("BlogView", "Home", new { id = msg.BlogID, cmpage = msg.Page, cmfloor = msg.Floor })">@msg.Title</a></div>
     }
     @foreach (NewBCRMsg reply in NewReplys)
     {
         <div>@(reply.From) 回复你 <span style="float:right">@reply.Date.ToString("MM-dd HH:mm")</span></div>
-        <div style="border-bottom: 1px solid #eee"><a href="@Url.Action("BlogView", "Home", new { id = reply.BlogID, cmpage = reply.CMPage, cmid = reply.CommentID, cmrpage = reply.CMRPage })">@reply.Title</a></div>
+        <div style="border-bottom: 1px solid #eee"><a href="@Url.Action("BlogView", "Home", new { id = reply.BlogID, cmpage = reply.CMPage, cmfloor = reply.CMFloor, cmrpage = reply.CMRPage })">@reply.Title</a></div>
     }
 </div>
 <div class="text-center">
