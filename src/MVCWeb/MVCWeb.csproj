@@ -264,6 +264,7 @@
     <Content Include="Views\Home\BlogCommentPage.cshtml" />
     <Content Include="Views\Home\BlogCommentReplyPage.cshtml" />
     <Content Include="Views\Home\UserProfile.cshtml" />
+    <Content Include="Views\Home\GetMsg.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

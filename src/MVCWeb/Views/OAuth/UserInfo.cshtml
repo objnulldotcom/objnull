@@ -5,20 +5,21 @@
 
 @if (CurrentUser != null)
 {
-    <li>
+    <li id="MsgLi" class="dropdown">
         <a id="BtnMsg" href="javascript:;">消息<span id="MsgCount" class="badge">@(ViewBag.MsgCount == 0 ? "" : ViewBag.MsgCount)</span></a>
-        <div id="MsgBox" style="width: 300px; height: 300px; position: absolute; top: 55px; left: -75px; border: 1px solid #0094ff; border-radius: 5px;">
-            xvdvxdvdvxdvd
-            <div>sdfsfe</div>
+        <div id="MsgBox" class="dropdown-menu">
+            加载中……
         </div>
     </li>
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="min-width:160px">
-            <img src="@CurrentUser.AvatarUrl&s=20" height="20" width="20" />
-            @CurrentUser.Name &nbsp;&nbsp;<span class="caret"></span>
+            <img src="@CurrentUser.AvatarUrl&s=20" height="20" width="20" style="margin: -1px 0px" />
+            @CurrentUser.UserName &nbsp;&nbsp;<span class="caret"></span>
         </a>
         <ul class="dropdown-menu" role="menu">
+            <li><a href="@Url.Action("UserProfile", "Home")">我的Github</a></li>
             <li><a href="@Url.Action("UserProfile", "Home")">我的主页</a></li>
+            <li><a href="@Url.Action("UserProfile", "Home")">我的消息</a></li>
             <li><a href="@Url.Action("LogOut", "OAuth")">退出</a></li>
         </ul>
     </li>

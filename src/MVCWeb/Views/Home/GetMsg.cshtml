@@ -1,0 +1,20 @@
+﻿@using MVCWeb.Redis.Models;
+@{ 
+    IEnumerable<NewBCMsg> NewComments = ViewBag.NewComments;
+    IEnumerable<NewBCRMsg> NewReplys = ViewBag.NewReplys;
+}
+<div class="fs2" style="word-break:keep-all; padding-left: 5px; padding-right: 5px">
+    @foreach (NewBCMsg msg in NewComments)
+    {
+        <div>@(msg.Count) 条评论 <span style="float:right">@msg.Date.ToString("MM-dd HH:mm")</span></div>
+        <div style="border-bottom: 1px solid #eee"><a href="@Url.Action("BlogView", "Home", new { id = msg.BlogID, cmpage = msg.Page })">@msg.Title</a></div>
+    }
+    @foreach (NewBCRMsg reply in NewReplys)
+    {
+        <div>@(reply.From) 回复你 <span style="float:right">@reply.Date.ToString("MM-dd HH:mm")</span></div>
+        <div style="border-bottom: 1px solid #eee"><a href="@Url.Action("BlogView", "Home", new { id = reply.BlogID, cmpage = reply.CMPage, cmid = reply.CommentID, cmrpage = reply.CMRPage })">@reply.Title</a></div>
+    }
+</div>
+<div class="text-center">
+    <a href="javascript:;" onclick="ClearMsg()">清空</a>
+</div>

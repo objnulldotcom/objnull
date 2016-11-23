@@ -32,6 +32,14 @@ namespace MVCWeb
         public string GitHubLogin { get; set; }
 
         public string GitHubAccessToken { get; set; }
+
+        public string UserName
+        {
+            get
+            {
+                return string.IsNullOrEmpty(Name) ? GitHubLogin : Name;
+            }
+        }
     }
 
     public class CurrentManager : IPrincipal

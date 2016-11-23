@@ -10,7 +10,10 @@ namespace MVCWeb.Redis.Base
 {
     public interface IMyRedisDB
     {
+        IServer RedisServer { get; set; }
         IDatabase RedisDB { get; set; }
+
+        void DelKey(string key);
         void StringSet(string key, string value);
         string StringGet(string key);
         void SetAdd<T>(string key, T obj);
@@ -20,7 +23,13 @@ namespace MVCWeb.Redis.Base
     
     public class MyRedisDB : IMyRedisDB
     {
+        public IServer RedisServer { get; set; }
         public IDatabase RedisDB { get; set; }
+
+        public void DelKey(string key)
+        {
+            RedisDB.KeyDelete(key);
+        }
 
         public void StringSet(string key, string value)
         {
@@ -49,6 +58,5 @@ namespace MVCWeb.Redis.Base
         {
             RedisDB.SetRemove(key, JsonConvert.SerializeObject(obj));
         }
-        
     }
 }

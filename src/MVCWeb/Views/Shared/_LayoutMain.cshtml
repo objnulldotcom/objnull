@@ -23,6 +23,20 @@
     <!--SignalR-->
     <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
     <script src="~/signalr/hubs"></script>
+    <style>
+        .msgBox {
+            width: 300px;
+            height: 300px;
+            position: absolute;
+            top: 52px;
+            left: -225px;
+            background-color: #fff;
+            border-left: 1px solid #e7e7e7;
+            border-right: 1px solid #e7e7e7;
+            border-bottom: 1px solid #e7e7e7;
+            display:none;
+        }
+    </style>
     <script>
         var viewer;
         //设置图片查看器
@@ -37,26 +51,54 @@
             var char = str.replace(/[^\x00-\xff]/g, '**');
             return char.length;
         }
+
+        //发送更新消息
+        function SendNewMsg(id) {
+            MsgHub.server.sendToUser(id, "NewMsg");
+        }
         //更新消息数量
         function UpdateMsgCount() {
             $.ajax({
                 url: "@Url.Action("GetMsgCount", "Home")",
                 type: "get",
-                data: { userID: $("#CurrentUserID").val() },
                 success: function (result) {
+                    result = result == "0" ? "" : result;
                     $("#MsgCount").html(result);
                 }
             });
         }
-        //发送更新消息
-        function SendNewMsg(id) {
-            MsgHub.server.sendToUser(id, "NewMsg");
+        //清空消息
+        function ClearMsg() {
+            $.ajax({
+                url: "@Url.Action("ClearMsg", "Home")",
+                type: "post",
+                success: function (result) {
+                    if (result.msg == "done") {
+                        $("#BtnMsg").click();
+                        UpdateMsgCount();
+                    } else {
+                        swal(result.msg)
+                    }
+                }
+            });
+        }
+        //切换消息框
+        function ShowMsgBox(type) {
+            if (type) {
+                $("#MsgLi").css("background-color", "#e7e7e7");
+                $("#MsgBox").slideDown(60);
+            } else {
+                $("#MsgLi").css("background-color", "");
+                $("#MsgBox").slideUp(60);
+                $("#MsgBox").html("加载中……");
+            }
         }
 
         var MsgHub;
         //SignalR
         $(function () {
-            if ($("#CurrentUserID") == null) {
+            //未登录不初始化signalr及消息相关事件
+            if ($("#CurrentUserID") == "") {
                 return;
             }
             MsgHub = $.connection.MsgHub;
@@ -66,11 +108,50 @@
                 }
             };
             $.connection.hub.start().done(function () {
-                
+
             });
 
             $("#BtnMsg").click(function () {
+                if ($("#MsgBox").is(":hidden")) {
+                    UpdateMsgCount();
+                    ShowMsgBox(true);
+                    if ($("#MsgCount").html() == "") {
+                        $("#MsgBox").html('<div class="text-center">没有未读消息</div>');
+                        return;
+                    }
+                    $.ajax({
+                        url: "@Url.Action("GetMsg", "Home")",
+                        type: "get",
+                        success: function (result) {
+                            $("#MsgBox").html(result);
+                        }
+                    });
+                } else {
+                    ShowMsgBox(false);
+                }
+            });
 
+            //点击消息框外隐藏消息框
+            $(document).mouseup(function (e) {
+                var container = $("#MsgBox");
+                if (!container.is(e.target) && container.has(e.target).length === 0 && !$("#BtnMsg").is(e.target))
+                {
+                    ShowMsgBox(false);
+                }
+            });
+
+            $("#BtnClearMsg").click(function () {
+                $.ajax({
+                    url: "@Url.Action("ClearMsg", "Home")",
+                    type: "post",
+                    success: function (result) {
+                        if (result.msg == "done") {
+                            $("#BtnMsg").click();
+                        } else {
+                            swal(result.msg)
+                        }
+                    }
+                });
             });
         });
     </script>
@@ -90,17 +171,17 @@
                 </a>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a href="@Url.Action("BlogList", "Home")">涨姿势</a></li>
-                    @*<li><a href="@Url.Action("BCar", "Home")">TreeNewBee</a></li>*@
-                    @*<li><a href="@Url.Action("BCar", "Home")">问答</a></li>
-                    <li><a href="@Url.Action("BCar", "Home")">笔记</a></li>*@
-                </ul>
                 <div class="navbar-form navbar-left">
                     <div class="form-group">
                         <input type="text" class="form-control" placeholder="搜索还没做">
                     </div>
                 </div>
+                <ul class="nav navbar-nav">
+                    <li><a href="@Url.Action("BlogList", "Home")">涨姿势</a></li>
+                    @*<li><a href="@Url.Action("BCar", "Home")">TreeNewBee</a></li>*@
+                    @*<li><a href="@Url.Action("BCar", "Home")">问答</a></li>
+                        <li><a href="@Url.Action("BCar", "Home")">笔记</a></li>*@
+                </ul>
                 <ul class="nav navbar-nav navbar-right">
                     @Html.Action("UserInfo", "OAuth")
                 </ul>

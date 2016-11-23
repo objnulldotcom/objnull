@@ -7,14 +7,14 @@
     foreach (BlogComment comment in CommentList)
     {
         <div class="row">
-            <div class="col-md-12">
+            <div id="Comment@(comment.ID)" class="col-md-12">
                 @Html.Raw(comment.MDValue)
             </div>
             <div class="col-md-12" style="line-height: 32px;margin-top: -10px">
                 <a><img src="@comment.Owner.AvatarUrl&s=32" style="max-width: 32px" alt="@comment.Owner.Name" title="@comment.Owner.Name"></a>
                 <a>@comment.Owner.Name</a>
-                <span class="fs2"> at <span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToString("yyyy-MM-dd HH:MM")</span>
-                <a id="ShowReply@(comment.ID)" href="javascript:;" style="text-decoration:none" onclick="ShowReply('@comment.ID')" recount="@comment.ReplyCount">
+                <span class="fs2"> at <span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToString("yyyy-MM-dd HH:mm")</span>
+                <a id="ShowReply@(comment.ID)" href="javascript:;" style="text-decoration:none" onclick="ShowReply('@comment.ID', 1)" recount="@comment.ReplyCount">
                     @if (comment.ReplyCount > 0)
                     { @Html.Raw(comment.ReplyCount + "条回复") }
                     else
@@ -53,3 +53,4 @@ else
     </div>
 }
 <input type="hidden" id="CommentTotalCount" value="@ViewBag.TotalCount" />
+<input type="hidden" id="CommentCurrentPage" value="@ViewBag.CurrentPage" />

@@ -65,13 +65,18 @@ namespace MVCWeb.Controllers
             int totalCount;
             ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.InsertDate, true, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
             return View();
         }
 
-        public ActionResult BlogView(Guid id)
+        public ActionResult BlogView(Guid id, string cmid = "", int cmpage = 0, int cmrpage = 0)
         {
             ViewBag.Blog = BlogDataSvc.GetByID(id);
             ViewBag.Login = CurrentUser != null;
+
+            ViewBag.Cmid = cmid;
+            ViewBag.Cmpage = cmpage;
+            ViewBag.Cmrpage = cmrpage;
             return View();
         }
         
@@ -103,8 +108,8 @@ namespace MVCWeb.Controllers
                 bcmsg.BlogID = blogID;
                 bcmsg.Count = 1;
                 bcmsg.Date = DateTime.Now;
-                bcmsg.Page = blog.CommentCount % 10 + 1;
-                bcmsg.Title = blog.Title.Substring(0, 20);
+                bcmsg.Page = blog.CommentCount / 10 + 1;
+                bcmsg.Title = blog.Title.Length > 15 ? blog.Title.Substring(0, 15) + "……" : blog.Title;
                 MyRedisDB.SetAdd(key, bcmsg);
             }
 
@@ -117,11 +122,12 @@ namespace MVCWeb.Controllers
             int totalCount;
             ViewBag.BlogCommentList = BlogCommentDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogID == blogID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
             return View();
         }
 
         [HttpPost]
-        public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt)
+        public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt, int cmpage)
         {
             BlogCommentReply reply = new BlogCommentReply();
             reply.BlogCommentID = commentID;
@@ -132,6 +138,18 @@ namespace MVCWeb.Controllers
             BlogComment comment = BlogCommentDataSvc.GetByID(commentID);
             comment.ReplyCount += 1;
             BlogCommentDataSvc.Update(comment);
+            
+            string key = MyRedisKeys.Pre_NewBCRMsg + toUserID;
+            NewBCRMsg bcrmsg = new NewBCRMsg();
+            bcrmsg.BlogID = comment.BlogID;
+            bcrmsg.CommentID = comment.ID;
+            bcrmsg.Date = DateTime.Now;
+            bcrmsg.From = CurrentUser.UserName; 
+            bcrmsg.CMPage = cmpage;
+            bcrmsg.CMRPage = comment.ReplyCount / 10 + 1;
+            bcrmsg.Title = txt.Length > 10 ? txt.Substring(0, 10) + "……" : txt;
+            MyRedisDB.SetAdd(key, bcrmsg);
+
             return Json(new { msg = "done" });
         }
 
@@ -141,16 +159,42 @@ namespace MVCWeb.Controllers
             int totalCount;
             ViewBag.BlogCommentReplyList = BlogCommentReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogCommentID == commentID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
             ViewBag.CommentID = commentID;
             return View();
         }
 
         #endregion
 
+        #region Msg
+
         public string GetMsgCount()
         {
-            return (MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID) + MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_NewBCRMsg + CurrentUser.ID)).ToString();
+            string BCkey = MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID;
+            string BCRkey = MyRedisKeys.Pre_NewBCRMsg + CurrentUser.ID;
+            return (MyRedisDB.RedisDB.SetLength(BCkey) + MyRedisDB.RedisDB.SetLength(BCRkey)).ToString();
         }
+
+        public ActionResult GetMsg()
+        {
+            string BCkey = MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID;
+            string BCRkey = MyRedisKeys.Pre_NewBCRMsg + CurrentUser.ID;
+            ViewBag.NewComments = MyRedisDB.GetSet<NewBCMsg>(BCkey).OrderByDescending(m => m.Date);
+            ViewBag.NewReplys = MyRedisDB.GetSet<NewBCRMsg>(BCRkey).OrderByDescending(m => m.Date);
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult ClearMsg()
+        {
+            string BCkey = MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID;
+            string BCRkey = MyRedisKeys.Pre_NewBCRMsg + CurrentUser.ID;
+            MyRedisDB.DelKey(BCkey);
+            MyRedisDB.DelKey(BCRkey);
+            return Json(new { msg = "done" });
+        }
+
+        #endregion
 
         public ActionResult Error()
         {

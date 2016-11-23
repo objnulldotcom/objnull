@@ -14,7 +14,7 @@ namespace MVCWeb.Redis.Models
 
         public string Title { get; set; }
 
-        public int Count { get; set; }
+        public string From { get; set; }
 
         public int CMPage { get; set; }
 

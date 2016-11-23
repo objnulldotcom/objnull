@@ -17,7 +17,21 @@
             SetViewer("MDValue");
             $("#CommentBox").hide();
             $("#PreBox").hide();
-            GetCommentPage(1);
+            @if(ViewBag.Cmpage == 0)
+            {
+                @Html.Raw("GetCommentPage(1);")
+            }
+            else
+            {
+                @Html.Raw("FirstLoad = false;\n")
+                @Html.Raw("GetCommentPage(" + ViewBag.Cmpage + ");\n")
+            }
+
+            @if (ViewBag.Cmid != "")
+            {
+                @Html.Raw("ShowReply('" + ViewBag.Cmid + "', " + ViewBag.Cmrpage + ");\n")
+                @Html.Raw("$(\"html,body\").animate({ scrollTop: $(\"#Comment" + ViewBag.Cmid + "\").offset().top }, 300);\n")
+            }
 
             //代码高亮插件
             marked.setOptions({
@@ -92,6 +106,7 @@
             $.ajax({
                 url: "@Url.Action("BlogCommentPage", "Home")",
                 type: "Post",
+                async: false,
                 data: postData,
                 success: function (result) {
                     $("#Comments").html(result);
@@ -105,7 +120,7 @@
                     $("#Pager").pagination({
                         items: $("#CommentTotalCount").val(),
                         itemsOnPage: pageSize,
-                        currentPage: index,
+                        currentPage: $("#CommentCurrentPage").val(),
                         prevText: "<",
                         nextText: ">",
                         listStyle: "pagination",
@@ -119,7 +134,7 @@
         }
 
         //显示回复
-        function ShowReply(id) {
+        function ShowReply(id, index) {
             if ($("#ShowReply" + id).html() == "收起回复") {
                 $("#ReplyBox" + id).hide();
                 var recount = $("#ShowReply" + id).attr("recount");
@@ -132,7 +147,7 @@
                 $("#ReplyBox" + id).show();
                 $("#ShowReply" + id).html("收起回复");
                 if ($("#Replys" + id).html() == "") {
-                    GetCommentReplyPage(1, id);
+                    GetCommentReplyPage(index, id);
                 }
             }
         }
@@ -151,12 +166,13 @@
             }
             $.ajax({
                 url: "@Url.Action("AddBlogCommentReply", "Home")",
-                data: { commentID: id, toUserID: toUser, txt: txt },
+                data: { commentID: id, toUserID: toUser, txt: txt, cmpage: $("#CommentCurrentPage").val() },
                 type: "post",
                 success: function (result) {
                     if (result.msg == "done") {
                         GetCommentReplyPage(99999, id);
                         $("#ReplyTxt" + id).val("");
+                        SendNewMsg(toUser);
                     } else {
                         swal(result.msg);
                     }
@@ -187,7 +203,7 @@
                     $("#ReplyPager" + commentID).pagination({
                         items: $("#ReplyTotalCount" + commentID).val(),
                         itemsOnPage: pageSize,
-                        currentPage: index,
+                        currentPage: $("#ReplyCurrentPage" + commentID).val(),
                         prevText: "<",
                         nextText: ">",
                         listStyle: "pagination pagination-sm",
