@@ -10,6 +10,7 @@ namespace MVCWeb.Controllers
 {
     public class FileController : BaseController
     {
+        //上传图片
         [HttpPost]
         public ActionResult JqueryUploadImg(HttpPostedFileBase upFile, int pt)
         {
@@ -49,6 +50,7 @@ namespace MVCWeb.Controllers
             return Json(new { error = "", path = date + ":" + newName });
         }
 
+        //下载图片
         public ActionResult DownloadImg(string path, int pt)
         {
             string fPath = "";

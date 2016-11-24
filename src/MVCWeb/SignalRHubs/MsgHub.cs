@@ -15,6 +15,7 @@ namespace MVCWeb.SignalRHubs
             Clients.All.addNewMessage(msg);
         }
 
+        //发送给指定用户
         public void SendToUser(string userID, string msg)
         {
             Clients.User(userID).addNewMessage(msg);

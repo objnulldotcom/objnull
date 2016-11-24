@@ -274,6 +274,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Scripts\Views\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MVCWeb.DataSvc\MVCWeb.DataSvc.csproj">
@@ -304,7 +305,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2220</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:2220/</IISUrl>
+          <IISUrl>http://localhost:2221/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Text;
+using Newtonsoft.Json;
 using MVCWeb.Model.Models;
 using MVCWeb.DataSvc.Svc;
 using MVCWeb.Redis.Base;
@@ -17,12 +19,19 @@ namespace MVCWeb.Controllers
         public IBlogCommentDataSvc BlogCommentDataSvc { get; set; }
         public IBlogCommentReplyDataSvc BlogCommentReplyDataSvc { get; set; }
         public IMyRedisDB MyRedisDB { get; set; }
-        
+
+        public int GetByteLength(string val)
+        {
+            return Encoding.Default.GetByteCount(val);
+        }
+
+        //首页
         public ActionResult Index()
         {
             return View();
         }
-        
+
+        //个人主页
         public ActionResult UserProfile(string id = null)
         {
             Guid userID = id == null ? CurrentUser.ID : Guid.Parse(id);
@@ -34,15 +43,67 @@ namespace MVCWeb.Controllers
 
         #region 姿势blog
 
+        //新姿势
         public ActionResult NewBlog()
         {
+            string key = MyRedisKeys.Pre_BlogDraft + CurrentUser.ID;
+            Blog draft = JsonConvert.DeserializeObject<Blog>(MyRedisDB.StringGet(key));
+            if(draft != null)
+            {
+                ViewBag.DraftBlog = draft;
+            }
             return View();
         }
+        
+        //保存草稿
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult SaveDraft(int type, string title, string mdTxt)
+        {
+            if (string.IsNullOrEmpty(title) && string.IsNullOrEmpty(mdTxt))//内容空不保存草稿
+            {
+                return Json(new { msg = "empty" });
+            }
+            int tlength = Encoding.Default.GetByteCount(title);
+            int txtlength = Encoding.Default.GetByteCount(mdTxt);
+            if (tlength > 90 || txtlength > 50000)
+            {
+                return Json(new { msg = "参数太长" });
+            }
 
+            if (type < 0 || type > 4)
+            {
+                type = 0;
+            }
+            Blog nblog = new Blog();
+            nblog.Type = type;
+            nblog.Title = title;
+            nblog.MDText = mdTxt;
+            string key = MyRedisKeys.Pre_BlogDraft + CurrentUser.ID;
+            MyRedisDB.StringSet(key, JsonConvert.SerializeObject(nblog));
+            return Json(new { msg = "done", date = DateTime.Now.ToString("HH:mm") });
+        }
+
+        //发表新姿势
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult NewBlog(int type, string title, string mdTxt, string mdValue)
         {
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
+            {
+                return Json(new { msg = "参数错误" });
+            }
+            int tlength = Encoding.Default.GetByteCount(title);
+            int txtlength = Encoding.Default.GetByteCount(mdTxt);
+            if (tlength > 90 || txtlength > 50000)
+            {
+                return Json(new { msg = "参数太长" });
+            }
+
+            if (type < 0 || type > 4)
+            {
+                type = 0;
+            }
             Blog nblog = new Blog();
             nblog.Type = type;
             nblog.Title = title;
@@ -50,15 +111,20 @@ namespace MVCWeb.Controllers
             nblog.MDValue = mdValue;
             nblog.OwnerID = CurrentUser.ID;
             BlogDataSvc.Add(nblog);
+            //发布成功删除草稿
+            string key = MyRedisKeys.Pre_BlogDraft + CurrentUser.ID;
+            MyRedisDB.DelKey(key);
             return Json(new { msg = "done", url = Url.Action("BlogList") });
         }
 
+        //姿势列表
         public ActionResult BlogList()
         {
             ViewBag.Login = CurrentUser != null;
             return View();
         }
 
+        //姿势分页
         [HttpPost]
         public ActionResult BlogPage(int pageSize, int pageNum = 1)
         {
@@ -69,6 +135,7 @@ namespace MVCWeb.Controllers
             return View();
         }
 
+        //查看姿势
         public ActionResult BlogView(Guid id, int cmpage = 0, int cmfloor = 0, int cmrpage = 0)
         {
             ViewBag.Blog = BlogDataSvc.GetByID(id);
@@ -80,6 +147,7 @@ namespace MVCWeb.Controllers
             return View();
         }
 
+        //添加评论
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult AddBlogComment(Guid blogID, string mdTxt, string mdValue)
@@ -117,6 +185,7 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done" });
         }
 
+        //评论分页
         [HttpPost]
         public ActionResult BlogCommentPage(Guid blogID, int pageSize, int pageNum = 1)
         {
@@ -127,6 +196,7 @@ namespace MVCWeb.Controllers
             return View();
         }
 
+        //添加评论回复
         [HttpPost]
         public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt, int cmpage, int cmfloor)
         {
@@ -154,6 +224,7 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done" });
         }
 
+        //评论回复分页
         [HttpPost]
         public ActionResult BlogCommentReplyPage(Guid commentID, int floor, int pageSize, int pageNum = 1)
         {
@@ -169,6 +240,7 @@ namespace MVCWeb.Controllers
 
         #region Msg
 
+        //未读消息数量
         public string GetMsgCount()
         {
             string BCkey = MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID;
@@ -176,6 +248,7 @@ namespace MVCWeb.Controllers
             return (MyRedisDB.RedisDB.SetLength(BCkey) + MyRedisDB.RedisDB.SetLength(BCRkey)).ToString();
         }
 
+        //未读消息
         public ActionResult GetMsg()
         {
             string BCkey = MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID;
@@ -185,6 +258,7 @@ namespace MVCWeb.Controllers
             return View();
         }
 
+        //清空未读
         [HttpPost]
         public ActionResult ClearMsg()
         {
@@ -197,6 +271,7 @@ namespace MVCWeb.Controllers
 
         #endregion
 
+        //错误
         public ActionResult Error()
         {
             return View();
