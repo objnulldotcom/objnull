@@ -44,6 +44,11 @@ namespace MVCWeb.Model.Models
         public int ReplyCount { get; set; }
 
         /// <summary>
+        /// 顺序
+        /// </summary>
+        public int Order { get; set; }
+
+        /// <summary>
         /// 所属姿势ID
         /// </summary>
         public Guid BlogID { get; set; }

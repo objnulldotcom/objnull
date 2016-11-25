@@ -14,11 +14,9 @@ namespace MVCWeb.Redis.Models
 
         public string From { get; set; }
 
-        public int CMPage { get; set; }
+        public int COrder { get; set; }
 
-        public int CMFloor { get; set; }
-
-        public int CMRPage { get; set; }
+        public int ROrder { get; set; }
 
         public DateTime Date { get; set; }
     }

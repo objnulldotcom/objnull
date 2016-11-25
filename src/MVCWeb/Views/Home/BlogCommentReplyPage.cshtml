@@ -5,18 +5,19 @@
 
 @foreach (BlogCommentReply reply in CommentReplyList)
 {
+    string userName = string.IsNullOrEmpty(reply.Owner.Name) ? reply.Owner.GitHubLogin : reply.Owner.Name;
     <div class="ReplyBar col-md-12 fs2">
         <div style="float:left;">
-            <a><img src="@reply.Owner.AvatarUrl&s=32" style="max-width: 32px" alt="@reply.Owner.Name" title="@reply.Owner.Name"></a>
+            <a><img class="img-rounded" src="@reply.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName" title="@userName"></a>
         </div>
         <div style="padding-left:40px">
             <span>
-                <a>@reply.Owner.Name</a>回复<a>@reply.ToUser.Name</a> at @reply.InsertDate.ToString("yyyy-MM-dd HH:mm")
-                <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.Floor, '@reply.Owner.Name', '@reply.Owner.ID')">回复</a>
+                <a>@userName</a>回复<a>@(string.IsNullOrEmpty(reply.ToUser.Name) ? reply.ToUser.GitHubLogin : reply.ToUser.Name)</a> at @reply.InsertDate.ToString("yyyy-MM-dd HH:mm")
+                <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.COrder, '@userName', '@reply.Owner.ID')">回复</a>
             </span>
             <p>@reply.Content</p>
         </div>
     </div>
 }
-<input type="hidden" id="ReplyTotalCount@(ViewBag.Floor)" value="@ViewBag.TotalCount" />
-<input type="hidden" id="ReplyCurrentPage@(ViewBag.Floor)" value="@ViewBag.CurrentPage" />
+<input type="hidden" id="ReplyTotalCount@(ViewBag.COrder)" value="@ViewBag.TotalCount" />
+<input type="hidden" id="ReplyCurrentPage@(ViewBag.COrder)" value="@ViewBag.CurrentPage" />

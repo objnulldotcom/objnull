@@ -159,64 +159,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\bootstrap-theme.css" />
-    <Content Include="Content\bootstrap-theme.min.css" />
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\PagedList.css" />
-    <Content Include="Content\Site.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\bootstrap.min.css.map" />
-    <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\bootstrap-theme.min.css.map" />
-    <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Images\favicon-16x16.png" />
     <Content Include="Images\favicon-32x32.png" />
     <Content Include="Images\favicon-96x96.png" />
     <Content Include="Images\LOGO.png" />
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Properties\PublishProfiles\Pub.pubxml" />
-    <None Include="Scripts\jquery-3.1.1.intellisense.js" />
-    <Content Include="Scripts\FileUpload\app.js" />
-    <Content Include="Scripts\FileUpload\cors\jquery.postmessage-transport.js" />
-    <Content Include="Scripts\FileUpload\cors\jquery.xdr-transport.js" />
-    <Content Include="Scripts\FileUpload\jquery.fileupload-angular.js" />
-    <Content Include="Scripts\FileUpload\jquery.fileupload-audio.js" />
-    <Content Include="Scripts\FileUpload\jquery.fileupload-image.js" />
-    <Content Include="Scripts\FileUpload\jquery.fileupload-jquery-ui.js" />
-    <Content Include="Scripts\FileUpload\jquery.fileupload-process.js" />
-    <Content Include="Scripts\FileUpload\jquery.fileupload-ui.js" />
-    <Content Include="Scripts\FileUpload\jquery.fileupload-validate.js" />
-    <Content Include="Scripts\FileUpload\jquery.fileupload-video.js" />
-    <Content Include="Scripts\FileUpload\jquery.fileupload.js" />
-    <Content Include="Scripts\FileUpload\jquery.iframe-transport.js" />
-    <Content Include="Scripts\FileUpload\main.js" />
-    <Content Include="Scripts\FileUpload\vendor\jquery.ui.widget.js" />
-    <Content Include="Scripts\HighlightJs\default.min.css" />
-    <Content Include="Scripts\HighlightJs\highlight.min.js" />
-    <Content Include="Scripts\jquery-3.1.1.js" />
-    <Content Include="Scripts\jquery-3.1.1.min.js" />
-    <Content Include="Scripts\jquery-3.1.1.slim.js" />
-    <Content Include="Scripts\jquery-3.1.1.slim.min.js" />
-    <Content Include="Scripts\jquery.signalR-2.2.1.js" />
-    <Content Include="Scripts\jquery.signalR-2.2.1.min.js" />
-    <Content Include="Scripts\Marked\marked.js" />
-    <Content Include="Scripts\modernizr-2.8.3.js" />
-    <Content Include="Scripts\SimplePagination\jquery.simplePagination.js" />
-    <Content Include="Scripts\SimplePagination\simplePagination.css" />
-    <Content Include="Scripts\SweetAlert\sweetalert-dev.js" />
-    <Content Include="Scripts\SweetAlert\sweetalert.css" />
-    <Content Include="Scripts\SweetAlert\sweetalert.min.js" />
-    <Content Include="Scripts\Viewerjs\viewer.css" />
-    <Content Include="Scripts\Viewerjs\viewer.js" />
-    <Content Include="Scripts\Viewerjs\viewer.min.css" />
-    <Content Include="Scripts\Viewerjs\viewer.min.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -248,8 +201,6 @@
   <ItemGroup>
     <Content Include="Views\web.config" />
     <Content Include="packages.config" />
-    <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
-    <Content Include="Scripts\jquery-3.1.1.min.map" />
     <Content Include="Views\Shared\_LayoutMain.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\OAuth\UserInfo.cshtml" />
@@ -274,7 +225,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Scripts\Views\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MVCWeb.DataSvc\MVCWeb.DataSvc.csproj">

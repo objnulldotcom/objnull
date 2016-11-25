@@ -30,7 +30,7 @@
                         break;
                 }
             </div>
-            <a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank"><img class="img-rounded" src="@blog.Owner.AvatarUrl&s=48" style="max-width: 48px" alt="@blog.Owner.Name" title="@blog.Owner.Name"></a>
+            <a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank"><img class="img-rounded" src="@blog.Owner.AvatarUrl&s=48" height="48" width="48" alt="@blog.Owner.Name" title="@blog.Owner.Name"></a>
         </div>
         <div class="media-body">
             <div class="media-heading fs1"><a href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank" style="text-decoration:none">@blog.Title</a></div>

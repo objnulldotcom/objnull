@@ -10,7 +10,7 @@
             //关注或取关
             $("#BtnFollow").click(function () {
                 var atype = "";
-                if ($("#BtnFollow").html() == "关注") {
+                if ($("#BtnFollow").html() == "Follow") {
                     atype = "put";
                 } else {
                     atype = "delete";
@@ -20,10 +20,10 @@
                     url: "https://api.github.com/user/following/@(guser.login)?access_token=@(ViewBag.Token)",
                     type: atype,
                     success: function (result) {
-                        if ($("#BtnFollow").html() == "关注") {
-                            $("#BtnFollow").html("取消关注");
+                        if ($("#BtnFollow").html() == "Follow") {
+                            $("#BtnFollow").html("DisFollow");
                         } else {
-                            $("#BtnFollow").html("关注");
+                            $("#BtnFollow").html("Follow");
                         }
                         $("#BtnFollow").attr("disabled", false);
                     }
@@ -44,9 +44,9 @@
             }
             else
             {
-                <a class="btn btn-default" href="@guser.html_url" target="_blank">查看Github</a>
+                <a class="btn btn-default" href="@guser.html_url" target="_blank">Github</a>
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                <button id="BtnFollow" class="btn btn-default">关注</button>
+                <button id="BtnFollow" class="btn btn-default">Follow</button>
             }
         </div>
     </div>

@@ -138,16 +138,15 @@ namespace MVCWeb.Controllers
         }
 
         //查看姿势
-        public ActionResult BlogView(Guid id, int cmpage = 0, int cmfloor = 0, int cmrpage = 0)
+        public ActionResult BlogView(Guid id, int co = 0, int ro = 0)
         {
             Blog blog = BlogDataSvc.GetByID(id);
             ViewBag.Blog = blog;
             ViewBag.Login = CurrentUser != null;
             ViewBag.Owner = CurrentUser != null ? CurrentUser.ID == blog.OwnerID : false;
 
-            ViewBag.Cmpage = cmpage;
-            ViewBag.Cmfloor = cmfloor;
-            ViewBag.Cmrpage = cmrpage;
+            ViewBag.COrder = co;
+            ViewBag.ROrder = ro;
 
             ViewBag.ShowPro = false;
             if (CurrentUser != null)
@@ -205,34 +204,39 @@ namespace MVCWeb.Controllers
         [ValidateInput(false)]
         public ActionResult AddBlogComment(Guid blogID, string mdTxt, string mdValue)
         {
+            Blog blog = BlogDataSvc.GetByID(blogID);
+            blog.CommentCount += 1;
+
             BlogComment comment = new BlogComment();
             comment.BlogID = blogID;
             comment.MDText = mdTxt;
             comment.MDValue = mdValue;
             comment.OwnerID = CurrentUser.ID;
+            comment.Order = blog.CommentCount;
             BlogCommentDataSvc.Add(comment);
-            Blog blog = BlogDataSvc.GetByID(blogID);
-            blog.CommentCount += 1;
+
             BlogDataSvc.Update(blog);
 
-            string key = MyRedisKeys.Pre_NewBCMsg + blog.OwnerID;
-            NewBCMsg bcmsg = MyRedisDB.GetSet<NewBCMsg>(key).Where(m => m.BlogID == blogID).FirstOrDefault();
-            if (bcmsg != null)
+            if(blog.OwnerID != CurrentUser.ID)
             {
-                MyRedisDB.SetRemove(key, bcmsg);
-                bcmsg.Count += 1;
-                MyRedisDB.SetAdd(key, bcmsg);
-            }
-            else
-            {
-                bcmsg = new NewBCMsg();
-                bcmsg.BlogID = blogID;
-                bcmsg.Count = 1;
-                bcmsg.Date = DateTime.Now;
-                bcmsg.Page = blog.CommentCount / 10 + 1;
-                bcmsg.Floor = blog.CommentCount % 10 == 0 ? 10 : blog.CommentCount % 10;
-                bcmsg.Title = blog.Title.Length > 15 ? blog.Title.Substring(0, 15) + "……" : blog.Title;
-                MyRedisDB.SetAdd(key, bcmsg);
+                string key = MyRedisKeys.Pre_NewBCMsg + blog.OwnerID;
+                NewBCMsg bcmsg = MyRedisDB.GetSet<NewBCMsg>(key).Where(m => m.BlogID == blogID).FirstOrDefault();
+                if (bcmsg != null)
+                {
+                    MyRedisDB.SetRemove(key, bcmsg);
+                    bcmsg.Count += 1;
+                    MyRedisDB.SetAdd(key, bcmsg);
+                }
+                else
+                {
+                    bcmsg = new NewBCMsg();
+                    bcmsg.BlogID = blogID;
+                    bcmsg.Count = 1;
+                    bcmsg.Date = DateTime.Now;
+                    bcmsg.Order = comment.Order;
+                    bcmsg.Title = blog.Title.Length > 15 ? blog.Title.Substring(0, 15) + "……" : blog.Title;
+                    MyRedisDB.SetAdd(key, bcmsg);
+                }
             }
 
             return Json(new { msg = "done", count = blog.CommentCount });
@@ -251,41 +255,46 @@ namespace MVCWeb.Controllers
 
         //添加评论回复
         [HttpPost]
-        public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt, int cmpage, int cmfloor)
+        public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt)
         {
+            BlogComment comment = BlogCommentDataSvc.GetByID(commentID);
+            comment.ReplyCount += 1;
+            
             BlogCommentReply reply = new BlogCommentReply();
             reply.BlogCommentID = commentID;
             reply.Content = txt;
             reply.ToUserID = toUserID;
             reply.OwnerID = CurrentUser.ID;
+            reply.Order = comment.ReplyCount;
             BlogCommentReplyDataSvc.Add(reply);
-            BlogComment comment = BlogCommentDataSvc.GetByID(commentID);
-            comment.ReplyCount += 1;
+
             BlogCommentDataSvc.Update(comment);
 
-            string key = MyRedisKeys.Pre_NewBCRMsg + toUserID;
-            NewBCRMsg bcrmsg = new NewBCRMsg();
-            bcrmsg.BlogID = comment.BlogID;
-            bcrmsg.Date = DateTime.Now;
-            bcrmsg.From = CurrentUser.UserName;
-            bcrmsg.CMPage = cmpage;
-            bcrmsg.CMFloor = cmfloor;
-            bcrmsg.CMRPage = comment.ReplyCount / 10 + 1;
-            bcrmsg.Title = txt.Length > 10 ? txt.Substring(0, 10) + "……" : txt;
-            MyRedisDB.SetAdd(key, bcrmsg);
+            if(toUserID != CurrentUser.ID)
+            {
+                string key = MyRedisKeys.Pre_NewBCRMsg + toUserID;
+                NewBCRMsg bcrmsg = new NewBCRMsg();
+                bcrmsg.BlogID = comment.BlogID;
+                bcrmsg.Date = DateTime.Now;
+                bcrmsg.From = CurrentUser.UserName;
+                bcrmsg.COrder = comment.Order;
+                bcrmsg.ROrder = reply.Order;
+                bcrmsg.Title = txt.Length > 15 ? txt.Substring(0, 15) + "……" : txt;
+                MyRedisDB.SetAdd(key, bcrmsg);
+            }
 
             return Json(new { msg = "done" });
         }
 
         //评论回复分页
         [HttpPost]
-        public ActionResult BlogCommentReplyPage(Guid commentID, int floor, int pageSize, int pageNum = 1)
+        public ActionResult BlogCommentReplyPage(Guid commentID, int corder, int pageSize, int pageNum = 1)
         {
             int totalCount;
             ViewBag.BlogCommentReplyList = BlogCommentReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogCommentID == commentID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
-            ViewBag.Floor = floor;
+            ViewBag.COrder = corder;
             return View();
         }
 

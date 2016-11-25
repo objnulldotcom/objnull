@@ -14,9 +14,7 @@ namespace MVCWeb.Redis.Models
 
         public int Count { get; set; }
 
-        public int Page { get; set; }
-
-        public int Floor { get; set; }
+        public int Order { get; set; }
 
         public DateTime Date { get; set; }
     }

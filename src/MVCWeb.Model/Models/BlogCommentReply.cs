@@ -27,7 +27,12 @@ namespace MVCWeb.Model.Models
         /// 内容
         /// </summary>
         public string Content { get; set; }
-        
+
+        /// <summary>
+        /// 顺序
+        /// </summary>
+        public int Order { get; set; }
+
         /// <summary>
         /// 发布人ID
         /// </summary>
