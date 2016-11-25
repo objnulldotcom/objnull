@@ -11,55 +11,59 @@
     <div class="media">
         <div class="media-left">
             <div style="height: 35px;padding-top: 2px;text-align: center;">
-                @{
-                    switch (blog.Type)
-                    {
-                        case (int)EnumBlogType.姿势:
-                            <span class="label label-primary" style="font-weight: 400">姿势</span>
-                            break;
-                        case (int)EnumBlogType.宣传:
-                            <span class="label label-danger" style="font-weight: 400">宣传</span>
-                            break;
-                        case (int)EnumBlogType.心得:
-                            <span class="label label-info" style="font-weight: 400">心得</span>
-                            break;
-                        case (int)EnumBlogType.科普:
-                            <span class="label label-success" style="font-weight: 400">科普</span>
-                            break;
-                        case (int)EnumBlogType.搬运:
-                            <span class="label label-warning" style="font-weight: 400">搬运</span>
-                            break;
-                    }
+                @switch (blog.Type)
+                {
+                    case (int)EnumBlogType.姿势:
+                        <span class="label label-primary" style="font-weight: 400">姿势</span>
+                        break;
+                    case (int)EnumBlogType.宣传:
+                        <span class="label label-danger" style="font-weight: 400">宣传</span>
+                        break;
+                    case (int)EnumBlogType.心得:
+                        <span class="label label-info" style="font-weight: 400">心得</span>
+                        break;
+                    case (int)EnumBlogType.科普:
+                        <span class="label label-success" style="font-weight: 400">科普</span>
+                        break;
+                    case (int)EnumBlogType.搬运:
+                        <span class="label label-warning" style="font-weight: 400">搬运</span>
+                        break;
                 }
             </div>
-            <a href="@Url.Action("Profile", "Home", new { id = blog.Owner.ID })"><img class="img-rounded" src="@blog.Owner.AvatarUrl&s=48" style="max-width: 48px" alt="@blog.Owner.Name" title="@blog.Owner.Name"></a>
+            <a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank"><img class="img-rounded" src="@blog.Owner.AvatarUrl&s=48" style="max-width: 48px" alt="@blog.Owner.Name" title="@blog.Owner.Name"></a>
         </div>
         <div class="media-body">
             <div class="media-heading fs1"><a href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank" style="text-decoration:none">@blog.Title</a></div>
             @{
-                Regex img = new Regex("<img.+>\n*");
+                //提取内容预览
+                Regex img = new Regex("<img.+?>\n*");
                 blog.MDValue = img.Replace(blog.MDValue, "");
-                Regex reg = new Regex("<p>.+</p>");
-                MatchCollection mc = reg.Matches(blog.MDValue.Replace("<br>", " "));
+                Regex link = new Regex("<a.+?</a>*");
+                blog.MDValue = link.Replace(blog.MDValue, "");
+                blog.MDValue = blog.MDValue.Replace("<br>", " ").Replace("<strong>", "").Replace("</strong>", "").Replace("<em>", "").Replace("</em>", "");
+                blog.MDValue = blog.MDValue.Replace("<del>", "").Replace("</del>", "").Replace("<code>", "").Replace("</code>", "");
+                Regex reg = new Regex("<p>.+?</p>");
+                MatchCollection mc = reg.Matches(blog.MDValue);
                 string result = "";
                 for (int i = 0; i < mc.Count; i++)
                 {
                     string ptxt = mc[i].Value.Replace("<p>", "").Replace("</p>", "");
-                    if (System.Text.Encoding.Default.GetBytes(result + ptxt).Length > 380)
+                    result += ptxt + " ";
+                    if (System.Text.Encoding.Default.GetByteCount(result) > 380)
                     {
-                        result = result.TrimEnd() + "……";
+                        result = result.Substring(0, 200);
                         break;
                     }
-                    result += ptxt + " ";
                 }
+                result = result.TrimEnd() + "……";
             }
             <div class="fs2" style="height: 35px; overflow: hidden">@Html.Raw("<p>" + result + "</p>")</div>
             <div class="fs2" style="padding-top:2px">
-                <a>@(string.IsNullOrEmpty(blog.Owner.Name) ? blog.Owner.GitHubLogin : blog.Owner.Name)</a> post at&nbsp;
+                <a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank">@(string.IsNullOrEmpty(blog.Owner.Name) ? blog.Owner.GitHubLogin : blog.Owner.Name)</a> post at&nbsp;
                 <span class="glyphicon glyphicon-time"></span>@blog.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;
-                <span class="glyphicon glyphicon-eye-open"></span>123&nbsp;
-                <span class="glyphicon glyphicon-comment"></span>54&nbsp;
-                <span class="glyphicon glyphicon-thumbs-up"></span>10
+                <span class="glyphicon glyphicon-eye-open"></span>@blog.ViewCount&nbsp;
+                <span class="glyphicon glyphicon-comment"></span>@blog.CommentCount&nbsp;
+                <span class="glyphicon glyphicon-thumbs-up"></span>@blog.ProCount
             </div>
         </div>
     </div>

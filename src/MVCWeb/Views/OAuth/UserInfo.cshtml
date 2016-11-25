@@ -8,7 +8,7 @@
     <li id="MsgLi" class="dropdown">
         <a id="BtnMsg" href="javascript:;">消息<span id="MsgCount" class="badge">@(ViewBag.MsgCount == 0 ? "" : ViewBag.MsgCount)</span></a>
         <div id="MsgBox" class="dropdown-menu">
-            加载中……
+            <div class="text-center">加载中……</div>
         </div>
     </li>
     <li class="dropdown">
@@ -17,9 +17,10 @@
             @CurrentUser.UserName &nbsp;&nbsp;<span class="caret"></span>
         </a>
         <ul class="dropdown-menu" role="menu">
-            <li><a href="@Url.Action("UserProfile", "Home")">我的Github</a></li>
+            <li><a href="https://github.com/@(CurrentUser.GitHubLogin)">我的Github</a></li>
             <li><a href="@Url.Action("UserProfile", "Home")">我的主页</a></li>
             <li><a href="@Url.Action("UserProfile", "Home")">我的消息</a></li>
+            <li><a id="BtnUpdateInfo" href="javascript:;">更新账号</a></li>
             <li><a href="@Url.Action("LogOut", "OAuth")">退出</a></li>
         </ul>
     </li>

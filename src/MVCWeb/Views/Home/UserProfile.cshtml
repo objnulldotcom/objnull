@@ -7,6 +7,7 @@
 @section head{
     <script>
         $(function () {
+            //关注或取关
             $("#BtnFollow").click(function () {
                 var atype = "";
                 if ($("#BtnFollow").html() == "关注") {
@@ -37,9 +38,16 @@
         <div class="fs1" style="margin-top: 16px; font-size:26px">@guser.name</div>
         <div style="font-size:20px; color:#666">@guser.login</div>
         <div style="margin-top: 16px; color:#666">@guser.bio</div>
-        <div style="margin-top: 16px; border-top:1px solid #e5e5e5">
-            <a class="btn btn-default" href="@guser.html_url" target="_blank">查看Github</a>
-            <button id="BtnFollow" class="btn btn-default">关注</button>
+        <div class="text-center" style="margin-top: 16px; padding-top: 16px; border-top:1px solid #e5e5e5">
+            @if (ViewBag.Owner)
+            {
+            }
+            else
+            {
+                <a class="btn btn-default" href="@guser.html_url" target="_blank">查看Github</a>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <button id="BtnFollow" class="btn btn-default">关注</button>
+            }
         </div>
     </div>
     <div class="col-md-9">

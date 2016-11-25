@@ -76,7 +76,7 @@
             } else {
                 $("#MsgLi").css("background-color", "");
                 $("#MsgBox").slideUp(60);
-                $("#MsgBox").html("加载中……");
+                $("#MsgBox").html("<div class=\"text-center\">加载中……</div>");
             }
         }
 
@@ -96,7 +96,7 @@
             $.connection.hub.start().done(function () {
 
             });
-
+            //显示或隐藏消息
             $("#BtnMsg").click(function () {
                 if ($("#MsgBox").is(":hidden")) {
                     UpdateMsgCount();
@@ -120,21 +120,21 @@
             //点击消息框外隐藏消息框
             $(document).mouseup(function (e) {
                 var container = $("#MsgBox");
-                if (!container.is(e.target) && container.has(e.target).length === 0 && !$("#BtnMsg").is(e.target))
-                {
+                if (!container.is(e.target) && container.has(e.target).length === 0 && !$("#BtnMsg").is(e.target)) {
                     ShowMsgBox(false);
                 }
             });
 
-            $("#BtnClearMsg").click(function () {
+            //更新账号
+            $("#BtnUpdateInfo").click(function () {
                 $.ajax({
-                    url: "@Url.Action("ClearMsg", "Home")",
+                    url: "@Url.Action("UpdateInfo", "OAuth")",
                     type: "post",
                     success: function (result) {
                         if (result.msg == "done") {
-                            $("#BtnMsg").click();
+                            window.location.reload();
                         } else {
-                            swal(result.msg)
+                            swal("更新失败");
                         }
                     }
                 });

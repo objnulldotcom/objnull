@@ -35,6 +35,7 @@ namespace MVCWeb.Controllers
         public ActionResult UserProfile(string id = null)
         {
             Guid userID = id == null ? CurrentUser.ID : Guid.Parse(id);
+            ViewBag.Owner = userID == CurrentUser.ID;
             NullUser user = NullUserDataSvc.GetByID(userID);
             ViewBag.GitHubUser = GitHub.GetGitHubUserByName(user.GitHubLogin);
             ViewBag.Token = CurrentUser.GitHubAccessToken;
@@ -47,9 +48,10 @@ namespace MVCWeb.Controllers
         public ActionResult NewBlog()
         {
             string key = MyRedisKeys.Pre_BlogDraft + CurrentUser.ID;
-            Blog draft = JsonConvert.DeserializeObject<Blog>(MyRedisDB.StringGet(key));
-            if(draft != null)
+            string draftval = MyRedisDB.StringGet(key);
+            if(!string.IsNullOrEmpty(draftval))
             {
+                Blog draft = JsonConvert.DeserializeObject<Blog>(draftval);
                 ViewBag.DraftBlog = draft;
             }
             return View();
@@ -138,13 +140,64 @@ namespace MVCWeb.Controllers
         //查看姿势
         public ActionResult BlogView(Guid id, int cmpage = 0, int cmfloor = 0, int cmrpage = 0)
         {
-            ViewBag.Blog = BlogDataSvc.GetByID(id);
+            Blog blog = BlogDataSvc.GetByID(id);
+            ViewBag.Blog = blog;
             ViewBag.Login = CurrentUser != null;
+            ViewBag.Owner = CurrentUser != null ? CurrentUser.ID == blog.OwnerID : false;
 
             ViewBag.Cmpage = cmpage;
             ViewBag.Cmfloor = cmfloor;
             ViewBag.Cmrpage = cmrpage;
+
+            ViewBag.ShowPro = false;
+            if (CurrentUser != null)
+            {
+                string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
+                IEnumerable<UserRecord> UserRecords = MyRedisDB.GetSet<UserRecord>(key);
+                if(UserRecords.Count() == 0)
+                {
+                    MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = 1 });
+                    MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
+                    blog.ViewCount += 1;
+                    BlogDataSvc.Update(blog);
+                }
+                else if(UserRecords.Where(r => r.TargetID == blog.ID && r.type == 1).Count() == 0)
+                {
+                    MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = 1 });
+                    blog.ViewCount += 1;
+                    BlogDataSvc.Update(blog);
+                }
+
+                if (UserRecords.Where(r => r.TargetID == blog.ID && r.type == 2).Count() == 0)
+                {
+                    ViewBag.ShowPro = true;
+                }
+            }
+
             return View();
+        }
+
+        //点赞
+        [HttpPost]
+        public ActionResult ProBlog(Guid id)
+        {
+            Blog blog = BlogDataSvc.GetByID(id);
+            string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
+            IEnumerable<UserRecord> UserRecords = MyRedisDB.GetSet<UserRecord>(key);
+            if (UserRecords.Count() == 0)
+            {
+                MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = 2 });
+                MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
+                blog.ProCount += 1;
+                BlogDataSvc.Update(blog);
+            }
+            else if (UserRecords.Where(r => r.TargetID == blog.ID && r.type == 2).Count() == 0)
+            {
+                MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = 2 });
+                blog.ProCount += 1;
+                BlogDataSvc.Update(blog);
+            }
+            return Json(new { msg = "done", count = blog.ProCount });
         }
 
         //添加评论
@@ -182,7 +235,7 @@ namespace MVCWeb.Controllers
                 MyRedisDB.SetAdd(key, bcmsg);
             }
 
-            return Json(new { msg = "done" });
+            return Json(new { msg = "done", count = blog.CommentCount });
         }
 
         //评论分页

@@ -102,7 +102,7 @@
                     swal("内容不能为空");
                     return;
                 }
-                var clength = getBt(mdTxt.length);
+                var clength = getBt(mdTxt);
                 if (clength > 50000) {
                     swal("内容最多50000字节，当前" + clength + "字节");
                     return;
@@ -151,6 +151,12 @@
                 SaveDraft();
             }, 1000 * 300);
 
+            //读取草稿
+            @if(Draft != null)
+            {
+                @Html.Raw("UpateMDV();\n")
+                @Html.Raw("$('#SltType').val(" + Draft.Type + ").trigger('change');")
+            }
         });
 
         //选择文件
@@ -195,6 +201,7 @@
 }
 <div class="row" style="padding-top: 15px">
     <div id="MDTitle" class="col-md-10 fs1">
+        @(Draft == null ? "" : Draft.Title)
     </div>
     <div class="col-md-2 text-right">
         <span id="LblBType" class="label label-primary" style="font-weight: 400">姿势</span>

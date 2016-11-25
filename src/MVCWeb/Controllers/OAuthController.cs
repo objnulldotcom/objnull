@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using MVCWeb.DataSvc.Svc;
 using MVCWeb.Model.Models;
 using MVCWeb.Redis.Base;
-using MVCWeb.Redis.Models;
 
 namespace MVCWeb.Controllers
 {
@@ -17,6 +16,7 @@ namespace MVCWeb.Controllers
         public INullUserDataSvc NullUserDataSvc { get; set; }
         public IMyRedisDB MyRedisDB { get; set; }
 
+        //用户信息
         public ActionResult UserInfo()
         {
             if (CurrentUser != null)
@@ -27,6 +27,15 @@ namespace MVCWeb.Controllers
             return PartialView();
         }
         
+        [HttpPost]
+        //更新账号
+        public ActionResult UpdateInfo()
+        {
+            UpdateUserInfo("github", CurrentUser.GitHubAccessToken);
+            return Json(new { msg = "done" });
+        }
+
+        //退出
         public ActionResult LogOut()
         {
             HttpContext.WriteCookie("UID", "", DateTime.Now.AddDays(-1));

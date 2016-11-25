@@ -39,7 +39,7 @@ namespace MVCWeb
             }
 #endif
             filterContext.ExceptionHandled = true;
-            filterContext.HttpContext.Response.RedirectToRoute(new { controller = "Demo", action = "Error" });
+            filterContext.HttpContext.Response.RedirectToRoute(new { controller = "Home", action = "Error" });
         }
     }
 

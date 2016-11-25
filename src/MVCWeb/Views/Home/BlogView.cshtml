@@ -91,8 +91,24 @@
                             $("#BtnCmt").click();
                             $("#CommentBox").hide();
                             SendNewMsg("@Blog.OwnerID");
+                            $("#CommentCount").html(result.count);
                         } else {
                             swal(result.msg);
+                        }
+                    }
+                });
+            });
+
+            //点赞
+            $("#BtnPro").click(function () {
+                $.ajax({
+                    url: "@Url.Action("ProBlog", "Home")",
+                    data: { id: "@Blog.ID" },
+                    type: "post",
+                    success: function (result) {
+                        if (result.msg == "done") {
+                            $("#BtnPro").hide();
+                            $("#ProCount").html(result.count);
                         }
                     }
                 });
@@ -264,11 +280,12 @@
         @Html.Raw(Blog.MDValue)
     </div>
     <div class="col-md-6" id="Status" style="line-height: 34px">
-        <a>@Blog.Owner.Name</a> post at&nbsp;
+        <a href="@Url.Action("UserProfile", "Home", new { id = Blog.Owner.ID })" target="_blank"><img class="img-rounded" src="@Blog.Owner.AvatarUrl&s=36" style="max-width: 34px" alt="@Blog.Owner.Name" title="@Blog.Owner.Name"></a>
+        <a href="@Url.Action("UserProfile", "Home", new { id = Blog.Owner.ID })" target="_blank">@(string.IsNullOrEmpty(Blog.Owner.Name) ? Blog.Owner.GitHubLogin : Blog.Owner.Name)</a> post at&nbsp;
         <span class="glyphicon glyphicon-time"></span>@Blog.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;
-        <span class="glyphicon glyphicon-eye-open"></span>123&nbsp;
-        <span class="glyphicon glyphicon-comment"></span>54&nbsp;
-        <span class="glyphicon glyphicon-thumbs-up"></span>10
+        <span class="glyphicon glyphicon-eye-open"></span>@Blog.ViewCount&nbsp;
+        <span class="glyphicon glyphicon-comment"></span><span id="CommentCount">@Blog.CommentCount</span>&nbsp;
+        <span class="glyphicon glyphicon-thumbs-up"></span><span id="ProCount">@Blog.ProCount</span>
     </div>
     <div class="col-md-6 text-right">
         @if (ViewBag.Login)
@@ -276,10 +293,20 @@
             <button id="BtnComment" type="button" class="btn btn-default">
                 <span class="glyphicon glyphicon-comment"></span> 评论
             </button>
-            <span>&nbsp;&nbsp;</span>
-            <button id="BtnPro" type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-thumbs-up"></span> 赞
-            </button>
+            if (!ViewBag.Owner)
+            {
+                <span>&nbsp;&nbsp;</span>
+                <button id="BtnStar" type="button" class="btn btn-default">
+                    <span class="glyphicon glyphicon-bookmark"></span> 收藏
+                </button>
+                <span>&nbsp;&nbsp;</span>
+                if (ViewBag.ShowPro)
+                {
+                    <button id="BtnPro" type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-thumbs-up"></span> 赞
+                    </button>
+                }
+            }
         }
     </div>
 </div>
