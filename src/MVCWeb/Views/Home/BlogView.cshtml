@@ -119,6 +119,20 @@
                     }
                 });
             });
+
+            //收藏
+            $("#BtnStar").click(function () {
+                $.ajax({
+                    url: "@Url.Action("StarBlog", "Home")",
+                    data: { id: "@Blog.ID" },
+                    type: "post",
+                    success: function (result) {
+                        if (result.msg == "done") {
+                            $("#BtnStar").hide();
+                        }
+                    }
+                });
+            });
         });
 
         var FirstLoad = true;
@@ -302,9 +316,12 @@
             if (!ViewBag.Owner)
             {
                 <span>&nbsp;&nbsp;</span>
-                <button id="BtnStar" type="button" class="btn btn-default">
-                    <span class="glyphicon glyphicon-bookmark"></span> 收藏
-                </button>
+                if (ViewBag.ShowStar)
+                {
+                    <button id="BtnStar" type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-bookmark"></span> 收藏
+                    </button>
+                }
                 <span>&nbsp;&nbsp;</span>
                 if (ViewBag.ShowPro)
                 {

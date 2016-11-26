@@ -72,5 +72,10 @@ namespace MVCWeb.Model.Models
         /// 收到的姿势评论回复集合
         /// </summary>
         public virtual ICollection<BlogCommentReply> ReceivedBlogCommentReplys { get; set; }
+
+        /// <summary>
+        /// 收藏
+        /// </summary>
+        public virtual ICollection<UserStar> UserStars { get; set; }
     }
 }

@@ -18,6 +18,7 @@ namespace MVCWeb.Controllers
         public IBlogDataSvc BlogDataSvc { get; set; }
         public IBlogCommentDataSvc BlogCommentDataSvc { get; set; }
         public IBlogCommentReplyDataSvc BlogCommentReplyDataSvc { get; set; }
+        public IUserStarDataSvc UserStarDataSvc { get; set; }
         public IMyRedisDB MyRedisDB { get; set; }
 
         public int GetByteLength(string val)
@@ -151,25 +152,50 @@ namespace MVCWeb.Controllers
             ViewBag.ShowPro = false;
             if (CurrentUser != null)
             {
+                //查看次数
                 string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
-                IEnumerable<UserRecord> UserRecords = MyRedisDB.GetSet<UserRecord>(key);
-                if(UserRecords.Count() == 0)
+                IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
+                if(userRecords.Count() == 0)
                 {
-                    MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = 1 });
+                    MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = (int)EnumRecordType.查看 });
                     MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
                     blog.ViewCount += 1;
                     BlogDataSvc.Update(blog);
                 }
-                else if(UserRecords.Where(r => r.TargetID == blog.ID && r.type == 1).Count() == 0)
+                else if(userRecords.Where(r => r.TargetID == blog.ID && r.type == (int)EnumRecordType.查看).Count() == 0)
                 {
-                    MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = 1 });
+                    MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = (int)EnumRecordType.查看 });
                     blog.ViewCount += 1;
                     BlogDataSvc.Update(blog);
                 }
-
-                if (UserRecords.Where(r => r.TargetID == blog.ID && r.type == 2).Count() == 0)
+                //点赞
+                if (userRecords.Where(r => r.TargetID == blog.ID && r.type == (int)EnumRecordType.点赞).Count() == 0)
                 {
                     ViewBag.ShowPro = true;
+                }
+                //收藏
+                ViewBag.ShowStar = true;
+                string starKey = MyRedisKeys.Pre_UserStarCache + CurrentUser.ID;
+                IEnumerable<UserStarCache> userStarCaches = MyRedisDB.GetSet<UserStarCache>(starKey);
+                if (userStarCaches.Count() == 0)
+                {
+                    IEnumerable<UserStar> userStars = UserStarDataSvc.GetByCondition(s => s.OwnerID == CurrentUser.ID);
+                    if(userStars.Count() > 0)
+                    {
+                        if (userStars.Where(s => s.TargetID == blog.ID && s.Type == (int)EnumStarType.姿势).Count() > 0)
+                        {
+                            ViewBag.ShowStar = false;
+                        }
+                        foreach (UserStar star in userStars)//添加收藏缓存
+                        {
+                            MyRedisDB.SetAdd(starKey, new UserStarCache() { TargetID = blog.ID, type = star.Type });
+                        }
+                        MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
+                    }
+                }
+                else if (userStarCaches.Where(s => s.TargetID == blog.ID && s.type == (int)EnumStarType.姿势).Count() > 0)
+                {
+                    ViewBag.ShowStar = false;
                 }
             }
 
@@ -182,19 +208,67 @@ namespace MVCWeb.Controllers
         {
             Blog blog = BlogDataSvc.GetByID(id);
             string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
-            IEnumerable<UserRecord> UserRecords = MyRedisDB.GetSet<UserRecord>(key);
-            if (UserRecords.Count() == 0)
+            IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
+            if (userRecords.Count() == 0)
             {
-                MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = 2 });
+                MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = (int)EnumRecordType.点赞 });
                 MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
                 blog.ProCount += 1;
                 BlogDataSvc.Update(blog);
             }
-            else if (UserRecords.Where(r => r.TargetID == blog.ID && r.type == 2).Count() == 0)
+            else if (userRecords.Where(r => r.TargetID == blog.ID && r.type == (int)EnumRecordType.点赞).Count() == 0)
             {
-                MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = 2 });
+                MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = (int)EnumRecordType.点赞 });
                 blog.ProCount += 1;
                 BlogDataSvc.Update(blog);
+            }
+            return Json(new { msg = "done", count = blog.ProCount });
+        }
+
+        //收藏
+        [HttpPost]
+        public ActionResult StarBlog(Guid id)
+        {
+            Blog blog = BlogDataSvc.GetByID(id);
+            bool add = false;
+            string starKey = MyRedisKeys.Pre_UserStarCache + CurrentUser.ID;
+            IEnumerable<UserStarCache> userStarCaches = MyRedisDB.GetSet<UserStarCache>(starKey);
+            if (userStarCaches.Count() == 0)
+            {
+                IEnumerable<UserStar> userStars = UserStarDataSvc.GetByCondition(s => s.OwnerID == CurrentUser.ID);
+                if (userStars.Count() > 0)
+                {
+                    //添加收藏缓存
+                    foreach (UserStar star in userStars)
+                    {
+                        MyRedisDB.SetAdd(starKey, new UserStarCache() { TargetID = blog.ID, type = star.Type });
+                    }
+                    MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
+                    //添加收藏
+                    if (userStars.Where(s => s.TargetID == blog.ID && s.Type == (int)EnumStarType.姿势).Count() == 0)
+                    {
+                        add = true;
+                    }
+                }
+                else
+                {
+                    add = true;
+                }
+            }
+            else if (userStarCaches.Where(s => s.TargetID == blog.ID && s.type == (int)EnumStarType.姿势).Count() == 0)
+            {
+                add = true;
+            }
+            if (add)
+            {
+                //添加收藏
+                UserStar star = new UserStar();
+                star.OwnerID = CurrentUser.ID;
+                star.TargetID = blog.ID;
+                star.Title = blog.Title;
+                star.Type = (int)EnumStarType.姿势;
+                UserStarDataSvc.Add(star);
+                MyRedisDB.SetAdd(starKey, new UserStarCache() { TargetID = blog.ID, type = star.Type });
             }
             return Json(new { msg = "done", count = blog.ProCount });
         }

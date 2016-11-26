@@ -41,7 +41,7 @@
                 Regex link = new Regex("<a.+?</a>*");
                 blog.MDValue = link.Replace(blog.MDValue, "");
                 blog.MDValue = blog.MDValue.Replace("<br>", " ").Replace("<strong>", "").Replace("</strong>", "").Replace("<em>", "").Replace("</em>", "");
-                blog.MDValue = blog.MDValue.Replace("<del>", "").Replace("</del>", "").Replace("<code>", "").Replace("</code>", "");
+                blog.MDValue = blog.MDValue.Replace("<del>", "").Replace("</del>", "").Replace("<code>", "").Replace("</code>", "").Replace("\n", " ");
                 Regex reg = new Regex("<p>.+?</p>");
                 MatchCollection mc = reg.Matches(blog.MDValue);
                 string result = "";

@@ -5,9 +5,9 @@ namespace MVCWeb.Model.DBContext
 {
     public class MyDBContext : DbContext
     {
-        //实体集
-        public IDbSet<NullUser> Users { get; set; }
-        public IDbSet<Blog> Blogs { get; set; }
+        //实体集（不用定义，BaseDataSvc中动态构造）
+        //public IDbSet<NullUser> Users { get; set; }
+        //public IDbSet<Blog> Blogs { get; set; }
 
         public MyDBContext() : base("MySQLConnection")
         {
@@ -28,6 +28,7 @@ namespace MVCWeb.Model.DBContext
             modelBuilder.Configurations.Add(new BlogMapping());
             modelBuilder.Configurations.Add(new BlogCommentMapping());
             modelBuilder.Configurations.Add(new BlogCommentReplyMapping());
+            modelBuilder.Configurations.Add(new UserStarMapping());
         }
     }
 }

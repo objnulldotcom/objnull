@@ -180,7 +180,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="SignalRHubs\Startup.cs" />
     <Compile Include="Assist\BaseController.cs" />
-    <Compile Include="Assist\Enum\EnumBlogType.cs" />
+    <Compile Include="Assist\Enums.cs" />
     <Compile Include="Assist\OAuth\GitHub.cs" />
     <Compile Include="Assist\OAuth\GitHubAccessToken.cs" />
     <Compile Include="Assist\OAuth\GitHubUser.cs" />

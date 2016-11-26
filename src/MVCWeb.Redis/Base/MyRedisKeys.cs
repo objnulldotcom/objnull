@@ -14,5 +14,6 @@ namespace MVCWeb.Redis.Base
         public const string Pre_NewBCRMsg = "NewBCRMsg";
         public const string Pre_BlogDraft = "BlogDraft";
         public const string Pre_UserRecord = "UserRecord";
+        public const string Pre_UserStarCache = "UserStarCache";
     }
 }

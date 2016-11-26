@@ -17,7 +17,7 @@
             @CurrentUser.UserName &nbsp;&nbsp;<span class="caret"></span>
         </a>
         <ul class="dropdown-menu" role="menu">
-            <li><a href="https://github.com/@(CurrentUser.GitHubLogin)">我的Github</a></li>
+            <li><a href="https://github.com/@(CurrentUser.GitHubLogin)" target="_blank">我的Github</a></li>
             <li><a href="@Url.Action("UserProfile", "Home")">我的主页</a></li>
             <li><a href="@Url.Action("UserProfile", "Home")">我的消息</a></li>
             <li><a id="BtnUpdateInfo" href="javascript:;">更新账号</a></li>

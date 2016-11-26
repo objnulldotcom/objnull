@@ -47,4 +47,15 @@ namespace MVCWeb.Model.DBContext
             HasRequired(it => it.ToUser).WithMany(that => that.ReceivedBlogCommentReplys).HasForeignKey(it => it.ToUserID);
         }
     }
+
+    public class UserStarMapping : EntityTypeConfiguration<UserStar>
+    {
+        public UserStarMapping()
+        {
+            ToTable("UserStar");
+            HasKey(that => that.ID);
+
+            HasRequired(it => it.Owner).WithMany(that => that.UserStars).HasForeignKey(it => it.OwnerID);
+        }
+    }
 }
