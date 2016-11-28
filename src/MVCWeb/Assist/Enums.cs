@@ -17,7 +17,7 @@ namespace MVCWeb
     public enum EnumStarType
     {
         姿势 = 1,
-        NeeBee = 2,
+        NewBee = 2,
         笔记 = 3,
         问题 = 4
     }

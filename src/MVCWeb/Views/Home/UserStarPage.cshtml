@@ -1,0 +1,40 @@
+﻿@using MVCWeb;
+@using MVCWeb.Model.Models;
+@{
+    List<UserStar> UserStars = ViewBag.UserStars as List<UserStar>;
+}
+<div class="row">
+    <div class="col-md-2">
+        <ul class="nav nav-pills nav-stacked text-center">
+            <li class="@(ViewBag.Type == (int)EnumStarType.姿势 ? "active" : "")"><a href="javascript:;" onclick="UserStarPage(1, @((int)EnumStarType.姿势))">姿势</a></li>
+            <li class="@(ViewBag.Type == (int)EnumStarType.NewBee ? "active" : "")"><a href="javascript:;" onclick="UserStarPage(1, @((int)EnumStarType.NewBee))">NewBee</a></li>
+        </ul>
+    </div>
+    <div class="col-md-10">
+        <div class="row">
+            @{
+                string StarUrl = "";
+                switch ((int)ViewBag.Type)
+                {
+                    case (int)EnumStarType.姿势:
+                        StarUrl = Url.Action("BlogView", "Home");
+                        break;
+                    case (int)EnumStarType.NewBee:
+                        StarUrl = Url.Action("NewBeeView", "Home");
+                        break;
+                }
+            }
+            @foreach (UserStar star in UserStars)
+            {
+                <div class="col-md-12 fs3">
+                    <a href="@StarUrl/@star.TargetID" target="_blank" style="text-decoration:none">@(star.Title.Length > 35 ? star.Title.Substring(0, 35) + "……" : star.Title)</a>
+                    <div class="fs2" style="float:right">
+                        <span class="glyphicon glyphicon-time"></span>@star.InsertDate.ToString("yyyy-MM-dd HH:mm")
+                    </div>
+                </div>
+            }
+        </div>
+        <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
+        <input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
+    </div>
+</div>

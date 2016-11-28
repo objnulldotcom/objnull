@@ -33,3 +33,9 @@ textarea {
 .fs2{
     font-size: 12px;
 }
+
+.fs3{
+    font-size:16px;
+    font-weight:600;
+    font-family:'Microsoft YaHei';
+}

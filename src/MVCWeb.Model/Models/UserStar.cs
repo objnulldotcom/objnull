@@ -24,7 +24,7 @@ namespace MVCWeb.Model.Models
         public DateTime InsertDate { get; set; }
 
         /// <summary>
-        /// 类型
+        /// 类型 姿势 = 1, NeeBee = 2,笔记 = 3,问题 = 4
         /// </summary>
         public int Type { get; set; }
 

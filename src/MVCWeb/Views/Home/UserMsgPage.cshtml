@@ -1,0 +1,63 @@
+﻿@using MVCWeb;
+@using MVCWeb.Model.Models;
+@{
+    List<UserStar> UserStars = ViewBag.UserStars as List<UserStar>;
+}
+<div class="row">
+    <div class="col-md-2">
+        <ul class="nav nav-pills nav-stacked text-center">
+            <li class="@(ViewBag.Type == "replyme" ? "active" : "")"><a href="javascript:;" onclick="UserMsgPage(1, 'replyme')">回复我的</a></li>
+            <li class="@(ViewBag.Type == "myreply" ? "active" : "")"><a href="javascript:;" onclick="UserMsgPage(1, 'myreply')">我回复的</a></li>
+            <li class="@(ViewBag.Type == "mycomment" ? "active" : "")"><a href="javascript:;" onclick="UserMsgPage(1, 'mycomment')">我评论的</a></li>
+        </ul>
+    </div>
+    <div class="col-md-10">
+        <div class="row">
+            @switch ((string)ViewBag.Type)
+            {
+                case "replyme":
+                    List<BlogCommentReply> ReplyMes = ViewBag.ReplyMes as List<BlogCommentReply>;
+                    foreach (BlogCommentReply reply in ReplyMes)
+                    {
+                        <div class="col-md-12 fs3">
+                            @(string.IsNullOrEmpty(reply.Owner.Name) ? reply.Owner.GitHubLogin : reply.Owner.Name) 回复你
+                            <a href="@Url.Action("BlogView", "Home", new { id = reply.BlogComment.BlogID, co = reply.BlogComment.Order, ro = reply.Order })" target="_blank" style="text-decoration:none">@(reply.Content.Length > 35 ? reply.Content.Substring(0, 35) + "……" : reply.Content)</a>
+                            <div class="fs2" style="float:right">
+                                <span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToString("yyyy-MM-dd HH:mm")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "myreply":
+                    List<BlogCommentReply> MyReplys = ViewBag.MyReplys as List<BlogCommentReply>;
+                    foreach (BlogCommentReply reply in MyReplys)
+                    {
+                        <div class="col-md-12 fs3">
+                            回复 @(string.IsNullOrEmpty(reply.ToUser.Name) ? reply.ToUser.GitHubLogin : reply.ToUser.Name)
+                            <a href="@Url.Action("BlogView", "Home", new { id = reply.BlogComment.BlogID, co = reply.BlogComment.Order, ro = reply.Order })" target="_blank" style="text-decoration:none">@(reply.Content.Length > 35 ? reply.Content.Substring(0, 35) + "……" : reply.Content)</a>
+                            <div class="fs2" style="float:right">
+                                <span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToString("yyyy-MM-dd HH:mm")
+                            </div>
+                        </div>
+                    }
+                    break;
+                case "mycomment":
+                    List<BlogComment> MyComments = ViewBag.MyComments as List<BlogComment>;
+                    foreach (BlogComment comment in MyComments)
+                    {
+                        string title = comment.Blog.Title;
+                        <div class="col-md-12 fs3">                            
+                        评论
+                        <a href="@Url.Action("BlogView", "Home", new { id = comment.BlogID, co = comment.Order })" target="_blank" style="text-decoration:none">@( title.Length > 35 ? title.Substring(0, 35) + "……" : title)</a>
+                            <div class="fs2" style="float:right">
+                                <span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToString("yyyy-MM-dd HH:mm")
+                            </div>
+                        </div>
+                    }
+                    break;
+            }
+        </div>
+        <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
+        <input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
+    </div>
+</div>

@@ -21,6 +21,11 @@ namespace MVCWeb
             return JsonConvert.DeserializeObject<GitHubUser>(userInfo);
         }
 
+        /// <summary>
+        /// 未认证api请求限制60次请求每小时（不用了）
+        /// </summary>
+        /// <param name="loginName"></param>
+        /// <returns></returns>
         public static GitHubUser GetGitHubUserByName(string loginName)
         {
             string userInfo;

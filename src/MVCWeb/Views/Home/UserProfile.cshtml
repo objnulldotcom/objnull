@@ -1,10 +1,12 @@
-﻿@using MVCWeb;
+﻿@using MVCWeb.Model.Models;
 @{
-    ViewBag.Title = "我的主页 - 象空";
+    NullUser User = ViewBag.User as NullUser;
+    string UserName = string.IsNullOrEmpty(User.Name) ? User.GitHubLogin : User.Name;
+    ViewBag.Title = (ViewBag.Owner ? "我的主页" : UserName) + " - 象空";
     Layout = "~/Views/Shared/_LayoutMain.cshtml";
-    GitHubUser guser = ViewBag.GitHubUser as GitHubUser;
 }
 @section head{
+    <script src="~/Scripts/SimplePagination/jquery.simplePagination.js"></script>
     <script>
         $(function () {
             //关注或取关
@@ -17,7 +19,7 @@
                 }
                 $("#BtnFollow").attr("disabled", true);
                 $.ajax({
-                    url: "https://api.github.com/user/following/@(guser.login)?access_token=@(ViewBag.Token)",
+                    url: "https://api.github.com/user/following/@(User.GitHubLogin)?access_token=@(ViewBag.Token)",
                     type: atype,
                     success: function (result) {
                         if ($("#BtnFollow").html() == "Follow") {
@@ -29,33 +31,148 @@
                     }
                 });
             });
+
+            //姿势
+            $("#BtnBlog").click(function () {
+                $("#UserNav li").removeClass("active");
+                $(this).parent().addClass("active");
+                UserBlogPage(1);
+            });
+
+            //收藏
+            $("#BtnStar").click(function () {
+                $("#UserNav li").removeClass("active");
+                $(this).parent().addClass("active");
+                UserStarPage(1, @((int)EnumStarType.姿势));
+            });
+
+            //消息
+            $("#BtnMyMsg").click(function () {
+                $("#UserNav li").removeClass("active");
+                $(this).parent().addClass("active");
+                UserMsgPage(1, "replyme");
+            });
+
+            //显示姿势
+            $("#BtnBlog").click();
         });
+
+        //用户姿势查询
+        function UserBlogPage(index) {
+            var pageSize = 10;
+            var postData = { uid: "@User.ID", pageSize: pageSize, pageNum: index }
+            $.ajax({
+                url: "@Url.Action("UserBlogPage", "Home")",
+                type: "Post",
+                data: postData,
+                success: function (result) {
+                    $("#UserDate").html(result);
+                    $("#UserPager").pagination({
+                        items: $("#TotalCount").val(),
+                        itemsOnPage: pageSize,
+                        currentPage: $("#CurrentPage").val(),
+                        prevText: "<",
+                        nextText: ">",
+                        listStyle: "pagination pagination-sm",
+                        hrefTextPrefix: "javascript:;",
+                        onPageClick: function (pageNumber, event) {
+                            UserBlogPage(pageNumber);
+                        }
+                    });
+                }
+            });
+        }
+
+        //用户收藏查询
+        function UserStarPage(index, type) {
+            var pageSize = 10;
+            var postData = { pageSize: pageSize, pageNum: index, type: type }
+            $.ajax({
+                url: "@Url.Action("UserStarPage", "Home")",
+                type: "Post",
+                data: postData,
+                success: function (result) {
+                    $("#UserDate").html(result);
+                    $("#UserPager").pagination({
+                        items: $("#TotalCount").val(),
+                        itemsOnPage: pageSize,
+                        currentPage: $("#CurrentPage").val(),
+                        prevText: "<",
+                        nextText: ">",
+                        listStyle: "pagination pagination-sm",
+                        hrefTextPrefix: "javascript:;",
+                        onPageClick: function (pageNumber, event) {
+                            UserStarPage(pageNumber, type);
+                        }
+                    });
+                }
+            });
+        }
+
+        //用户收藏查询
+        function UserMsgPage(index, type) {
+            var pageSize = 10;
+            var postData = { pageSize: pageSize, pageNum: index, type: type }
+            $.ajax({
+                url: "@Url.Action("UserMsgPage", "Home")",
+                type: "Post",
+                data: postData,
+                success: function (result) {
+                    $("#UserDate").html(result);
+                    $("#UserPager").pagination({
+                        items: $("#TotalCount").val(),
+                        itemsOnPage: pageSize,
+                        currentPage: $("#CurrentPage").val(),
+                        prevText: "<",
+                        nextText: ">",
+                        listStyle: "pagination pagination-sm",
+                        hrefTextPrefix: "javascript:;",
+                        onPageClick: function (pageNumber, event) {
+                            UserMsgPage(pageNumber, type);
+                        }
+                    });
+                }
+            });
+        }
     </script>
 }
 <div class="row" style="margin-top: 24px">
     <div class="col-md-3 mdv">
-        <a><img src="@guser.avatar_url&s=300" class="img-rounded" /></a>
-        <div class="fs1" style="margin-top: 16px; font-size:26px">@guser.name</div>
-        <div style="font-size:20px; color:#666">@guser.login</div>
-        <div style="margin-top: 16px; color:#666">@guser.bio</div>
+        <a><img src="@User.AvatarUrl&s=300" class="img-rounded" /></a>
+        <div class="fs1" style="margin-top: 16px; font-size:26px">@User.Name</div>
+        <div style="font-size:20px; color:#666">@User.GitHubLogin</div>
         <div class="text-center" style="margin-top: 16px; padding-top: 16px; border-top:1px solid #e5e5e5">
             @if (ViewBag.Owner)
             {
             }
             else
             {
-                <a class="btn btn-default" href="@guser.html_url" target="_blank">Github</a>
+                <a class="btn btn-default" href="https://github.com/@User.GitHubLogin/" target="_blank">Github</a>
                 <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                 <button id="BtnFollow" class="btn btn-default">Follow</button>
             }
+            <span>@User.InsertDate.ToString("yyyy-MM-dd") 加入象空</span>
+            <span>12345个赞</span>
         </div>
     </div>
     <div class="col-md-9">
-        <ul class="nav nav-pills nav-justified">
-            <li role="presentation" class="active"><a href="#">总览</a></li>
-            <li role="presentation"><a href="#">Word 姿势</a></li>
-            <li role="presentation"><a href="#">Word NewBee</a></li>
-            <li role="presentation"><a href="#">Word 收藏</a></li>
+        <ul class="nav nav-tabs nav-justified" id="UserNav">
+            @if (ViewBag.Owner)
+            {
+                <li><a id="BtnBlog" href="javascript:;">Word 姿势</a></li>
+                <li><a id="BtnNewBee" href="javascript:;">Word NewBee</a></li>
+                <li><a id="BtnStar" href="javascript:;">Word 收藏</a></li>
+                <li><a id="BtnMyMsg" href="javascript:;">Word 消息</a></li>
+            }
+            else
+            {
+                <li><a id="BtnBlog" href="javascript:;">姿势</a></li>
+                <li><a href="javascript:;">笔记</a></li>
+            }
         </ul>
+        <div class="row">
+            <div id="UserDate" class="col-md-12" style="padding-top:5px"></div>
+            <div id="UserPager" class="col-md-12 text-center"></div>
+        </div>
     </div>
 </div>

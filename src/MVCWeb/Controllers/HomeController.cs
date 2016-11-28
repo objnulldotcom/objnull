@@ -32,16 +32,66 @@ namespace MVCWeb.Controllers
             return View();
         }
 
+        #region UserInfo
+
         //个人主页
         public ActionResult UserProfile(string id = null)
         {
             Guid userID = id == null ? CurrentUser.ID : Guid.Parse(id);
             ViewBag.Owner = userID == CurrentUser.ID;
-            NullUser user = NullUserDataSvc.GetByID(userID);
-            ViewBag.GitHubUser = GitHub.GetGitHubUserByName(user.GitHubLogin);
+            ViewBag.User = NullUserDataSvc.GetByID(userID);
             ViewBag.Token = CurrentUser.GitHubAccessToken;
             return View();
         }
+
+        //用户姿势
+        [HttpPost]
+        public ActionResult UserBlogPage(Guid uid, int pageSize, int pageNum = 1)
+        {
+            ViewBag.Owner = uid == CurrentUser.ID;
+            int totalCount;
+            ViewBag.UserBlogs = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, b => b.OwnerID == uid, b => b.InsertDate, true, out totalCount).ToList();
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            return View();
+        }
+
+        //word收藏
+        [HttpPost]
+        public ActionResult UserStarPage(int type, int pageSize, int pageNum = 1)
+        {
+            int totalCount;
+            ViewBag.UserStars = UserStarDataSvc.GetPagedEntitys(ref pageNum, pageSize, b => b.OwnerID == CurrentUser.ID && b.Type == type, b => b.InsertDate, true, out totalCount).ToList();
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            ViewBag.Type = type;
+            return View();
+        }
+
+        //word消息
+        [HttpPost]
+        public ActionResult UserMsgPage(string type, int pageSize, int pageNum = 1)
+        {
+            int totalCount = 0;
+            switch (type)
+            {
+                case "replyme":
+                    ViewBag.ReplyMes = BlogCommentReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, b => b.ToUserID == CurrentUser.ID, b => b.InsertDate, true, out totalCount).ToList();
+                    break;
+                case "myreply":
+                    ViewBag.MyReplys = BlogCommentReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, b => b.OwnerID == CurrentUser.ID, b => b.InsertDate, true, out totalCount).ToList();
+                    break;
+                case "mycomment":
+                    ViewBag.MyComments = BlogCommentDataSvc.GetPagedEntitys(ref pageNum, pageSize, b => b.OwnerID == CurrentUser.ID, b => b.InsertDate, true, out totalCount).ToList();
+                    break;
+            }
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            ViewBag.Type = type;
+            return View();
+        }
+
+        #endregion
 
         #region 姿势blog
 
@@ -50,14 +100,14 @@ namespace MVCWeb.Controllers
         {
             string key = MyRedisKeys.Pre_BlogDraft + CurrentUser.ID;
             string draftval = MyRedisDB.StringGet(key);
-            if(!string.IsNullOrEmpty(draftval))
+            if (!string.IsNullOrEmpty(draftval))
             {
                 Blog draft = JsonConvert.DeserializeObject<Blog>(draftval);
                 ViewBag.DraftBlog = draft;
             }
             return View();
         }
-        
+
         //保存草稿
         [HttpPost]
         [ValidateInput(false)]
@@ -155,14 +205,14 @@ namespace MVCWeb.Controllers
                 //查看次数
                 string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
                 IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
-                if(userRecords.Count() == 0)
+                if (userRecords.Count() == 0)
                 {
                     MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = (int)EnumRecordType.查看 });
                     MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
                     blog.ViewCount += 1;
                     BlogDataSvc.Update(blog);
                 }
-                else if(userRecords.Where(r => r.TargetID == blog.ID && r.type == (int)EnumRecordType.查看).Count() == 0)
+                else if (userRecords.Where(r => r.TargetID == blog.ID && r.type == (int)EnumRecordType.查看).Count() == 0)
                 {
                     MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = (int)EnumRecordType.查看 });
                     blog.ViewCount += 1;
@@ -180,7 +230,7 @@ namespace MVCWeb.Controllers
                 if (userStarCaches.Count() == 0)
                 {
                     IEnumerable<UserStar> userStars = UserStarDataSvc.GetByCondition(s => s.OwnerID == CurrentUser.ID);
-                    if(userStars.Count() > 0)
+                    if (userStars.Count() > 0)
                     {
                         if (userStars.Where(s => s.TargetID == blog.ID && s.Type == (int)EnumStarType.姿势).Count() > 0)
                         {
@@ -291,7 +341,7 @@ namespace MVCWeb.Controllers
 
             BlogDataSvc.Update(blog);
 
-            if(blog.OwnerID != CurrentUser.ID)
+            if (blog.OwnerID != CurrentUser.ID)
             {
                 string key = MyRedisKeys.Pre_NewBCMsg + blog.OwnerID;
                 NewBCMsg bcmsg = MyRedisDB.GetSet<NewBCMsg>(key).Where(m => m.BlogID == blogID).FirstOrDefault();
@@ -333,7 +383,7 @@ namespace MVCWeb.Controllers
         {
             BlogComment comment = BlogCommentDataSvc.GetByID(commentID);
             comment.ReplyCount += 1;
-            
+
             BlogCommentReply reply = new BlogCommentReply();
             reply.BlogCommentID = commentID;
             reply.Content = txt;
@@ -344,7 +394,7 @@ namespace MVCWeb.Controllers
 
             BlogCommentDataSvc.Update(comment);
 
-            if(toUserID != CurrentUser.ID)
+            if (toUserID != CurrentUser.ID)
             {
                 string key = MyRedisKeys.Pre_NewBCRMsg + toUserID;
                 NewBCRMsg bcrmsg = new NewBCRMsg();
