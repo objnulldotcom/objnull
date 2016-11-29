@@ -8,12 +8,29 @@
     <script src="~/Scripts/SimplePagination/jquery.simplePagination.js"></script>
     <script>
         $(function () {
-            JqueryPage(1);
+            JqueryPage(1, "new");
+            
+            $("#BtnNew").click(function () {
+                $("#NavOrder li").removeClass("active");
+                $(this).parent().addClass("active");
+                JqueryPage(1, "new");
+            });
+            $("#BtnView").click(function () {
+                $("#NavOrder li").removeClass("active");
+                $(this).parent().addClass("active");
+                JqueryPage(1, "view");
+            });
+            $("#BtnPro").click(function () {
+                $("#NavOrder li").removeClass("active");
+                $(this).parent().addClass("active");
+                JqueryPage(1, "pro");
+            });
         });
+
         //Ajax Jquery page
-        function JqueryPage(index) {
+        function JqueryPage(index, order) {
             var pageSize = 15;
-            var postData = { pageSize: pageSize, pageNum: index }
+            var postData = {order: order, pageSize: pageSize, pageNum: index }
             $.ajax({
                 url: "@Url.Action("BlogPage", "Home")",
                 type: "Post",
@@ -38,9 +55,21 @@
 
     </script>
 }
-<div class="row">
-    <div class="col-md-12">
-        <a class="btn btn-primary" href="@Url.Action("NewBlog", "Home")">新姿势</a>
+<div class="row" style="padding: 10px 0px">
+    <div class="col-md-12" style="height: 100px; margin-bottom: 10px">
+    </div>
+    <div class="col-md-6">
+        <ul class="nav nav-pills" id="NavOrder">
+            <li class="active"><a id="BtnNew" href="javascript:;">最新</a></li>
+            <li><a id="BtnView" href="javascript:;">热门</a></li>
+            <li><a id="BtnPro" href="javascript:;">好评</a></li>
+        </ul>
+    </div>
+    <div class="col-md-6 text-right" style="height: 40px; line-height: 40px">
+        @if (ViewBag.Login)
+        {
+            <a class="btn btn-primary" href="@Url.Action("NewBlog", "Home")"><span class="glyphicon glyphicon-pencil"></span> 新姿势</a>
+        }
     </div>
 </div>
 <div class="row">

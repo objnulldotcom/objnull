@@ -18,7 +18,7 @@
                 <a id="ShowReply@(comment.Order)" href="javascript:;" style="text-decoration:none" onclick="ShowReply(@comment.Order, 1)" recount="@comment.ReplyCount">
                     @if (comment.ReplyCount > 0)
                     { @Html.Raw(comment.ReplyCount + "条回复") }
-                    else
+                    else if (ViewBag.Login)
                     { @Html.Raw("回复") }
                 </a>
             </div>
@@ -27,18 +27,21 @@
             <div id="Replys@(comment.Order)"></div>
             <div id="ReplyPager@(comment.Order)" class="col-md-12 text-center" style="margin: -15px 0px">
             </div>
-            <div class="col-md-11">
-                <div class="input-group">
-                    <div class="input-group-addon">
-                        <span id="ReplyToUser@(comment.Order)">@@@userName </span>
-                        <a id="DefaultUser@(comment.Order)" href="javascript:;" style="display:none" onclick="ReplyDefault(@comment.Order,'@userName','@comment.Owner.ID')"><span class="badge">x</span></a>
+            @if (ViewBag.Login)
+            {
+                <div class="col-md-11">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <span id="ReplyToUser@(comment.Order)">@@@userName </span>
+                            <a id="DefaultUser@(comment.Order)" href="javascript:;" style="display:none" onclick="ReplyDefault(@comment.Order,'@userName','@comment.Owner.ID')"><span class="badge">x</span></a>
+                        </div>
+                        <input id="ReplyTxt@(comment.Order)" type="text" class="form-control" touser="@comment.OwnerID" />
                     </div>
-                    <input id="ReplyTxt@(comment.Order)" type="text" class="form-control" touser="@comment.OwnerID" />
                 </div>
-            </div>
-            <div class="col-md-1">
-                <button class="btn btn-default" onclick="AddReply(@comment.Order)">确定</button>
-            </div>
+                <div class="col-md-1">
+                    <button class="btn btn-default" onclick="AddReply(@comment.Order)">确定</button>
+                </div>
+            }
         </div>
         <div class="row">
             <div class="col-md-12">

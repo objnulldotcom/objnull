@@ -95,7 +95,7 @@ namespace MVCWeb.Controllers
 
         #region 姿势blog
 
-        //新姿势
+        //新姿势 needlogin
         public ActionResult NewBlog()
         {
             string key = MyRedisKeys.Pre_BlogDraft + CurrentUser.ID;
@@ -108,7 +108,7 @@ namespace MVCWeb.Controllers
             return View();
         }
 
-        //保存草稿
+        //保存草稿 needlogin
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult SaveDraft(int type, string title, string mdTxt)
@@ -137,7 +137,7 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done", date = DateTime.Now.ToString("HH:mm") });
         }
 
-        //发表新姿势
+        //发表新姿势 needlogin
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult NewBlog(int type, string title, string mdTxt, string mdValue)
@@ -173,7 +173,7 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done", url = Url.Action("BlogList") });
         }
 
-        //编辑姿势
+        //编辑姿势 needlogin
         public ActionResult EditBlog(Guid id)
         {
             Blog blog = BlogDataSvc.GetByID(id);
@@ -185,7 +185,7 @@ namespace MVCWeb.Controllers
             return View();
         }
 
-        //完成编辑
+        //完成编辑 needlogin
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult EditBlog(Guid id, string mdTxt, string mdValue)
@@ -219,10 +219,22 @@ namespace MVCWeb.Controllers
 
         //姿势分页
         [HttpPost]
-        public ActionResult BlogPage(int pageSize, int pageNum = 1)
+        public ActionResult BlogPage(string order, int pageSize, int pageNum = 1)
         {
-            int totalCount;
-            ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.InsertDate, true, out totalCount).ToList();
+            DateTime validDate = DateTime.Now.AddDays(-3);
+            int totalCount = 0;
+            if(order == "new")
+            {
+                ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.InsertDate, true, out totalCount).ToList();
+            }
+            else if(order == "view")
+            {
+                ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.InsertDate > validDate, it => it.ViewCount, true, out totalCount).ToList();
+            }
+            else if(order == "pro")
+            {
+                ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.InsertDate > validDate, it => it.ProCount, true, out totalCount).ToList();
+            }
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             return View();
@@ -292,7 +304,7 @@ namespace MVCWeb.Controllers
             return View();
         }
 
-        //点赞
+        //点赞 needlogin
         [HttpPost]
         public ActionResult ProBlog(Guid id)
         {
@@ -315,7 +327,7 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done", count = blog.ProCount });
         }
 
-        //收藏
+        //收藏 needlogin
         [HttpPost]
         public ActionResult StarBlog(Guid id)
         {
@@ -363,7 +375,7 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done", count = blog.ProCount });
         }
 
-        //添加评论
+        //添加评论 needlogin
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult AddBlogComment(Guid blogID, string mdTxt, string mdValue)
@@ -414,13 +426,14 @@ namespace MVCWeb.Controllers
         public ActionResult BlogCommentPage(Guid blogID, int pageSize, int pageNum = 1)
         {
             int totalCount;
+            ViewBag.Login = CurrentUser != null;
             ViewBag.BlogCommentList = BlogCommentDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogID == blogID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             return View();
         }
 
-        //添加评论回复
+        //添加评论回复 needlogin
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt)
