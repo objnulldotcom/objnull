@@ -12,7 +12,14 @@ namespace MVCWeb.SignalRHubs
         //使用cookie中的用户ID作为signalr客户端标识
         public string GetUserId(IRequest request)
         {
-            return request.Cookies["UID"].Value;
+            if (!string.IsNullOrEmpty(request.Cookies["UID"].Value))
+            {
+                return request.Cookies["UID"].Value;
+            }
+            else
+            {
+                return "";
+            }
         }
     }
 }

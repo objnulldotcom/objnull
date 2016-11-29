@@ -44,6 +44,7 @@ namespace MVCWeb.Controllers
             HttpContext.WriteCookie("LoginType", "", DateTime.Now.AddDays(-1));
             HttpContext.WriteCookie("GLogin", "", DateTime.Now.AddDays(-1));
             HttpContext.WriteCookie("GToken", "", DateTime.Now.AddDays(-1));
+            HttpContext.WriteCookie("SKEY", "", DateTime.Now.AddDays(-1));
             return RedirectToAction("Index", "Home");
         }
 
@@ -85,6 +86,7 @@ namespace MVCWeb.Controllers
                 HttpContext.WriteCookie("LoginType", user.LoginType, DateTime.Now.AddYears(3));
                 HttpContext.WriteCookie("GLogin", githubUser.login, DateTime.Now.AddYears(3));
                 HttpContext.WriteCookie("GToken", user.GitHubAccessToken, DateTime.Now.AddYears(3));
+                HttpContext.WriteCookie("SKEY", Utils.RijndaelEncrypt(user.ID.ToString()), DateTime.Now.AddYears(3));
             }
             return true;
         }

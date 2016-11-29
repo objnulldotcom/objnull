@@ -157,6 +157,9 @@ namespace MVCWeb.Controllers
             {
                 type = 0;
             }
+            //禁止脚本
+            mdTxt = mdTxt.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
+            mdValue = mdValue.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
             Blog nblog = new Blog();
             nblog.Type = type;
             nblog.Title = title;
@@ -168,6 +171,43 @@ namespace MVCWeb.Controllers
             string key = MyRedisKeys.Pre_BlogDraft + CurrentUser.ID;
             MyRedisDB.DelKey(key);
             return Json(new { msg = "done", url = Url.Action("BlogList") });
+        }
+
+        //编辑姿势
+        public ActionResult EditBlog(Guid id)
+        {
+            Blog blog = BlogDataSvc.GetByID(id);
+            if(blog.OwnerID != CurrentUser.ID)
+            {
+                RedirectToAction("Error");
+            }
+            ViewBag.Blog = blog;
+            return View();
+        }
+
+        //完成编辑
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult EditBlog(Guid id, string mdTxt, string mdValue)
+        {
+            if (string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
+            {
+                return Json(new { msg = "参数错误" });
+            }
+            int txtlength = Encoding.Default.GetByteCount(mdTxt);
+            if (txtlength > 50000)
+            {
+                return Json(new { msg = "参数太长" });
+            }
+
+            //禁止脚本
+            mdTxt = mdTxt.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
+            mdValue = mdValue.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
+            Blog nblog = BlogDataSvc.GetByID(id);
+            nblog.MDText = mdTxt;
+            nblog.MDValue = mdValue;
+            BlogDataSvc.Update(nblog);
+            return Json(new { msg = "done", url = Url.Action("BlogView", new { id = nblog.ID }) });
         }
 
         //姿势列表
@@ -328,6 +368,9 @@ namespace MVCWeb.Controllers
         [ValidateInput(false)]
         public ActionResult AddBlogComment(Guid blogID, string mdTxt, string mdValue)
         {
+            //禁止脚本
+            mdTxt = mdTxt.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
+            mdValue = mdValue.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
             Blog blog = BlogDataSvc.GetByID(blogID);
             blog.CommentCount += 1;
 
@@ -379,11 +422,13 @@ namespace MVCWeb.Controllers
 
         //添加评论回复
         [HttpPost]
+        [ValidateInput(false)]
         public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt)
         {
+            txt = HttpUtility.HtmlEncode(txt);
             BlogComment comment = BlogCommentDataSvc.GetByID(commentID);
             comment.ReplyCount += 1;
-
+            
             BlogCommentReply reply = new BlogCommentReply();
             reply.BlogCommentID = commentID;
             reply.Content = txt;

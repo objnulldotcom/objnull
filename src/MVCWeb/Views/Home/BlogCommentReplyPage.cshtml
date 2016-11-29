@@ -15,7 +15,7 @@
                 <a>@userName</a>回复<a>@(string.IsNullOrEmpty(reply.ToUser.Name) ? reply.ToUser.GitHubLogin : reply.ToUser.Name)</a> at @reply.InsertDate.ToString("yyyy-MM-dd HH:mm")
                 <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.COrder, '@userName', '@reply.Owner.ID')">回复</a>
             </span>
-            <p>@reply.Content</p>
+            <p>@Html.Raw(reply.Content)</p>
         </div>
     </div>
 }

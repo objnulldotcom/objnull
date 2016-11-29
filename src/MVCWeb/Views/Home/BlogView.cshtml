@@ -44,7 +44,8 @@
             marked.setOptions({
                 highlight: function (code) {
                     return hljs.highlightAuto(code).value;
-                }
+                },
+                sanitize: true
             });
 
             //评论
@@ -329,6 +330,13 @@
                         <span class="glyphicon glyphicon-thumbs-up"></span> 赞
                     </button>
                 }
+            }
+            else
+            {
+                <span>&nbsp;&nbsp;</span>               
+                <a id="BtnEdit" class="btn btn-default" href="@Url.Action("EditBlog", "Home", new { id = Blog.ID })">
+                    <span class="glyphicon glyphicon-thumbs-up"></span> 编辑
+                </a>
             }
         }
     </div>

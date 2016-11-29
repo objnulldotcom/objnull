@@ -17,6 +17,9 @@ namespace MVCWeb
             DependencyResolver.SetResolver(Autofac.GetDependecyResolver());
             //注册过滤器
             Filters.RegisterFilters(GlobalFilters.Filters);
+            //设置加解密向量和秘钥
+            Utils.RijndaelIV = "ObjectIsNull@001";
+            Utils.RijndaelKey = "kowfswiefx*@&JX13d9:fawxf3j34x%1";
         }
     }
 }
