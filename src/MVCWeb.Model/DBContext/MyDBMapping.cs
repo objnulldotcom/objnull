@@ -58,4 +58,40 @@ namespace MVCWeb.Model.DBContext
             HasRequired(it => it.Owner).WithMany(that => that.UserStars).HasForeignKey(it => it.OwnerID);
         }
     }
+
+    public class NewBeeMapping : EntityTypeConfiguration<NewBee>
+    {
+        public NewBeeMapping()
+        {
+            ToTable("NewBee");
+            HasKey(it => it.ID);
+
+            HasRequired(it => it.Owner).WithMany(that => that.NewBees).HasForeignKey(it => it.OwnerID);
+        }
+    }
+
+    public class NewBeeFloorMapping : EntityTypeConfiguration<NewBeeFloor>
+    {
+        public NewBeeFloorMapping()
+        {
+            ToTable("NewBeeFloor");
+            HasKey(it => it.ID);
+
+            HasRequired(it => it.Owner).WithMany(that => that.NewBeeFloors).HasForeignKey(it => it.OwnerID);
+            HasRequired(it => it.NewBee).WithMany(that => that.NewBeeFloors).HasForeignKey(it => it.NewBeeID);
+        }
+    }
+
+    public class NewBeeFloorReplyMapping : EntityTypeConfiguration<NewBeeFloorReply>
+    {
+        public NewBeeFloorReplyMapping()
+        {
+            ToTable("NewBeeFloorReply");
+            HasKey(it => it.ID);
+
+            HasRequired(it => it.Owner).WithMany(that => that.NewBeeFloorReplys).HasForeignKey(it => it.OwnerID);
+            HasRequired(it => it.NewBeeFloor).WithMany(that => that.NewBeeFloorReplys).HasForeignKey(it => it.NewBeeFloorID);
+            HasRequired(it => it.ToUser).WithMany(that => that.ReceivedNewBeeFloorReplys).HasForeignKey(it => it.ToUserID);
+        }
+    }
 }

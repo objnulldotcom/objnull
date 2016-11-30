@@ -29,6 +29,9 @@ namespace MVCWeb.Model.DBContext
             modelBuilder.Configurations.Add(new BlogCommentMapping());
             modelBuilder.Configurations.Add(new BlogCommentReplyMapping());
             modelBuilder.Configurations.Add(new UserStarMapping());
+            modelBuilder.Configurations.Add(new NewBeeMapping());
+            modelBuilder.Configurations.Add(new NewBeeFloorMapping());
+            modelBuilder.Configurations.Add(new NewBeeFloorReplyMapping());
         }
     }
 }

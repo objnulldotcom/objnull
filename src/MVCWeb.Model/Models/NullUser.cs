@@ -77,5 +77,25 @@ namespace MVCWeb.Model.Models
         /// 收藏
         /// </summary>
         public virtual ICollection<UserStar> UserStars { get; set; }
+        
+        /// <summary>
+        /// NewBee集合
+        /// </summary>
+        public virtual ICollection<NewBee> NewBees { get; set; }
+
+        /// <summary>
+        /// NewBee楼层集合
+        /// </summary>
+        public virtual ICollection<NewBeeFloor> NewBeeFloors { get; set; }
+
+        /// <summary>
+        /// NewBee楼层回复集合
+        /// </summary>
+        public virtual ICollection<NewBeeFloorReply> NewBeeFloorReplys { get; set; }
+
+        /// <summary>
+        /// 收到的NewBee楼层回复集合
+        /// </summary>
+        public virtual ICollection<NewBeeFloorReply> ReceivedNewBeeFloorReplys { get; set; }
     }
 }

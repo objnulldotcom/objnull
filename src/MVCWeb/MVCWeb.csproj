@@ -269,6 +269,7 @@
     <Content Include="Views\Home\UserStarPage.cshtml" />
     <Content Include="Views\Home\UserMsgPage.cshtml" />
     <Content Include="Views\Home\EditBlog.cshtml" />
+    <Content Include="Views\Home\NewBeeList.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -19,6 +19,9 @@ namespace MVCWeb.Controllers
         public IBlogCommentDataSvc BlogCommentDataSvc { get; set; }
         public IBlogCommentReplyDataSvc BlogCommentReplyDataSvc { get; set; }
         public IUserStarDataSvc UserStarDataSvc { get; set; }
+        public INewBeeDataSvc NewBeeDataSvc { get; set; }
+        public INewBeeFloorDataSvc NewBeeFloorDataSvc { get; set; }
+        public INewBeeFloorReplyDataSvc NewBeeFloorReplyDataSvc { get; set; }
         public IMyRedisDB MyRedisDB { get; set; }
 
         public int GetByteLength(string val)
@@ -478,6 +481,37 @@ namespace MVCWeb.Controllers
             ViewBag.CurrentPage = pageNum;
             ViewBag.COrder = corder;
             return View();
+        }
+
+        #endregion
+
+        #region NewBee
+
+        public ActionResult NewBeeList()
+        {
+            ViewBag.Login = CurrentUser != null;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult NewNewBee(string title, string mdTxt, string mdValue)
+        {
+            NewBee nb = new NewBee();
+            nb.OwnerID = CurrentUser.ID;
+            nb.Title = title;
+            nb.FloorCount = 1;
+            NewBeeDataSvc.Add(nb);
+
+            NewBeeFloor nbf = new NewBeeFloor();
+            nbf.MDText = mdTxt;
+            nbf.MDValue = mdValue;
+            nbf.NewBeeID = nb.ID;
+            nbf.Order = 1;
+            nbf.OwnerID = CurrentUser.ID;
+            NewBeeFloorDataSvc.Add(nbf);
+
+            return Json(new { msg = "done" });
         }
 
         #endregion
