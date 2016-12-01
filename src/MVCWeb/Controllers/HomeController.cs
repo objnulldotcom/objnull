@@ -513,6 +513,23 @@ namespace MVCWeb.Controllers
 
             return Json(new { msg = "done" });
         }
+        
+        //姿势分页
+        [HttpPost]
+        public ActionResult NewBeePage(int pageSize, int pageNum = 1)
+        {
+            int totalCount = 0;
+            ViewBag.NewBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.InsertDate, true, out totalCount).ToList();
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            return View();
+        }
+
+        public ActionResult NewBeeView(Guid id)
+        {
+            ViewBag.NewBee = NewBeeDataSvc.GetByID(id);
+            return View();
+        }
 
         #endregion
 

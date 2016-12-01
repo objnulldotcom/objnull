@@ -1,0 +1,14 @@
+﻿@using MVCWeb;
+@using MVCWeb.Model.Models;
+@{
+    List<NewBee> NewBeeList = ViewBag.NewBeeList as List<NewBee>;
+}
+
+@foreach (NewBee newBee in NewBeeList)
+{
+    <div>
+        <a href="@Url.Action("NewBeeView", "Home", new { id = newBee.ID })">@newBee.Title</a>
+    </div>
+}
+<input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
+<input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />

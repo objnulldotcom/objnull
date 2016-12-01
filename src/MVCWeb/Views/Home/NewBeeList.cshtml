@@ -65,6 +65,7 @@
                         if (result.msg == "done") {
                             $("#CmtTxt").val("");
                             $("#BtnCmt").click();
+                            NewBeePage(1);
                         } else {
                             swal(result.msg);
                         }
@@ -72,14 +73,43 @@
                 });
             });
 
+            NewBeePage(1);
         });
+
+        //NewBeePage
+        function NewBeePage(index) {
+            var pageSize = 15;
+            var postData = { pageSize: pageSize, pageNum: index }
+            $.ajax({
+                url: "@Url.Action("NewBeePage", "Home")",
+                type: "Post",
+                data: postData,
+                success: function (result) {
+                    $("#NewBeePage").html(result);
+                    $("#NBPager").pagination({
+                        items: $("#TotalCount").val(),
+                        itemsOnPage: pageSize,
+                        currentPage: $("#CurrentPage").val(),
+                        prevText: "<",
+                        nextText: ">",
+                        listStyle: "pagination",
+                        hrefTextPrefix: "javascript:;",
+                        onPageClick: function (pageNumber, event) {
+                            NewBeePage(pageNumber);
+                        }
+                    });
+                }
+            });
+        }
     </script>
 }
-<div class="row">
-    <div class="col-md-12">
+<div class="row" style="padding-top: 10px">
+    <div class="col-md-12" style="height: 100px; margin-bottom: 10px">
+    </div>
+    <div id="NewBeePage" class="col-md-12">
 
     </div>
-    <div class="col-md-12">
+    <div id="NBPager" class="col-md-12">
 
     </div>
 </div>

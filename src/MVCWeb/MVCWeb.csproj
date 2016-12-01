@@ -270,6 +270,8 @@
     <Content Include="Views\Home\UserMsgPage.cshtml" />
     <Content Include="Views\Home\EditBlog.cshtml" />
     <Content Include="Views\Home\NewBeeList.cshtml" />
+    <Content Include="Views\Home\NewBeePage.cshtml" />
+    <Content Include="Views\Home\NewBeeView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
