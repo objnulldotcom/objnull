@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewBag.Title = "NewBeeList";
+    ViewBag.Title = "TreeNewBee - 象空";
     Layout = "~/Views/Shared/_LayoutMain.cshtml";
 }
 @section head{
@@ -19,6 +19,7 @@
                 highlight: function (code) {
                     return hljs.highlightAuto(code).value;
                 },
+                breaks: true,
                 sanitize: true
             });
 
@@ -106,32 +107,40 @@
 <div class="row" style="padding-top: 10px">
     <div class="col-md-12" style="height: 100px; margin-bottom: 10px">
     </div>
+</div>
+<div class="row">
     <div id="NewBeePage" class="col-md-12">
-
-    </div>
-    <div id="NBPager" class="col-md-12">
 
     </div>
 </div>
 <div class="row">
-    <div class="col-md-12">
-        <input id="TxtTitle" class="form-control" type="text" placeholder="标题" />
-    </div>
-    <div class="col-md-12" style="margin-bottom: 10px">
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="javascript:;" id="BtnCmt">评论</a></li>
-            <li role="presentation"><a href="javascript:;" id="BtnPre">预览</a></li>
-        </ul>
-    </div>
-    <div id="PreBox" class="col-md-12 mdv" style="min-height: 50px">
+    <div id="NBPager" class="col-md-12 text-center">
 
     </div>
-    <div id="EditBox" class="col-md-12">
-        <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法</a></span>
-        <textarea id="CmtTxt" class="form-control" rows="5" style="resize:vertical;"></textarea>
-    </div>
-    <div class="col-md-12 text-center" style="margin: 10px 0px">
-        <button id="BtnConfirm" class="btn btn-default">确定</button>
+</div>
+<div class="row">
+    <div class="col-md-8 col-md-offset-1">
+        <div class="row">
+            <div class="col-md-12">
+                <input id="TxtTitle" class="form-control" type="text" placeholder="标题" />
+            </div>
+            <div class="col-md-12" style="margin-bottom: 10px">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="javascript:;" id="BtnCmt">评论</a></li>
+                    <li role="presentation"><a href="javascript:;" id="BtnPre">预览</a></li>
+                </ul>
+            </div>
+            <div id="PreBox" class="col-md-12 mdv" style="min-height: 50px">
+
+            </div>
+            <div id="EditBox" class="col-md-12">
+                <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法</a></span>
+                <textarea id="CmtTxt" class="form-control" rows="5" style="resize:vertical;"></textarea>
+            </div>
+            <div class="col-md-12 text-center" style="margin: 10px 0px">
+                <button id="BtnConfirm" class="btn btn-default">确定</button>
+            </div>
+        </div>
     </div>
 </div>
 

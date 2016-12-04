@@ -6,8 +6,18 @@
 
 @foreach (NewBee newBee in NewBeeList)
 {
-    <div>
-        <a href="@Url.Action("NewBeeView", "Home", new { id = newBee.ID })">@newBee.Title</a>
+    <div class="row">
+        <div class="col-md-1">
+            <span><span class="glyphicon glyphicon-comment"></span>@newBee.FloorCount</span>
+        </div>
+        <div class="col-md-8">
+            <a href="@Url.Action("NewBeeView", "Home", new { id = newBee.ID })">@newBee.Title</a>
+        </div>
+        <div class="col-md-3 text-right">
+           <span><span class="glyphicon glyphicon-user"></span>@newBee.Owner.GitHubLogin</span>
+            <span><span class="glyphicon glyphicon-time"></span>@newBee.InsertDate.ToString("yyyy-MM-dd HH:mm")</span>
+            <span><span class="glyphicon glyphicon-eye-open"></span>@newBee.ViewCount</span>
+        </div>
     </div>
 }
 <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />

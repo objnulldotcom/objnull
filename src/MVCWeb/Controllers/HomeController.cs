@@ -513,8 +513,52 @@ namespace MVCWeb.Controllers
 
             return Json(new { msg = "done" });
         }
-        
-        //姿势分页
+
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult AddNewBeeFloor(Guid NewBeeID, string mdTxt, string mdValue)
+        {
+            //禁止脚本
+            mdTxt = mdTxt.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
+            mdValue = mdValue.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
+            NewBee newBee = NewBeeDataSvc.GetByID(NewBeeID);
+            newBee.FloorCount += 1;
+
+            NewBeeFloor floor = new NewBeeFloor();
+            floor.NewBeeID = NewBeeID;
+            floor.MDText = mdTxt;
+            floor.MDValue = mdValue;
+            floor.OwnerID = CurrentUser.ID;
+            floor.Order = newBee.FloorCount;
+            NewBeeFloorDataSvc.Add(floor);
+
+            NewBeeDataSvc.Update(newBee);
+
+            if (newBee.OwnerID != CurrentUser.ID)
+            {
+                string key = MyRedisKeys.Pre_NewBCMsg + newBee.OwnerID;
+                NewBCMsg bcmsg = MyRedisDB.GetSet<NewBCMsg>(key).Where(m => m.BlogID == NewBeeID).FirstOrDefault();
+                if (bcmsg != null)
+                {
+                    MyRedisDB.SetRemove(key, bcmsg);
+                    bcmsg.Count += 1;
+                    MyRedisDB.SetAdd(key, bcmsg);
+                }
+                else
+                {
+                    bcmsg = new NewBCMsg();
+                    bcmsg.BlogID = NewBeeID;
+                    bcmsg.Count = 1;
+                    bcmsg.Date = DateTime.Now;
+                    bcmsg.Order = floor.Order;
+                    bcmsg.Title = newBee.Title.Length > 15 ? newBee.Title.Substring(0, 15) + "……" : newBee.Title;
+                    MyRedisDB.SetAdd(key, bcmsg);
+                }
+            }
+
+            return Json(new { msg = "done", count = newBee.FloorCount });
+        }
+
         [HttpPost]
         public ActionResult NewBeePage(int pageSize, int pageNum = 1)
         {
@@ -530,7 +574,62 @@ namespace MVCWeb.Controllers
             ViewBag.NewBee = NewBeeDataSvc.GetByID(id);
             return View();
         }
+        
+        [HttpPost]
+        public ActionResult NewBeeFloorPage(Guid nbID, int pageSize, int pageNum = 1)
+        {
+            int totalCount = 0;
+            ViewBag.Login = CurrentUser != null;
+            ViewBag.NewBeeFloorList = NewBeeFloorDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.NewBeeID == nbID, it => it.InsertDate, true, out totalCount).ToList();
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            return View();
+        }
+        
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult AddNewBeeFloorReply(Guid floorID, Guid toUserID, string txt)
+        {
+            txt = HttpUtility.HtmlEncode(txt);
+            NewBeeFloor floor = NewBeeFloorDataSvc.GetByID(floorID);
+            floor.ReplyCount += 1;
 
+            NewBeeFloorReply reply = new NewBeeFloorReply();
+            reply.NewBeeFloorID = floorID;
+            reply.Content = txt;
+            reply.ToUserID = toUserID;
+            reply.OwnerID = CurrentUser.ID;
+            reply.Order = floor.ReplyCount;
+            NewBeeFloorReplyDataSvc.Add(reply);
+
+            NewBeeFloorDataSvc.Update(floor);
+
+            if (toUserID != CurrentUser.ID)
+            {
+                string key = MyRedisKeys.Pre_NewBCRMsg + toUserID;
+                NewBCRMsg bcrmsg = new NewBCRMsg();
+                bcrmsg.BlogID = floor.NewBeeID;
+                bcrmsg.Date = DateTime.Now;
+                bcrmsg.From = CurrentUser.UserName;
+                bcrmsg.COrder = floor.Order;
+                bcrmsg.ROrder = reply.Order;
+                bcrmsg.Title = txt.Length > 15 ? txt.Substring(0, 15) + "……" : txt;
+                MyRedisDB.SetAdd(key, bcrmsg);
+            }
+
+            return Json(new { msg = "done" });
+        }
+        
+        [HttpPost]
+        public ActionResult NewBeeFloorReplyPage(Guid floorID, int corder, int pageSize, int pageNum = 1)
+        {
+            int totalCount;
+            ViewBag.NewBeeFloorReplyList = NewBeeFloorReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.NewBeeFloorID == floorID, it => it.InsertDate, false, out totalCount).ToList();
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            ViewBag.COrder = corder;
+            return View();
+        }
         #endregion
 
         #region Msg

@@ -3,7 +3,7 @@
     NewBee NewBee = ViewBag.NewBee as NewBee;
     ViewBag.Title = NewBee.Title + " - 象空";
     Layout = "~/Views/Shared/_LayoutMain.cshtml";
-    int CPageSize = 10;
+    int FPageSize = 20;
     int RPageSize = 10;
 }
 @section head{
@@ -15,47 +15,18 @@
     <!--simplePagination-->
     <script src="~/Scripts/SimplePagination/jquery.simplePagination.js"></script>
     <script>
-        $(function () {
-            SetViewer("MDValue");
-            $("#CommentBox").hide();
+        $(function() {
+            NewBeeFloorPage(1);
+
+
             $("#PreBox").hide();
-            @*@if(ViewBag.COrder == 0)
-            {
-                @Html.Raw("GetCommentPage(1);")
-            }
-            else
-            {
-                int cOrder = (int)ViewBag.COrder;
-                int cPage = cOrder % CPageSize == 0 ? cOrder / CPageSize : cOrder / CPageSize + 1;
-                @Html.Raw("FirstLoad = false;\n")
-                @Html.Raw("GetCommentPage(" + cPage + ");\n")
-                @Html.Raw("$(\"html,body\").animate({ scrollTop: $(\"#Comment" + cOrder + "\").offset().top }, 300);\n")
-
-                if (ViewBag.ROrder != 0)
-                {
-                    int rOrder = (int)ViewBag.ROrder;
-                    int rPage = rOrder % RPageSize == 0 ? rOrder / RPageSize : rOrder / RPageSize + 1;
-                    @Html.Raw("ShowReply(" + cOrder + ", " + rPage + ");\n")
-                    @Html.Raw("$(\"html,body\").animate({ scrollTop: $(\"#ReplyBox" + cOrder + "\").offset().top }, 300);\n")
-                }
-            }*@
-
             //代码高亮插件
             marked.setOptions({
                 highlight: function (code) {
                     return hljs.highlightAuto(code).value;
                 },
+                breaks: true,
                 sanitize: true
-            });
-
-            //评论
-            $("#BtnComment").click(function () {
-                $("#CommentBox").show();
-                $(document).scrollTop(9999);
-            });
-            //取消
-            $("#BtnCancel").click(function () {
-                $("#CommentBox").hide();
             });
             //评论面板
             $("#BtnCmt").click(function () {
@@ -78,6 +49,7 @@
             });
             //确定
             $("#BtnConfirm").click(function () {
+                var title = $("#TxtTitle").val();
                 var txt = $("#CmtTxt").val();
                 if (txt.length == 0) {
                     swal("请填写评论内容");
@@ -88,12 +60,12 @@
                     return;
                 }
                 $.ajax({
-                    url: "@Url.Action("AddBlogComment", "Home")",
-                    data: { blogID: "@NewBee.ID", mdTxt: txt, mdValue: marked(txt) },
+                    url: "@Url.Action("AddNewBeeFloor", "Home")",
+                    data: { NewBeeID: "@NewBee.ID", mdTxt: txt, mdValue: marked(txt) },
                     type: "post",
                     success: function (result) {
                         if (result.msg == "done") {
-                            GetCommentPage(99999);
+                            NewBeeFloorPage(99999);
                             $("#CmtTxt").val("");
                             $("#BtnCmt").click();
                             $("#CommentBox").hide();
@@ -105,66 +77,27 @@
                     }
                 });
             });
-
-            //点赞
-            $("#BtnPro").click(function () {
-                $.ajax({
-                    url: "@Url.Action("ProBlog", "Home")",
-                    data: { id: "@NewBee.ID" },
-                    type: "post",
-                    success: function (result) {
-                        if (result.msg == "done") {
-                            $("#BtnPro").hide();
-                            $("#ProCount").html(result.count);
-                        }
-                    }
-                });
-            });
-
-            //收藏
-            $("#BtnStar").click(function () {
-                $.ajax({
-                    url: "@Url.Action("StarBlog", "Home")",
-                    data: { id: "@NewBee.ID" },
-                    type: "post",
-                    success: function (result) {
-                        if (result.msg == "done") {
-                            $("#BtnStar").hide();
-                        }
-                    }
-                });
-            });
         });
 
-        var FirstLoad = true;
-        //获取评论
-        function GetCommentPage(index) {
-            var pageSize = @Html.Raw(CPageSize) ;
-            var postData = { blogID: "@NewBee.ID", pageSize: pageSize, pageNum: index }
+        function NewBeeFloorPage(index) {
+            var pageSize = @FPageSize;
+            var postData = { nbID:"@NewBee.ID", pageSize: pageSize, pageNum: index }
             $.ajax({
-                url: "@Url.Action("BlogCommentPage", "Home")",
+                url: "@Url.Action("NewBeeFloorPage", "Home")",
                 type: "Post",
-                async: false,
                 data: postData,
                 success: function (result) {
-                    $("#Comments").html(result);
-                    if (!FirstLoad) {
-                        $("html,body").animate({ scrollTop: $("#Status").offset().top }, 300)
-                    }
-                    FirstLoad = false;
-                    if ($("#CommentTotalCount").val() == "0") {
-                        return;
-                    }
-                    $("#Pager").pagination({
-                        items: $("#CommentTotalCount").val(),
+                    $("#NewBeeFloorPage").html(result);
+                    $("#NBFPager").pagination({
+                        items: $("#TotalCount").val(),
                         itemsOnPage: pageSize,
-                        currentPage: $("#CommentCurrentPage").val(),
+                        currentPage: $("#CurrentPage").val(),
                         prevText: "<",
                         nextText: ">",
                         listStyle: "pagination",
                         hrefTextPrefix: "javascript:;",
                         onPageClick: function (pageNumber, event) {
-                            GetCommentPage(pageNumber);
+                            NewBeeFloorPage(pageNumber);
                         }
                     });
                 }
@@ -204,8 +137,8 @@
                 return;
             }
             $.ajax({
-                url: "@Url.Action("AddBlogCommentReply", "Home")",
-                data: { commentID: cmid, toUserID: toUser, txt: txt },
+                url: "@Url.Action("AddNewBeeFloorReply", "Home")",
+                data: { floorID: cmid, toUserID: toUser, txt: txt },
                 type: "post",
                 success: function (result) {
                     if (result.msg == "done") {
@@ -223,9 +156,9 @@
         function GetCommentReplyPage(index, corder) {
             var pageSize = @Html.Raw(RPageSize) ;
             var cmid = $("#Comment" + corder).attr("cmid");
-            var postData = { commentID: cmid, corder: corder, pageSize: pageSize, pageNum: index }
+            var postData = { floorID: cmid, corder: corder, pageSize: pageSize, pageNum: index }
             $.ajax({
-                url: "@Url.Action("BlogCommentReplyPage", "Home")",
+                url: "@Url.Action("NewBeeFloorReplyPage", "Home")",
                 type: "Post",
                 data: postData,
                 success: function (result) {
@@ -272,50 +205,41 @@
     </script>
 }
 <div class="row" style="padding-top: 15px">
-    <div id="MDTitle" class="col-md-11 fs1">
+    <div id="MDTitle" class="col-md-12 fs1">
         <div class="well well-sm">
-            @NewBee.Title
-        </div>
-    </div>
-    
-    <div class="col-md-6" id="Status" style="line-height: 40px; height: 40px">
-        <a href="@Url.Action("UserProfile", "Home", new { id = NewBee.Owner.ID })" target="_blank"><img class="img-rounded" src="@NewBee.Owner.AvatarUrl&s=32" height="32" width="32" alt="@NewBee.Owner.Name" title="@NewBee.Owner.Name"></a>
-        <a href="@Url.Action("UserProfile", "Home", new { id = NewBee.Owner.ID })" target="_blank">@(string.IsNullOrEmpty(NewBee.Owner.Name) ? NewBee.Owner.GitHubLogin : NewBee.Owner.Name)</a> post at&nbsp;
-        <span class="glyphicon glyphicon-time"></span>@NewBee.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;
-        <span class="glyphicon glyphicon-eye-open"></span>@NewBee.ViewCount&nbsp;
-    </div>
-</div>
-<hr />
-<div class="row">
-    <div class="col-md-12">
-        <div class="well well-sm">
-            评论列表
+            @Html.Raw(NewBee.Title)
         </div>
     </div>
 </div>
-<div id="Comments">
-</div>
 <div class="row">
-    <div id="Pager" class="col-md-12 text-center">
-    </div>
-</div>
-<div class="row" id="CommentBox">
-    <div class="col-md-12" style="margin-bottom: 10px">
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="javascript:;" id="BtnCmt">评论</a></li>
-            <li role="presentation"><a href="javascript:;" id="BtnPre">预览</a></li>
-        </ul>
-    </div>
-    <div id="PreBox" class="col-md-12 mdv" style="min-height: 50px">
+    <div id="NewBeeFloorPage" class="col-md-12">
 
     </div>
-    <div id="EditBox" class="col-md-12">
-        <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法</a></span>
-        <textarea id="CmtTxt" class="form-control" rows="5" style="resize:vertical;"></textarea>
-    </div>
-    <div class="col-md-12 text-center" style="margin: 10px 0px">
-        <button id="BtnConfirm" class="btn btn-default">确定</button>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button id="BtnCancel" class="btn btn-default">取消</button>
+    <div id="NBFPager" class="col-md-12">
+
     </div>
 </div>
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-1">
+        <div class="row">
+            <div class="col-md-12" style="margin-bottom: 10px">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="javascript:;" id="BtnCmt">评论</a></li>
+                    <li role="presentation"><a href="javascript:;" id="BtnPre">预览</a></li>
+                </ul>
+            </div>
+            <div id="PreBox" class="col-md-12 mdv" style="min-height: 50px">
+
+            </div>
+            <div id="EditBox" class="col-md-12">
+                <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法</a></span>
+                <textarea id="CmtTxt" class="form-control" rows="5" style="resize:vertical;"></textarea>
+            </div>
+            <div class="col-md-12 text-center" style="margin: 10px 0px">
+                <button id="BtnConfirm" class="btn btn-default">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
