@@ -37,7 +37,12 @@ namespace MVCWeb.Model.Models
         /// 查看数
         /// </summary>
         public int ViewCount { get; set; }
-        
+
+        /// <summary>
+        /// 最后盖楼日期
+        /// </summary>
+        public DateTime LastFloorDate { get; set; }
+
         /// <summary>
         /// 发布人ID
         /// </summary>

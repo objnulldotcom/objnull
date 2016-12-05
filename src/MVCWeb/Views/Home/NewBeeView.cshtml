@@ -18,7 +18,6 @@
         $(function() {
             NewBeeFloorPage(1);
 
-
             $("#PreBox").hide();
             //代码高亮插件
             marked.setOptions({
@@ -26,7 +25,7 @@
                     return hljs.highlightAuto(code).value;
                 },
                 breaks: true,
-                sanitize: true
+                sanitize: false
             });
             //评论面板
             $("#BtnCmt").click(function () {

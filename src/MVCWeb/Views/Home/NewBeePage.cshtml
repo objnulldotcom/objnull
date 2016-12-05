@@ -6,19 +6,41 @@
 
 @foreach (NewBee newBee in NewBeeList)
 {
-    <div class="row">
-        <div class="col-md-1">
-            <span><span class="glyphicon glyphicon-comment"></span>@newBee.FloorCount</span>
+    string date = "";
+    if (newBee.LastFloorDate.Date == DateTime.Now.Date)
+    {
+        date = newBee.LastFloorDate.ToString("HH:mm");
+    }
+    else if (newBee.LastFloorDate.Year == DateTime.Now.Year)
+    {
+        date = newBee.LastFloorDate.ToString("MM-dd");
+    }
+    else
+    {
+        date = newBee.LastFloorDate.ToString("yy-MM-dd");
+    }
+    string userName = string.IsNullOrEmpty(newBee.Owner.Name) ? newBee.Owner.GitHubLogin : newBee.Owner.Name;
+    <div class="row" style="margin-top: 10px">
+        <div class="col-md-1 text-center">
+            <span><span class="glyphicon glyphicon-comment"></span>&nbsp;@newBee.FloorCount</span>
         </div>
         <div class="col-md-8">
-            <a href="@Url.Action("NewBeeView", "Home", new { id = newBee.ID })">@newBee.Title</a>
+            <a href="@Url.Action("NewBeeView", "Home", new { id = newBee.ID })" style="text-decoration:none">@newBee.Title</a>
         </div>
-        <div class="col-md-3 text-right">
-           <span><span class="glyphicon glyphicon-user"></span>@newBee.Owner.GitHubLogin</span>
-            <span><span class="glyphicon glyphicon-time"></span>@newBee.InsertDate.ToString("yyyy-MM-dd HH:mm")</span>
+        <div class="col-md-3 text-right fs2">
+            <span>
+                <span class="glyphicon glyphicon-user"></span>
+                <a href="@Url.Action("UserProfile", "Home", new { id = newBee.Owner.ID })" style="text-decoration:none" target="_blank">@userName</a>
+            </span>&nbsp;&nbsp;
+            <span><span class="glyphicon glyphicon-time"></span>@date</span>&nbsp;&nbsp;
             <span><span class="glyphicon glyphicon-eye-open"></span>@newBee.ViewCount</span>
         </div>
     </div>
 }
 <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
 <input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
+<div class="row">
+    <div id="NBPager" class="col-md-8 col-md-offset-1 text-center">
+
+    </div>
+</div>

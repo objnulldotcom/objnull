@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Text;
 using Newtonsoft.Json;
+using Ganss.XSS;
 using MVCWeb.Model.Models;
 using MVCWeb.DataSvc.Svc;
 using MVCWeb.Redis.Base;
@@ -23,6 +24,8 @@ namespace MVCWeb.Controllers
         public INewBeeFloorDataSvc NewBeeFloorDataSvc { get; set; }
         public INewBeeFloorReplyDataSvc NewBeeFloorReplyDataSvc { get; set; }
         public IMyRedisDB MyRedisDB { get; set; }
+
+        public HtmlSanitizer HtmlST = new HtmlSanitizer();
 
         public int GetByteLength(string val)
         {
@@ -497,15 +500,29 @@ namespace MVCWeb.Controllers
         [ValidateInput(false)]
         public ActionResult NewNewBee(string title, string mdTxt, string mdValue)
         {
+            if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
+            {
+                return Json(new { msg = "参数错误" });
+            }
+
+            int tlength = Encoding.Default.GetByteCount(title);
+            int txtlength = Encoding.Default.GetByteCount(mdTxt);
+            int vallength = Encoding.Default.GetByteCount(mdValue);
+            if (tlength > 100 || txtlength > 5000 || vallength > 10000)
+            {
+                return Json(new { msg = "参数太长" });
+            }
+
             NewBee nb = new NewBee();
             nb.OwnerID = CurrentUser.ID;
             nb.Title = title;
             nb.FloorCount = 1;
+            nb.LastFloorDate = DateTime.Now;
             NewBeeDataSvc.Add(nb);
-
+            
             NewBeeFloor nbf = new NewBeeFloor();
             nbf.MDText = mdTxt;
-            nbf.MDValue = mdValue;
+            nbf.MDValue = HtmlST.Sanitize(mdValue);
             nbf.NewBeeID = nb.ID;
             nbf.Order = 1;
             nbf.OwnerID = CurrentUser.ID;
@@ -515,19 +532,33 @@ namespace MVCWeb.Controllers
         }
 
         [HttpPost]
+        public ActionResult NewBeePage(int pageSize, int pageNum = 1)
+        {
+            int totalCount = 0;
+            ViewBag.NewBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.LastFloorDate, true, out totalCount).ToList();
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            return View();
+        }
+
+        public ActionResult NewBeeView(Guid id)
+        {
+            ViewBag.NewBee = NewBeeDataSvc.GetByID(id);
+            return View();
+        }
+        
+        [HttpPost]
         [ValidateInput(false)]
         public ActionResult AddNewBeeFloor(Guid NewBeeID, string mdTxt, string mdValue)
         {
-            //禁止脚本
-            mdTxt = mdTxt.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
-            mdValue = mdValue.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
             NewBee newBee = NewBeeDataSvc.GetByID(NewBeeID);
             newBee.FloorCount += 1;
-
+            newBee.LastFloorDate = DateTime.Now;
+            
             NewBeeFloor floor = new NewBeeFloor();
             floor.NewBeeID = NewBeeID;
             floor.MDText = mdTxt;
-            floor.MDValue = mdValue;
+            floor.MDValue = HtmlST.Sanitize(mdValue);
             floor.OwnerID = CurrentUser.ID;
             floor.Order = newBee.FloorCount;
             NewBeeFloorDataSvc.Add(floor);
@@ -559,22 +590,6 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done", count = newBee.FloorCount });
         }
 
-        [HttpPost]
-        public ActionResult NewBeePage(int pageSize, int pageNum = 1)
-        {
-            int totalCount = 0;
-            ViewBag.NewBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.InsertDate, true, out totalCount).ToList();
-            ViewBag.TotalCount = totalCount;
-            ViewBag.CurrentPage = pageNum;
-            return View();
-        }
-
-        public ActionResult NewBeeView(Guid id)
-        {
-            ViewBag.NewBee = NewBeeDataSvc.GetByID(id);
-            return View();
-        }
-        
         [HttpPost]
         public ActionResult NewBeeFloorPage(Guid nbID, int pageSize, int pageNum = 1)
         {

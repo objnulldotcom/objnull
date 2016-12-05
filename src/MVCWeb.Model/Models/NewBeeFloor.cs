@@ -29,10 +29,10 @@ namespace MVCWeb.Model.Models
         public string MDText { get; set; }
 
         /// <summary>
-        /// html内容
+        /// MD html
         /// </summary>
         public string MDValue { get; set; }
-
+        
         /// <summary>
         /// 回复数
         /// </summary>
