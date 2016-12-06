@@ -22,7 +22,14 @@ namespace MVCWeb.Controllers
             if (CurrentUser != null)
             {
                 ViewBag.User = CurrentUser;
-                ViewBag.MsgCount = MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID) + MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_NewBCRMsg + CurrentUser.ID);
+                ViewBag.MsgCount = MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_CMsg + CurrentUser.ID) + MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_RMsg + CurrentUser.ID);
+                if(string.IsNullOrEmpty(HttpContext.ReadCookie("LastLogin")))
+                {
+                    NullUser user = NullUserDataSvc.GetByID(CurrentUser.ID);
+                    user.LastLoginDate = DateTime.Now;
+                    NullUserDataSvc.Update(user);
+                    HttpContext.WriteCookie("LastLogin", DateTime.Now.ToString(), DateTime.Now.AddDays(1).Date);
+                }
             }
             return PartialView();
         }
@@ -31,8 +38,15 @@ namespace MVCWeb.Controllers
         //更新账号
         public ActionResult UpdateInfo()
         {
-            UpdateUserInfo("github", CurrentUser.GitHubAccessToken);
-            return Json(new { msg = "done" });
+            NullUser user = NullUserDataSvc.GetByID(CurrentUser.ID);
+            if (UpdateUserInfo("github", user.GitHubAccessToken))
+            {
+                return Json(new { msg = "done" });
+            }
+            else
+            {
+                return Json(new { msg = "error" });
+            }
         }
 
         //退出
@@ -43,7 +57,6 @@ namespace MVCWeb.Controllers
             HttpContext.WriteCookie("UAvatar", "", DateTime.Now.AddDays(-1));
             HttpContext.WriteCookie("LoginType", "", DateTime.Now.AddDays(-1));
             HttpContext.WriteCookie("GLogin", "", DateTime.Now.AddDays(-1));
-            HttpContext.WriteCookie("GToken", "", DateTime.Now.AddDays(-1));
             HttpContext.WriteCookie("SKEY", "", DateTime.Now.AddDays(-1));
             return RedirectToAction("Index", "Home");
         }
@@ -85,7 +98,6 @@ namespace MVCWeb.Controllers
                 HttpContext.WriteCookie("UAvatar", githubUser.avatar_url, DateTime.Now.AddYears(3));
                 HttpContext.WriteCookie("LoginType", user.LoginType, DateTime.Now.AddYears(3));
                 HttpContext.WriteCookie("GLogin", githubUser.login, DateTime.Now.AddYears(3));
-                HttpContext.WriteCookie("GToken", user.GitHubAccessToken, DateTime.Now.AddYears(3));
                 HttpContext.WriteCookie("SKEY", Utils.RijndaelEncrypt(user.ID.ToString()), DateTime.Now.AddYears(3));
             }
             return true;

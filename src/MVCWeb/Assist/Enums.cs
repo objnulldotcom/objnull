@@ -14,7 +14,7 @@ namespace MVCWeb
         搬运 = 4
     }
 
-    public enum EnumStarType
+    public enum EnumObjectType
     {
         姿势 = 1,
         NewBee = 2,

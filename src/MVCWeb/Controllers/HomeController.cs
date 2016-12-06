@@ -45,8 +45,9 @@ namespace MVCWeb.Controllers
         {
             Guid userID = id == null ? CurrentUser.ID : Guid.Parse(id);
             ViewBag.Owner = userID == CurrentUser.ID;
-            ViewBag.User = NullUserDataSvc.GetByID(userID);
-            ViewBag.Token = CurrentUser.GitHubAccessToken;
+            NullUser user = NullUserDataSvc.GetByID(userID);
+            ViewBag.User = user;
+            ViewBag.Token = user.GitHubAccessToken;
             return View();
         }
 
@@ -67,7 +68,7 @@ namespace MVCWeb.Controllers
         public ActionResult UserStarPage(int type, int pageSize, int pageNum = 1)
         {
             int totalCount;
-            ViewBag.UserStars = UserStarDataSvc.GetPagedEntitys(ref pageNum, pageSize, b => b.OwnerID == CurrentUser.ID && b.Type == type, b => b.InsertDate, true, out totalCount).ToList();
+            ViewBag.UserStars = UserStarDataSvc.GetPagedEntitys(ref pageNum, pageSize, b => b.OwnerID == CurrentUser.ID && b.ObjType == type, b => b.InsertDate, true, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             ViewBag.Type = type;
@@ -265,19 +266,19 @@ namespace MVCWeb.Controllers
                 IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
                 if (userRecords.Count() == 0)
                 {
-                    MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = (int)EnumRecordType.查看 });
+                    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = blog.ID, type = (int)EnumRecordType.查看 });
                     MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
                     blog.ViewCount += 1;
                     BlogDataSvc.Update(blog);
                 }
-                else if (userRecords.Where(r => r.TargetID == blog.ID && r.type == (int)EnumRecordType.查看).Count() == 0)
+                else if (userRecords.Where(r => r.ObjID == blog.ID && r.type == (int)EnumRecordType.查看).Count() == 0)
                 {
-                    MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = (int)EnumRecordType.查看 });
+                    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = blog.ID, type = (int)EnumRecordType.查看 });
                     blog.ViewCount += 1;
                     BlogDataSvc.Update(blog);
                 }
                 //点赞
-                if (userRecords.Where(r => r.TargetID == blog.ID && r.type == (int)EnumRecordType.点赞).Count() == 0)
+                if (userRecords.Where(r => r.ObjID == blog.ID && r.type == (int)EnumRecordType.点赞).Count() == 0)
                 {
                     ViewBag.ShowPro = true;
                 }
@@ -290,18 +291,18 @@ namespace MVCWeb.Controllers
                     IEnumerable<UserStar> userStars = UserStarDataSvc.GetByCondition(s => s.OwnerID == CurrentUser.ID);
                     if (userStars.Count() > 0)
                     {
-                        if (userStars.Where(s => s.TargetID == blog.ID && s.Type == (int)EnumStarType.姿势).Count() > 0)
+                        if (userStars.Where(s => s.ObjID == blog.ID && s.ObjType == (int)EnumObjectType.姿势).Count() > 0)
                         {
                             ViewBag.ShowStar = false;
                         }
                         foreach (UserStar star in userStars)//添加收藏缓存
                         {
-                            MyRedisDB.SetAdd(starKey, new UserStarCache() { TargetID = blog.ID, type = star.Type });
+                            MyRedisDB.SetAdd(starKey, new UserStarCache() { ObjID = blog.ID, ObjType = star.ObjType });
                         }
                         MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
                     }
                 }
-                else if (userStarCaches.Where(s => s.TargetID == blog.ID && s.type == (int)EnumStarType.姿势).Count() > 0)
+                else if (userStarCaches.Where(s => s.ObjID == blog.ID && s.ObjType == (int)EnumObjectType.姿势).Count() > 0)
                 {
                     ViewBag.ShowStar = false;
                 }
@@ -319,14 +320,14 @@ namespace MVCWeb.Controllers
             IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
             if (userRecords.Count() == 0)
             {
-                MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = (int)EnumRecordType.点赞 });
+                MyRedisDB.SetAdd(key, new UserRecord() { ObjID = blog.ID, type = (int)EnumRecordType.点赞 });
                 MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
                 blog.ProCount += 1;
                 BlogDataSvc.Update(blog);
             }
-            else if (userRecords.Where(r => r.TargetID == blog.ID && r.type == (int)EnumRecordType.点赞).Count() == 0)
+            else if (userRecords.Where(r => r.ObjID == blog.ID && r.type == (int)EnumRecordType.点赞).Count() == 0)
             {
-                MyRedisDB.SetAdd(key, new UserRecord() { TargetID = blog.ID, type = (int)EnumRecordType.点赞 });
+                MyRedisDB.SetAdd(key, new UserRecord() { ObjID = blog.ID, type = (int)EnumRecordType.点赞 });
                 blog.ProCount += 1;
                 BlogDataSvc.Update(blog);
             }
@@ -349,11 +350,11 @@ namespace MVCWeb.Controllers
                     //添加收藏缓存
                     foreach (UserStar star in userStars)
                     {
-                        MyRedisDB.SetAdd(starKey, new UserStarCache() { TargetID = blog.ID, type = star.Type });
+                        MyRedisDB.SetAdd(starKey, new UserStarCache() { ObjID = blog.ID, ObjType = star.ObjType });
                     }
                     MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
                     //添加收藏
-                    if (userStars.Where(s => s.TargetID == blog.ID && s.Type == (int)EnumStarType.姿势).Count() == 0)
+                    if (userStars.Where(s => s.ObjID == blog.ID && s.ObjType == (int)EnumObjectType.姿势).Count() == 0)
                     {
                         add = true;
                     }
@@ -363,7 +364,7 @@ namespace MVCWeb.Controllers
                     add = true;
                 }
             }
-            else if (userStarCaches.Where(s => s.TargetID == blog.ID && s.type == (int)EnumStarType.姿势).Count() == 0)
+            else if (userStarCaches.Where(s => s.ObjID == blog.ID && s.ObjType == (int)EnumObjectType.姿势).Count() == 0)
             {
                 add = true;
             }
@@ -372,11 +373,11 @@ namespace MVCWeb.Controllers
                 //添加收藏
                 UserStar star = new UserStar();
                 star.OwnerID = CurrentUser.ID;
-                star.TargetID = blog.ID;
+                star.ObjID = blog.ID;
                 star.Title = blog.Title;
-                star.Type = (int)EnumStarType.姿势;
+                star.ObjType = (int)EnumObjectType.姿势;
                 UserStarDataSvc.Add(star);
-                MyRedisDB.SetAdd(starKey, new UserStarCache() { TargetID = blog.ID, type = star.Type });
+                MyRedisDB.SetAdd(starKey, new UserStarCache() { ObjID = blog.ID, ObjType = star.ObjType });
             }
             return Json(new { msg = "done", count = blog.ProCount });
         }
@@ -404,8 +405,8 @@ namespace MVCWeb.Controllers
 
             if (blog.OwnerID != CurrentUser.ID)
             {
-                string key = MyRedisKeys.Pre_NewBCMsg + blog.OwnerID;
-                NewBCMsg bcmsg = MyRedisDB.GetSet<NewBCMsg>(key).Where(m => m.BlogID == blogID).FirstOrDefault();
+                string key = MyRedisKeys.Pre_CMsg + blog.OwnerID;
+                CMsg bcmsg = MyRedisDB.GetSet<CMsg>(key).Where(m => m.ObjID == blogID).FirstOrDefault();
                 if (bcmsg != null)
                 {
                     MyRedisDB.SetRemove(key, bcmsg);
@@ -414,8 +415,9 @@ namespace MVCWeb.Controllers
                 }
                 else
                 {
-                    bcmsg = new NewBCMsg();
-                    bcmsg.BlogID = blogID;
+                    bcmsg = new CMsg();
+                    bcmsg.ObjType = (int)EnumObjectType.姿势;
+                    bcmsg.ObjID = blogID;
                     bcmsg.Count = 1;
                     bcmsg.Date = DateTime.Now;
                     bcmsg.Order = comment.Order;
@@ -460,9 +462,10 @@ namespace MVCWeb.Controllers
 
             if (toUserID != CurrentUser.ID)
             {
-                string key = MyRedisKeys.Pre_NewBCRMsg + toUserID;
-                NewBCRMsg bcrmsg = new NewBCRMsg();
-                bcrmsg.BlogID = comment.BlogID;
+                string key = MyRedisKeys.Pre_RMsg + toUserID;
+                RMsg bcrmsg = new RMsg();
+                bcrmsg.ObjType = (int)EnumObjectType.姿势;
+                bcrmsg.ObjID = comment.BlogID;
                 bcrmsg.Date = DateTime.Now;
                 bcrmsg.From = CurrentUser.UserName;
                 bcrmsg.COrder = comment.Order;
@@ -567,8 +570,8 @@ namespace MVCWeb.Controllers
 
             if (newBee.OwnerID != CurrentUser.ID)
             {
-                string key = MyRedisKeys.Pre_NewBCMsg + newBee.OwnerID;
-                NewBCMsg bcmsg = MyRedisDB.GetSet<NewBCMsg>(key).Where(m => m.BlogID == NewBeeID).FirstOrDefault();
+                string key = MyRedisKeys.Pre_CMsg + newBee.OwnerID;
+                CMsg bcmsg = MyRedisDB.GetSet<CMsg>(key).Where(m => m.ObjID == NewBeeID).FirstOrDefault();
                 if (bcmsg != null)
                 {
                     MyRedisDB.SetRemove(key, bcmsg);
@@ -577,8 +580,9 @@ namespace MVCWeb.Controllers
                 }
                 else
                 {
-                    bcmsg = new NewBCMsg();
-                    bcmsg.BlogID = NewBeeID;
+                    bcmsg = new CMsg();
+                    bcmsg.ObjType = (int)EnumObjectType.NewBee;
+                    bcmsg.ObjID = NewBeeID;
                     bcmsg.Count = 1;
                     bcmsg.Date = DateTime.Now;
                     bcmsg.Order = floor.Order;
@@ -621,9 +625,10 @@ namespace MVCWeb.Controllers
 
             if (toUserID != CurrentUser.ID)
             {
-                string key = MyRedisKeys.Pre_NewBCRMsg + toUserID;
-                NewBCRMsg bcrmsg = new NewBCRMsg();
-                bcrmsg.BlogID = floor.NewBeeID;
+                string key = MyRedisKeys.Pre_RMsg + toUserID;
+                RMsg bcrmsg = new RMsg();
+                bcrmsg.ObjType = (int)EnumObjectType.NewBee;
+                bcrmsg.ObjID = floor.NewBeeID;
                 bcrmsg.Date = DateTime.Now;
                 bcrmsg.From = CurrentUser.UserName;
                 bcrmsg.COrder = floor.Order;
@@ -652,18 +657,18 @@ namespace MVCWeb.Controllers
         //未读消息数量
         public string GetMsgCount()
         {
-            string BCkey = MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID;
-            string BCRkey = MyRedisKeys.Pre_NewBCRMsg + CurrentUser.ID;
-            return (MyRedisDB.RedisDB.SetLength(BCkey) + MyRedisDB.RedisDB.SetLength(BCRkey)).ToString();
+            string Ckey = MyRedisKeys.Pre_CMsg + CurrentUser.ID;
+            string Rkey = MyRedisKeys.Pre_RMsg + CurrentUser.ID;
+            return (MyRedisDB.RedisDB.SetLength(Ckey) + MyRedisDB.RedisDB.SetLength(Rkey)).ToString();
         }
 
         //未读消息
         public ActionResult GetMsg()
         {
-            string BCkey = MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID;
-            string BCRkey = MyRedisKeys.Pre_NewBCRMsg + CurrentUser.ID;
-            ViewBag.NewComments = MyRedisDB.GetSet<NewBCMsg>(BCkey).OrderByDescending(m => m.Date);
-            ViewBag.NewReplys = MyRedisDB.GetSet<NewBCRMsg>(BCRkey).OrderByDescending(m => m.Date);
+            string Ckey = MyRedisKeys.Pre_CMsg + CurrentUser.ID;
+            string Rkey = MyRedisKeys.Pre_RMsg + CurrentUser.ID;
+            ViewBag.NewComments = MyRedisDB.GetSet<CMsg>(Ckey).OrderByDescending(m => m.Date);
+            ViewBag.NewReplys = MyRedisDB.GetSet<RMsg>(Rkey).OrderByDescending(m => m.Date);
             return View();
         }
 
@@ -671,10 +676,10 @@ namespace MVCWeb.Controllers
         [HttpPost]
         public ActionResult ClearMsg()
         {
-            string BCkey = MyRedisKeys.Pre_NewBCMsg + CurrentUser.ID;
-            string BCRkey = MyRedisKeys.Pre_NewBCRMsg + CurrentUser.ID;
-            MyRedisDB.DelKey(BCkey);
-            MyRedisDB.DelKey(BCRkey);
+            string Ckey = MyRedisKeys.Pre_CMsg + CurrentUser.ID;
+            string Rkey = MyRedisKeys.Pre_RMsg + CurrentUser.ID;
+            MyRedisDB.DelKey(Ckey);
+            MyRedisDB.DelKey(Rkey);
             return Json(new { msg = "done" });
         }
 

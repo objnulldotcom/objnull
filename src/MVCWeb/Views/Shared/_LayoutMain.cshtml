@@ -38,56 +38,13 @@
             return char.length;
         }
 
-        //发送更新消息
-        function SendNewMsg(id) {
-            MsgHub.server.sendToUser(id, "NewMsg");
-        }
-        //更新消息数量
-        function UpdateMsgCount() {
-            $.ajax({
-                url: "@Url.Action("GetMsgCount", "Home")",
-                type: "get",
-                success: function (result) {
-                    result = result == "0" ? "" : result;
-                    $("#MsgCount").html(result);
-                }
-            });
-        }
-        //清空消息
-        function ClearMsg() {
-            $.ajax({
-                url: "@Url.Action("ClearMsg", "Home")",
-                type: "post",
-                success: function (result) {
-                    if (result.msg == "done") {
-                        $("#BtnMsg").click();
-                        UpdateMsgCount();
-                    } else {
-                        swal(result.msg)
-                    }
-                }
-            });
-        }
-        //切换消息框
-        function ShowMsgBox(type) {
-            if (type) {
-                $("#MsgLi").css("background-color", "#e7e7e7");
-                $("#MsgBox").slideDown(60);
-            } else {
-                $("#MsgLi").css("background-color", "");
-                $("#MsgBox").slideUp(60);
-                $("#MsgBox").html("<div class=\"text-center\">加载中……</div>");
-            }
-        }
-
-        var MsgHub;
-        //SignalR
         $(function () {
-            //未登录不初始化signalr及消息相关事件
+            //未登录不初始化signalr及消息等事件
             if ($("#CurrentUserID").val() == "") {
                 return;
             }
-            MsgHub = $.connection.MsgHub;
+            //SignalR消息
+            var MsgHub = $.connection.MsgHub;
             MsgHub.client.addNewMessage = function (message) {
                 if (message == "NewMsg") {
                     UpdateMsgCount();
@@ -96,15 +53,61 @@
             $.connection.hub.start().done(function () {
 
             });
+
+            //发送更新消息
+            function SendNewMsg(id) {
+                MsgHub.server.sendToUser(id, "NewMsg");
+            }
+
+            //更新消息数量
+            function UpdateMsgCount() {
+                $.ajax({
+                    url: "@Url.Action("GetMsgCount", "Home")",
+                    type: "get",
+                    success: function (result) {
+                        result = result == "0" ? "" : result;
+                        $("#MsgCount").html(result);
+                    }
+                });
+            }
+
+            //清空消息
+            function ClearMsg() {
+                $.ajax({
+                    url: "@Url.Action("ClearMsg", "Home")",
+                    type: "post",
+                    success: function (result) {
+                        if (result.msg == "done") {
+                            ShowMsgBox(false);
+                            UpdateMsgCount();
+                        } else {
+                            swal(result.msg)
+                        }
+                    }
+                });
+            }
+
+            //切换显示消息框
+            function ShowMsgBox(type) {
+                if (type) {
+                    $("#MsgLi").css("background-color", "#e7e7e7");
+                    $("#MsgBox").slideDown(60);
+                } else {
+                    $("#MsgLi").css("background-color", "");
+                    $("#MsgBox").slideUp(60);
+                }
+            }
+
             //显示或隐藏消息
             $("#BtnMsg").click(function () {
                 if ($("#MsgBox").is(":hidden")) {
                     UpdateMsgCount();
-                    ShowMsgBox(true);
                     if ($("#MsgCount").html() == "") {
-                        $("#MsgBox").html('<div class="text-center">没有未读消息</div>');
+                        $("#MsgBox").html($("#NoMsgHtml").html());
                         return;
                     }
+                    ShowMsgBox(true);
+                    $("#MsgBox").html($("#LoadingHtml").html());
                     $.ajax({
                         url: "@Url.Action("GetMsg", "Home")",
                         type: "get",
@@ -153,7 +156,7 @@
                     <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="@Url.Action("Index", "Home")" style="padding: 10px">
-                    <img src="~/Images/favicon-32x32.png" height="30" width="30" title="首页" />
+                    <img src="~/Images/favicon-32x32.png" height="30" width="30" title="象空" />
                 </a>
             </div>
             <div class="navbar-collapse collapse">

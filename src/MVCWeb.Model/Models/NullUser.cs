@@ -11,6 +11,7 @@ namespace MVCWeb.Model.Models
         {
             ID = Guid.NewGuid();
             InsertDate = DateTime.Now;
+            LastLoginDate = DateTime.Now;
         }
 
         /// <summary>
@@ -52,6 +53,16 @@ namespace MVCWeb.Model.Models
         /// 添加日期
         /// </summary>
         public DateTime InsertDate { get; set; }
+
+        /// <summary>
+        /// 被赞数
+        /// </summary>
+        public int ProCount { get; set; }
+
+        /// <summary>
+        /// 最后登录日期
+        /// </summary>
+        public DateTime LastLoginDate { get; set; }
 
         /// <summary>
         /// 姿势集合

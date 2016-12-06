@@ -54,8 +54,8 @@
     <Compile Include="Base\MyRedisKeys.cs" />
     <Compile Include="Models\UserStarCache.cs" />
     <Compile Include="Models\UserRecord.cs" />
-    <Compile Include="Models\NewBCRMsg.cs" />
-    <Compile Include="Models\NewBCMsg.cs" />
+    <Compile Include="Models\RMsg.cs" />
+    <Compile Include="Models\CMsg.cs" />
     <Compile Include="Models\Manager.cs" />
     <Compile Include="Models\ActionRule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

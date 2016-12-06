@@ -58,14 +58,13 @@ namespace MVCWeb
                 string name = filterContext.HttpContext.ReadCookie("UName");
                 string avatar = filterContext.HttpContext.ReadCookie("UAvatar");
                 string login = filterContext.HttpContext.ReadCookie("GLogin");
-                string token = filterContext.HttpContext.ReadCookie("GToken");
                 string sKEY = filterContext.HttpContext.ReadCookie("SKEY");
                 if(sKEY != Utils.RijndaelEncrypt(id.ToString()))//SKEY检查
                 {
                     filterContext.HttpContext.Response.RedirectToRoute(new { controller = "OAuth", action = "LogOut" });
                     return;
                 }
-                filterContext.HttpContext.User = new CurrentUser() { ID = id, Name = name, AvatarUrl = avatar, LoginType = loginType, GitHubLogin = login, GitHubAccessToken = token };
+                filterContext.HttpContext.User = new CurrentUser() { ID = id, Name = name, AvatarUrl = avatar, LoginType = loginType, GitHubLogin = login };
             }
 
             //权限控制

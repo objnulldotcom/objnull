@@ -19,7 +19,7 @@ namespace MVCWeb.Model.Models
         public Guid ID { get; set; }
 
         /// <summary>
-        /// 类型
+        /// 类型 EnumBlogType
         /// </summary>
         public int Type { get; set; }
 

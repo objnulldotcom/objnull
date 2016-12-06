@@ -6,8 +6,8 @@
 <div class="row">
     <div class="col-md-2">
         <ul class="nav nav-pills nav-stacked text-center">
-            <li class="@(ViewBag.Type == (int)EnumStarType.姿势 ? "active" : "")"><a href="javascript:;" onclick="UserStarPage(1, @((int)EnumStarType.姿势))">姿势</a></li>
-            <li class="@(ViewBag.Type == (int)EnumStarType.NewBee ? "active" : "")"><a href="javascript:;" onclick="UserStarPage(1, @((int)EnumStarType.NewBee))">NewBee</a></li>
+            <li class="@(ViewBag.Type == (int)EnumObjectType.姿势 ? "active" : "")"><a href="javascript:;" onclick="UserStarPage(1, @((int)EnumObjectType.姿势))">姿势</a></li>
+            <li class="@(ViewBag.Type == (int)EnumObjectType.NewBee ? "active" : "")"><a href="javascript:;" onclick="UserStarPage(1, @((int)EnumObjectType.NewBee))">NewBee</a></li>
         </ul>
     </div>
     <div class="col-md-10">
@@ -16,10 +16,10 @@
                 string StarUrl = "";
                 switch ((int)ViewBag.Type)
                 {
-                    case (int)EnumStarType.姿势:
+                    case (int)EnumObjectType.姿势:
                         StarUrl = Url.Action("BlogView", "Home");
                         break;
-                    case (int)EnumStarType.NewBee:
+                    case (int)EnumObjectType.NewBee:
                         StarUrl = Url.Action("NewBeeView", "Home");
                         break;
                 }

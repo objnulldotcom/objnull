@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace MVCWeb.Redis.Models
 {
-    public class NewBCMsg
+    public class CMsg
     {
-        public Guid BlogID { get; set; }
+        /// <summary>
+        /// 对象类型：EnumObjectType
+        /// </summary>
+        public int ObjType { get; set; }
+
+        public Guid ObjID { get; set; }
 
         public string Title { get; set; }
 

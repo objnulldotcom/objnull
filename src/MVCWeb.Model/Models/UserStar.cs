@@ -24,9 +24,9 @@ namespace MVCWeb.Model.Models
         public DateTime InsertDate { get; set; }
 
         /// <summary>
-        /// 类型 姿势 = 1, NeeBee = 2,笔记 = 3,问题 = 4
+        /// 类型: EnumObjectType 姿势 = 1, NeeBee = 2,笔记 = 3,问题 = 4
         /// </summary>
-        public int Type { get; set; }
+        public int ObjType { get; set; }
 
         /// <summary>
         /// 标题
@@ -36,7 +36,7 @@ namespace MVCWeb.Model.Models
         /// <summary>
         /// 目标ID
         /// </summary>
-        public Guid TargetID { get; set; }
+        public Guid ObjID { get; set; }
 
         /// <summary>
         /// 用户ID

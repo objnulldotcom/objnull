@@ -31,8 +31,6 @@ namespace MVCWeb
 
         public string GitHubLogin { get; set; }
 
-        public string GitHubAccessToken { get; set; }
-
         public string UserName
         {
             get

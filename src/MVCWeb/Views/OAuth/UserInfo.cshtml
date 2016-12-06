@@ -8,7 +8,6 @@
     <li id="MsgLi" class="dropdown">
         <a id="BtnMsg" href="javascript:;">消息<span id="MsgCount" class="badge">@(ViewBag.MsgCount == 0 ? "" : ViewBag.MsgCount)</span></a>
         <div id="MsgBox" class="dropdown-menu">
-            <div class="text-center">加载中……</div>
         </div>
     </li>
     <li class="dropdown">
@@ -35,3 +34,9 @@ else
     </li>
 }
 <input id="CurrentUserID" type="hidden" value="@(CurrentUser == null ? "" : CurrentUser.ID.ToString())" />
+<div id="LoadingHtml" style="display: none">
+    <div class="text-center" style="margin: 10px 0px">加载中……</div>
+</div>
+<div id="NoMsgHtml" style="display: none">
+    <div class="text-center" style="margin: 10px 0px">没有未读消息</div>
+</div>
