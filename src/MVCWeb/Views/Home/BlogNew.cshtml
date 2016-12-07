@@ -74,7 +74,7 @@
                     if (data.result.error != "") {
                         alert(data.result.error);
                     } else {
-                        var link = "![](http://" + window.location.host + "@Url.Action("DownloadImg", "File", new { pt = 2 })" + "&path=" + data.result.path + ")";
+                        var link = "![](http://" + window.location.host + "@Url.Action("DownloadImg", "File", new { pt = (int)EnumObjectType.姿势 })" + "&path=" + data.result.path + ")";
                         InsertAtCaret("TxtMD", link);
                         UpateMDV();
                         SetViewer("MDValue");
@@ -110,7 +110,7 @@
                 }
                 var type = $("#SltType").val();
                 $.ajax({
-                    url: "@Url.Action("NewBlog", "Home")",
+                    url: "@Url.Action("BlogNew", "Home")",
                     data: { type: type, title: title, mdTxt: mdTxt, mdValue: marked(mdTxt) },
                     type: "post",
                     success: function (result) {
@@ -226,7 +226,7 @@
     </div>
     <div class="col-md-12" style="margin-bottom: 20px">
         <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法</a>&nbsp;,&nbsp;</span>
-        <input id="JqueryUpload" class="uploader" type="file" name="upFile" data-url="@Url.Action("JqueryUploadImg", "File", new { pt = 2 })" style="display:none">
+        <input id="JqueryUpload" class="uploader" type="file" name="upFile" data-url="@Url.Action("JqueryUploadImg", "File", new { pt = (int)EnumObjectType.姿势 })" style="display:none">
         <span>拖拽图片至文本框或<a href="javascript:;" onclick="OpenFile()">选择文件</a>上传 &nbsp;&nbsp;&nbsp;</span>
         <span id="UpPercent" style="color:#ff6a00"></span>
         <textarea id="TxtMD" class="form-control" rows="15" style="resize:vertical;">@(Draft == null ? "" : Draft.MDText)</textarea>

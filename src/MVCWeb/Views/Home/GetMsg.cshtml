@@ -1,20 +1,64 @@
 ﻿@using MVCWeb.Redis.Models;
-@{ 
-    IEnumerable<NewBCMsg> NewComments = ViewBag.NewComments;
-    IEnumerable<NewBCRMsg> NewReplys = ViewBag.NewReplys;
+@{
+    IEnumerable<CMsg> NewComments = ViewBag.NewComments;
+    IEnumerable<RMsg> NewReplys = ViewBag.NewReplys;
+    int i = 0;
+    int j = 0;
 }
-<div class="fs2" style="word-break:keep-all; padding-left: 5px; padding-right: 5px">
-    @foreach (NewBCMsg msg in NewComments)
+<div class="fs2" style="padding-left: 5px; padding-right: 5px; min-width: 250px; max-height: 500px; overflow:auto;">
+    @foreach (CMsg msg in NewComments)
     {
-        <div>@(msg.Count) 条评论在 <span style="float:right">@msg.Date.ToString("MM-dd HH:mm")</span></div>
-        <div style="border-bottom: 1px solid #eee"><a href="@Url.Action("BlogView", "Home", new { id = msg.BlogID, co = msg.Order })">@msg.Title</a></div>
+        i++;
+        string action = "";
+        switch (msg.ObjType)
+        {
+            case (int)EnumObjectType.姿势:
+                action = "BlogView";
+                break;
+            case (int)EnumObjectType.NewBee:
+                action = "NewBeeView";
+                break;
+        }
+        <div id="CMsgBar@(i)" class="MsgBar">
+            <div>
+                <span style="color:red">@msg.Count</span>&nbsp;条新评论在
+                <span style="float:right">
+                    <a id="BtnDelMsg" style="display:none; text-decoration:none" href="javascript:;" onclick="DelCMsg('@msg.ObjID', @i)">删除</a>
+                    @msg.Date.ToBlurDate()
+                </span>
+            </div>
+            <div style="border-bottom: 1px solid #eee;">
+                <a onclick="CheckCMsg('@Url.Action(action, "Home", new { id = msg.ObjID, co = msg.Order })', '@msg.ObjID')" href="javascript:;" style="text-decoration:none">@msg.Title</a>
+            </div>
+        </div>
     }
-    @foreach (NewBCRMsg reply in NewReplys)
+    @foreach (RMsg reply in NewReplys)
     {
-        <div>@(reply.From) 回复你 <span style="float:right">@reply.Date.ToString("MM-dd HH:mm")</span></div>
-        <div style="border-bottom: 1px solid #eee"><a href="@Url.Action("BlogView", "Home", new { id = reply.BlogID, co = reply.COrder, ro = reply.ROrder})">@reply.Title</a></div>
+        j++;
+        string action = "";
+        switch (reply.ObjType)
+        {
+            case (int)EnumObjectType.姿势:
+                action = "BlogView";
+                break;
+            case (int)EnumObjectType.NewBee:
+                action = "NewBeeView";
+                break;
+        }
+        <div id="RMsgBar@(j)" class="MsgBar">
+            <div>
+                <div style="max-width:150px; height: 17px; overflow:hidden; float: left; color: #ea8414">@reply.From</div>&nbsp;回复你
+                <span style="float:right">
+                    <a id="BtnDelMsg" style="display:none; text-decoration:none" href="javascript:;" onclick="DelRMsg('@reply.ObjID', @reply.COrder, @reply.ROrder, @j)">删除</a>
+                    @reply.Date.ToBlurDate()
+                </span>
+            </div>
+            <div style="border-bottom: 1px solid #eee">
+                <a onclick="CheckRMsg('@Url.Action(action, "Home", new { id = reply.ObjID, co = reply.COrder, ro = reply.ROrder})', '@reply.ObjID', @reply.COrder, @reply.ROrder)" href="javascript:;" style="text-decoration:none">@reply.Title</a>
+            </div>
+        </div>
     }
 </div>
-<div class="text-center">
-    <a href="javascript:;" onclick="ClearMsg()">清空</a>
+<div class="text-center" style="margin-top: 5px">
+    <button class="btn btn-primary btn-xs" onclick="ClearMsg()">清空</button>
 </div>

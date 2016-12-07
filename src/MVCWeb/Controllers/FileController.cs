@@ -19,23 +19,22 @@ namespace MVCWeb.Controllers
                 return Json(new { error = "文件太大" });
             }
             string upPath = "";
-            if (pt < 1 || pt > 4)
-            {
-                pt = 2;
-            }
             switch (pt)
             {
-                case 1:
+                case (int)EnumObjectType.姿势:
                     upPath = ConfigurationManager.AppSettings["BlogFilePath"];
                     break;
-                case 2:
+                case (int)EnumObjectType.NewBee:
                     upPath = ConfigurationManager.AppSettings["NewBeeFilePath"];
                     break;
-                case 3:
+                case (int)EnumObjectType.问题:
                     upPath = ConfigurationManager.AppSettings["QuestionFilePath"];
                     break;
-                case 4:
+                case (int)EnumObjectType.笔记:
                     upPath = ConfigurationManager.AppSettings["NoteFilePath"];
+                    break;
+                default:
+                    upPath = ConfigurationManager.AppSettings["NewBeeFilePath"];
                     break;
             }
             string date = DateTime.Now.ToString("yyyy-MM-dd");
@@ -54,23 +53,22 @@ namespace MVCWeb.Controllers
         public ActionResult DownloadImg(string path, int pt)
         {
             string fPath = "";
-            if (pt < 1 || pt > 4)
-            {
-                pt = 2;
-            }
             switch (pt)
             {
-                case 1:
+                case (int)EnumObjectType.姿势:
                     fPath = ConfigurationManager.AppSettings["BlogFilePath"];
                     break;
-                case 2:
+                case (int)EnumObjectType.NewBee:
                     fPath = ConfigurationManager.AppSettings["NewBeeFilePath"];
                     break;
-                case 3:
+                case (int)EnumObjectType.问题:
                     fPath = ConfigurationManager.AppSettings["QuestionFilePath"];
                     break;
-                case 4:
+                case (int)EnumObjectType.笔记:
                     fPath = ConfigurationManager.AppSettings["NoteFilePath"];
+                    break;
+                default:
+                    fPath = ConfigurationManager.AppSettings["NewBeeFilePath"];
                     break;
             }
             fPath = fPath + path.Replace(":", "\\");

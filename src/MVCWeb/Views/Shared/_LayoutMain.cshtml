@@ -38,13 +38,19 @@
             return char.length;
         }
 
+        var MsgHub;
+        //发送更新消息
+        function SendNewMsg(id) {
+            MsgHub.server.sendToUser(id, "NewMsg");
+        }
+
         $(function () {
             //未登录不初始化signalr及消息等事件
             if ($("#CurrentUserID").val() == "") {
                 return;
             }
             //SignalR消息
-            var MsgHub = $.connection.MsgHub;
+            MsgHub = $.connection.MsgHub;
             MsgHub.client.addNewMessage = function (message) {
                 if (message == "NewMsg") {
                     UpdateMsgCount();
@@ -54,65 +60,28 @@
 
             });
 
-            //发送更新消息
-            function SendNewMsg(id) {
-                MsgHub.server.sendToUser(id, "NewMsg");
-            }
-
-            //更新消息数量
-            function UpdateMsgCount() {
-                $.ajax({
-                    url: "@Url.Action("GetMsgCount", "Home")",
-                    type: "get",
-                    success: function (result) {
-                        result = result == "0" ? "" : result;
-                        $("#MsgCount").html(result);
-                    }
-                });
-            }
-
-            //清空消息
-            function ClearMsg() {
-                $.ajax({
-                    url: "@Url.Action("ClearMsg", "Home")",
-                    type: "post",
-                    success: function (result) {
-                        if (result.msg == "done") {
-                            ShowMsgBox(false);
-                            UpdateMsgCount();
-                        } else {
-                            swal(result.msg)
-                        }
-                    }
-                });
-            }
-
-            //切换显示消息框
-            function ShowMsgBox(type) {
-                if (type) {
-                    $("#MsgLi").css("background-color", "#e7e7e7");
-                    $("#MsgBox").slideDown(60);
-                } else {
-                    $("#MsgLi").css("background-color", "");
-                    $("#MsgBox").slideUp(60);
-                }
-            }
-
             //显示或隐藏消息
             $("#BtnMsg").click(function () {
                 if ($("#MsgBox").is(":hidden")) {
+                    ShowMsgBox(true);
                     UpdateMsgCount();
                     if ($("#MsgCount").html() == "") {
                         $("#MsgBox").html($("#NoMsgHtml").html());
                         return;
                     }
-                    ShowMsgBox(true);
                     $("#MsgBox").html($("#LoadingHtml").html());
                     $.ajax({
                         url: "@Url.Action("GetMsg", "Home")",
                         type: "get",
                         success: function (result) {
                             $("#MsgBox").html(result);
+                            $(".MsgBar").each(function () {
+                                $(this).hover(function () {
+                                    $(this).find("#BtnDelMsg").show();
+                                }, function () {
+                                    $(this).find("#BtnDelMsg").hide();
+                                });
+                            });
                         }
                     });
                 } else {
@@ -143,6 +112,87 @@
                 });
             });
         });
+
+        //切换显示消息框
+        function ShowMsgBox(type) {
+            if (type) {
+                $("#MsgLi").css("background-color", "#e7e7e7");
+                $("#MsgBox").slideDown(60);
+            } else {
+                $("#MsgLi").css("background-color", "");
+                $("#MsgBox").slideUp(60);
+            }
+        }
+
+        //更新消息数量
+        function UpdateMsgCount() {
+            $.ajax({
+                url: "@Url.Action("GetMsgCount", "Home")",
+                type: "get",
+                success: function (result) {
+                    result = result == "0" ? "" : result;
+                    $("#MsgCount").html(result);
+                }
+            });
+        }
+
+        //删除评论消息
+        function DelCMsg(objID, order) {
+            $.ajax({
+                url: "@Url.Action("DeleteCMsg", "Home")",
+                type: "post",
+                data: { objID: objID },
+                success: function (result) {
+                    UpdateMsgCount();
+                    if (order > 0) {
+                        $("#CMsgBar" + order).remove();
+                    }
+                }
+            });
+        }
+
+        //查看评论消息
+        function CheckCMsg(url, objID) {
+            DelCMsg(objID, 0);
+            window.location.href = url;
+        }
+
+        //删除回复消息
+        function DelRMsg(objID, co, ro, order) {
+            $.ajax({
+                url: "@Url.Action("DeletRMsg", "Home")",
+                type: "post",
+                data: { objID: objID, co: co, ro: ro },
+                success: function (result) {
+                    UpdateMsgCount();
+                    if (order > 0) {
+                        $("#RMsgBar" + order).remove();
+                    }
+                }
+            });
+        }
+        
+        //查看回复消息
+        function CheckRMsg(url, objID, co, ro) {
+            DelRMsg(objID, co, ro, 0);
+            window.location.href = url;
+        }
+
+        //清空消息
+        function ClearMsg() {
+            $.ajax({
+                url: "@Url.Action("ClearMsg", "Home")",
+                type: "post",
+                success: function (result) {
+                    if (result.msg == "done") {
+                        ShowMsgBox(false);
+                        UpdateMsgCount();
+                    } else {
+                        swal(result.msg)
+                    }
+                }
+            });
+        }
     </script>
     @RenderSection("head", false)
 </head>

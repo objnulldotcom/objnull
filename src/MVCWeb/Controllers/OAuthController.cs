@@ -23,7 +23,7 @@ namespace MVCWeb.Controllers
             {
                 ViewBag.User = CurrentUser;
                 ViewBag.MsgCount = MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_CMsg + CurrentUser.ID) + MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_RMsg + CurrentUser.ID);
-                if(string.IsNullOrEmpty(HttpContext.ReadCookie("LastLogin")))
+                if (string.IsNullOrEmpty(HttpContext.ReadCookie("LastLogin")))
                 {
                     NullUser user = NullUserDataSvc.GetByID(CurrentUser.ID);
                     user.LastLoginDate = DateTime.Now;

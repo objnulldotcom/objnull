@@ -87,22 +87,28 @@ namespace MVCWeb
         }
 
         #endregion
-
+        
         /// <summary>
-        /// 生成PagedListRenderOptions（扩展）
+        /// 简洁时间格式
         /// </summary>
-        /// <param name="htmlHelper"></param>
-        /// <param name="btnCount">分页按钮数量</param>
+        /// <param name="dateTime"></param>
         /// <returns></returns>
-        public static PagedListRenderOptions GetPagedListOption(this System.Web.Mvc.HtmlHelper htmlHelper, int btnCount = 5)
+        public static string ToBlurDate(this DateTime dateTime)
         {
-            PagedListRenderOptions option = new PagedListRenderOptions();
-            option.MaximumPageNumbersToDisplay = btnCount;
-            option.DisplayLinkToFirstPage = PagedListDisplayMode.Always;
-            option.DisplayLinkToLastPage = PagedListDisplayMode.Always;
-            option.DisplayLinkToPreviousPage = PagedListDisplayMode.Never;
-            option.DisplayLinkToNextPage = PagedListDisplayMode.Never;
-            return option;
+            string date = "";
+            if (dateTime.Date == DateTime.Now.Date)
+            {
+                date = dateTime.ToString("HH:mm");
+            }
+            else if (dateTime.Year == DateTime.Now.Year)
+            {
+                date = dateTime.ToString("MM-dd");
+            }
+            else
+            {
+                date = dateTime.ToString("yy-MM-dd");
+            }
+            return date;
         }
     }
 }

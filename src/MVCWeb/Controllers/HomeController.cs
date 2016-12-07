@@ -103,7 +103,7 @@ namespace MVCWeb.Controllers
         #region 姿势blog
 
         //新姿势 needlogin
-        public ActionResult NewBlog()
+        public ActionResult BlogNew()
         {
             string key = MyRedisKeys.Pre_BlogDraft + CurrentUser.ID;
             string draftval = MyRedisDB.StringGet(key);
@@ -147,7 +147,7 @@ namespace MVCWeb.Controllers
         //发表新姿势 needlogin
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult NewBlog(int type, string title, string mdTxt, string mdValue)
+        public ActionResult BlogNew(int type, string title, string mdTxt, string mdValue)
         {
             if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
             {
@@ -421,7 +421,7 @@ namespace MVCWeb.Controllers
                     bcmsg.Count = 1;
                     bcmsg.Date = DateTime.Now;
                     bcmsg.Order = comment.Order;
-                    bcmsg.Title = blog.Title.Length > 15 ? blog.Title.Substring(0, 15) + "……" : blog.Title;
+                    bcmsg.Title = blog.Title.Length > 18 ? blog.Title.Substring(0, 18) + "……" : blog.Title;
                     MyRedisDB.SetAdd(key, bcmsg);
                 }
             }
@@ -470,7 +470,7 @@ namespace MVCWeb.Controllers
                 bcrmsg.From = CurrentUser.UserName;
                 bcrmsg.COrder = comment.Order;
                 bcrmsg.ROrder = reply.Order;
-                bcrmsg.Title = txt.Length > 15 ? txt.Substring(0, 15) + "……" : txt;
+                bcrmsg.Title = txt.Length > 18 ? txt.Substring(0, 18) + "……" : txt;
                 MyRedisDB.SetAdd(key, bcrmsg);
             }
 
@@ -586,7 +586,7 @@ namespace MVCWeb.Controllers
                     bcmsg.Count = 1;
                     bcmsg.Date = DateTime.Now;
                     bcmsg.Order = floor.Order;
-                    bcmsg.Title = newBee.Title.Length > 15 ? newBee.Title.Substring(0, 15) + "……" : newBee.Title;
+                    bcmsg.Title = newBee.Title.Length > 18 ? newBee.Title.Substring(0, 18) + "……" : newBee.Title;
                     MyRedisDB.SetAdd(key, bcmsg);
                 }
             }
@@ -633,7 +633,7 @@ namespace MVCWeb.Controllers
                 bcrmsg.From = CurrentUser.UserName;
                 bcrmsg.COrder = floor.Order;
                 bcrmsg.ROrder = reply.Order;
-                bcrmsg.Title = txt.Length > 15 ? txt.Substring(0, 15) + "……" : txt;
+                bcrmsg.Title = txt.Length > 18 ? txt.Substring(0, 18) + "……" : txt;
                 MyRedisDB.SetAdd(key, bcrmsg);
             }
 
@@ -680,6 +680,24 @@ namespace MVCWeb.Controllers
             string Rkey = MyRedisKeys.Pre_RMsg + CurrentUser.ID;
             MyRedisDB.DelKey(Ckey);
             MyRedisDB.DelKey(Rkey);
+            return Json(new { msg = "done" });
+        }
+
+        //删除评论消息
+        [HttpPost]
+        public ActionResult DeleteCMsg(Guid objID)
+        {
+            string Ckey = MyRedisKeys.Pre_CMsg + CurrentUser.ID;
+            MyRedisDB.SetRemove(Ckey, MyRedisDB.GetSet<CMsg>(Ckey).Where(c => c.ObjID == objID).FirstOrDefault());
+            return Json(new { msg = "done" });
+        }
+
+        //删除回复消息
+        [HttpPost]
+        public ActionResult DeletRMsg(Guid objID, int co, int ro)
+        {
+            string Rkey = MyRedisKeys.Pre_RMsg + CurrentUser.ID;
+            MyRedisDB.SetRemove(Rkey, MyRedisDB.GetSet<RMsg>(Rkey).Where(r => r.ObjID == objID && r.COrder == co && r.ROrder == ro).FirstOrDefault());
             return Json(new { msg = "done" });
         }
 

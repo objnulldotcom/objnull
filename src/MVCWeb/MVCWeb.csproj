@@ -259,7 +259,7 @@
     <Content Include="Views\Shared\_LayoutMain.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\OAuth\UserInfo.cshtml" />
-    <Content Include="Views\Home\NewBlog.cshtml" />
+    <Content Include="Views\Home\BlogNew.cshtml" />
     <Content Include="Views\Home\BlogList.cshtml" />
     <Content Include="Views\Shared\_LayoutM.cshtml" />
     <Content Include="Views\Manager\MLogin.cshtml" />
