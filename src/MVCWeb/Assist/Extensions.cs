@@ -110,5 +110,37 @@ namespace MVCWeb
             }
             return date;
         }
+
+        /// <summary>
+        /// 获取字符串字节数
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static int GetByteCount(this string text)
+        {
+            return Encoding.Default.GetByteCount(text);
+        }
+
+        /// <summary>
+        /// 按字节数从头截取字符串
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static string SubByteStr(this string text, int length)
+        {
+            string result = "";
+            foreach(char c in text.ToCharArray())
+            {
+                int cbc = c.ToString().GetByteCount();
+                int rbc = result.GetByteCount();
+                if(rbc + cbc > length)
+                {
+                    break;
+                }
+                result += c;
+            }
+            return result;
+        }
     }
 }

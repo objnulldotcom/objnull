@@ -1,61 +1,12 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "涨姿势 - 象空";
     Layout = "~/Views/Shared/_LayoutMain.cshtml";
 }
-
 @section head{
     <script src="~/Scripts/SimplePagination/jquery.simplePagination.js"></script>
-    <script>
-        $(function () {
-            JqueryPage(1, "new");
-            
-            $("#BtnNew").click(function () {
-                $("#NavOrder li").removeClass("active");
-                $(this).parent().addClass("active");
-                JqueryPage(1, "new");
-            });
-            $("#BtnView").click(function () {
-                $("#NavOrder li").removeClass("active");
-                $(this).parent().addClass("active");
-                JqueryPage(1, "view");
-            });
-            $("#BtnPro").click(function () {
-                $("#NavOrder li").removeClass("active");
-                $(this).parent().addClass("active");
-                JqueryPage(1, "pro");
-            });
-        });
-
-        //Ajax Jquery page
-        function JqueryPage(index, order) {
-            var pageSize = 15;
-            var postData = {order: order, pageSize: pageSize, pageNum: index }
-            $.ajax({
-                url: "@Url.Action("BlogPage", "Home")",
-                type: "Post",
-                data: postData,
-                success: function (result) {
-                    $("#JTable").html(result);
-                    $("#JPager").pagination({
-                        items: $("#TotalCount").val(),
-                        itemsOnPage: pageSize,
-                        currentPage: $("#CurrentPage").val(),
-                        prevText: "<",
-                        nextText: ">",
-                        listStyle: "pagination",
-                        hrefTextPrefix: "javascript:;",
-                        onPageClick: function (pageNumber, event) {
-                            JqueryPage(pageNumber, order);
-                        }
-                    });
-                }
-            });
-        }
-
-    </script>
+    <script src="~/Scripts/Views/BlogList.js"></script>
 }
-<div class="row" style="padding: 10px 0px">
+<div class="row" style="padding: 15px 0px">
     <div class="col-md-12" style="height: 100px; margin-bottom: 10px">
     </div>
     <div class="col-md-6">
@@ -72,10 +23,19 @@
         }
     </div>
 </div>
+<div class="row" id="RowDays" style="display: none; padding-bottom: 15px">
+    <div class="col-md-12">
+        <select id="SltDays">
+            <option selected="selected" value="3">最近三天</option>
+            <option value="7">最近七天</option>
+            <option value="30">最近一月</option>
+        </select>
+    </div>
+</div>
+<input id="ValPageSize" type="hidden" value="15" />
+<input id="ValOrder" type="hidden" value="new" />
 <div class="row">
     <div id="JTable" class="col-md-12">
-    </div>
-    <div id="JPager" class="col-md-12 text-center">
     </div>
 </div>
 

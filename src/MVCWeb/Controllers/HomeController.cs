@@ -226,9 +226,9 @@ namespace MVCWeb.Controllers
 
         //姿势分页
         [HttpPost]
-        public ActionResult BlogPage(string order, int pageSize, int pageNum = 1)
+        public ActionResult BlogPage(string order, int pageSize, int pageNum = 1, int days = 3)
         {
-            DateTime validDate = DateTime.Now.AddDays(-3);
+            DateTime validDate = DateTime.Now.AddDays(days * -1);
             int totalCount = 0;
             if(order == "new")
             {

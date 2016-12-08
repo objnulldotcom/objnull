@@ -1,6 +1,7 @@
 ﻿@using MVCWeb;
 @using MVCWeb.Model.Models;
-@using System.Text.RegularExpressions;
+@using System.Text;
+@using HtmlAgilityPack;
 @{
     List<Blog> BlogList = ViewBag.BlogList as List<Blog>;
 }
@@ -8,63 +9,65 @@
 @foreach (Blog blog in BlogList)
 {
     string userName = string.IsNullOrEmpty(blog.Owner.Name) ? blog.Owner.GitHubLogin : blog.Owner.Name;
-    //提取内容预览
-    Regex img = new Regex("<img.+?>\n*");
-    blog.MDValue = img.Replace(blog.MDValue, "");
-    Regex link = new Regex("<a.+?</a>*");
-    blog.MDValue = link.Replace(blog.MDValue, "");
-    blog.MDValue = blog.MDValue.Replace("<br>", " ").Replace("<strong>", "").Replace("</strong>", "").Replace("<em>", "").Replace("</em>", "");
-    blog.MDValue = blog.MDValue.Replace("<del>", "").Replace("</del>", "").Replace("<code>", "").Replace("</code>", "").Replace("\n", " ");
-    Regex reg = new Regex("<p>.+?</p>");
-    MatchCollection mc = reg.Matches(blog.MDValue);
-    string result = "";
-    for (int i = 0; i < mc.Count; i++)
-    {
-        string ptxt = mc[i].Value.Replace("<p>", "").Replace("</p>", "");
-        result += ptxt + " ";
-        if (System.Text.Encoding.Default.GetByteCount(result) > 380)
-        {
-            result = result.Substring(0, 200);
-            break;
-        }
-    }
-    result = result.TrimEnd() + "……";
-    <div class="media">
-        <div class="media-left">
-            <div style="height: 35px;padding-top: 2px;text-align: center;">
-                @switch (blog.Type)
-                {
-                    case (int)EnumBlogType.姿势:
-                        <span class="label label-primary" style="font-weight: 400">姿势</span>
-                        break;
-                    case (int)EnumBlogType.宣传:
-                        <span class="label label-danger" style="font-weight: 400">宣传</span>
-                        break;
-                    case (int)EnumBlogType.心得:
-                        <span class="label label-info" style="font-weight: 400">心得</span>
-                        break;
-                    case (int)EnumBlogType.科普:
-                        <span class="label label-success" style="font-weight: 400">科普</span>
-                        break;
-                    case (int)EnumBlogType.搬运:
-                        <span class="label label-warning" style="font-weight: 400">搬运</span>
-                        break;
-                }
-            </div>
-            <a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank"><img class="img-rounded" src="@blog.Owner.AvatarUrl&s=48" height="48" width="48" alt="@blog.Owner.Name" title="@blog.Owner.Name"></a>
-        </div>
-        <div class="media-body">
-            <div class="media-heading fs1"><a href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank" style="text-decoration:none">@blog.Title</a></div>
-            <div class="fs2" style="height: 35px; overflow: hidden"><p>@Html.Raw(result)</p></div>
-            <div class="fs2" style="padding-top:2px">
-                <span class="glyphicon glyphicon-user"></span><a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank">@userName</a> post at&nbsp;
-                <span class="glyphicon glyphicon-time"></span>@blog.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;
-                <span class="glyphicon glyphicon-eye-open"></span>@blog.ViewCount&nbsp;
-                <span class="glyphicon glyphicon-comment"></span>@blog.CommentCount&nbsp;
-                <span class="glyphicon glyphicon-thumbs-up"></span>@blog.ProCount
+    //提取预览内容
+    HtmlDocument htmlDoc = new HtmlDocument();
+    htmlDoc.LoadHtml(blog.MDValue);
+    string innerText = htmlDoc.DocumentNode.InnerText;
+    string result = innerText.GetByteCount() > 350 ? innerText.SubByteStr(350) : innerText;
+    <div class="row">
+        <div class="col-md-12">
+            <div class="media" style="padding-bottom: 15px">
+                <div class="media-left">
+                    <div style="height: 38px;padding-top: 2px;text-align: center;">
+                        @switch (blog.Type)
+                        {
+                            case (int)EnumBlogType.姿势:
+                                <span class="label label-primary" style="font-weight: 400">姿势</span>
+                                break;
+                            case (int)EnumBlogType.宣传:
+                                <span class="label label-danger" style="font-weight: 400">宣传</span>
+                                break;
+                            case (int)EnumBlogType.心得:
+                                <span class="label label-info" style="font-weight: 400">心得</span>
+                                break;
+                            case (int)EnumBlogType.科普:
+                                <span class="label label-success" style="font-weight: 400">科普</span>
+                                break;
+                            case (int)EnumBlogType.搬运:
+                                <span class="label label-warning" style="font-weight: 400">搬运</span>
+                                break;
+                        }
+                    </div>
+                    <a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank">
+                        <img class="img-rounded" src="@blog.Owner.AvatarUrl&s=48" height="48" width="48" alt="@blog.Owner.Name" title="@blog.Owner.Name">
+                    </a>
+                </div>
+                <div class="media-body">
+                    <div class="media-heading fs1"><a href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank" style="text-decoration:none">@blog.Title</a></div>
+                    <div class="fs2" style="height: 35px; overflow: hidden"><p>@Html.Raw(result)……</p></div>
+                    <div class="fs2" style="padding-top:2px">
+                        <span>
+                            <span class="glyphicon glyphicon-user"></span>
+                            <a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank">@userName</a> post at&nbsp;
+                        </span>
+                        <span title="发布日期"><span class="glyphicon glyphicon-time"></span>@blog.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;</span>
+                        <span title="查看次数"><span class="glyphicon glyphicon-eye-open"></span>@blog.ViewCount&nbsp;</span>
+                        <span title="评论次数"><span class="glyphicon glyphicon-comment"></span>@blog.CommentCount&nbsp;</span>
+                        <span title="点赞次数"><span class="glyphicon glyphicon-thumbs-up"></span>@blog.ProCount</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 }
 <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
 <input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
+<div class="row">
+    <div id="JPager" class="col-md-12 text-center">
+    </div>
+</div>
+<div id="HtmlEmpty" class="row" style="display:none; padding-top: 50px; padding-bottom: 50px">
+    <div class="col-md-12 text-center">
+        最近<span id="TxtDays"></span>天没有<span id="TxtOrder"></span>
+    </div>
+</div>
