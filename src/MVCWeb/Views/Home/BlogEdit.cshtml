@@ -1,9 +1,10 @@
 ﻿@using MVCWeb.Model.Models;
 @{
-    ViewBag.Title = "新姿势 - 象空";
+    ViewBag.Title = "姿势编辑 - 象空";
     Layout = "~/Views/Shared/_LayoutMain.cshtml";
-    Blog Draft = ViewBag.DraftBlog as Blog;
+    Blog Blog = ViewBag.Blog as Blog;
 }
+
 @section head{
     <!--fileupload-->
     <script src="~/Scripts/FileUpload/vendor/jquery.ui.widget.js"></script>
@@ -15,14 +16,14 @@
     <!--marked-->
     <script src="~/Scripts/Marked/marked.js"></script>
     <!--Page-->
-    <script src="~/Scripts/Views/BlogNew.js"></script>
+    <script src="~/Scripts/Views/BlogEdit.js"></script>
 }
 <div class="row" style="padding-top: 15px">
     <div id="MDTitle" class="col-md-10 fs1">
-        @(Draft == null ? "" : Draft.Title)
+        @Blog.Title
     </div>
     <div class="col-md-2 text-right">
-        <span id="LblBType" class="label label-primary" style="font-weight: 400">姿势</span>
+        <span id="LblBType" class="label label-primary" style="font-weight: 400"></span>
     </div>
 </div>
 <div class="row" style="padding-top: 15px">
@@ -30,20 +31,6 @@
     </div>
 </div>
 <hr />
-<div class="row">
-    <div class="col-md-10">
-        <input id="TxtTitle" type="text" class="form-control" placeholder="标题" value="@(Draft == null ? "" : Draft.Title)" />
-    </div>
-    <div class="col-md-2">
-        <select id="SltType" class="form-control">
-            <option value="0" selected="selected">姿势</option>
-            <option value="1">宣传</option>
-            <option value="2">心得</option>
-            <option value="3">科普</option>
-            <option value="4">搬运</option>
-        </select>
-    </div>
-</div>
 <div class="row">
     <div class="col-md-12">
         <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法</a>&nbsp;,&nbsp;</span>
@@ -53,21 +40,15 @@
     </div>
 </div>
 <input id="ValPt" type="hidden" value="@((int)EnumObjectType.姿势)" />
+<input id="ValBlogID" type="hidden" value="@Blog.ID" />
+<input id="ValBlogType" type="hidden" value="@Blog.Type" />
 <div class="row">
     <div class="col-md-12">
-        <textarea id="TxtMD" class="form-control" rows="15" style="resize:vertical;">@(Draft == null ? "" : Draft.MDText)</textarea>
+        <textarea id="TxtMD" class="form-control" rows="15" style="resize:vertical;">@Blog.MDText</textarea>
     </div>
 </div>
-<div class="row" style="padding-bottom: 20px">
-    <div class="col-md-12">
-        <span id="DraftStatus"></span>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-1">
-        <button id="BtnDraft" class="btn btn-default">保存草稿</button>
-    </div>
-    <div class="col-md-10 text-center">
+<div class="row" style="padding-top: 15px">
+    <div class="col-md-12 text-center">
         <button id="BtnConfirm" class="btn btn-default">发布</button>
     </div>
 </div>

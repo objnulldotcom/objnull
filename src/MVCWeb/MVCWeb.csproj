@@ -230,6 +230,9 @@
     <Content Include="Scripts\Viewerjs\viewer.min.css" />
     <Content Include="Scripts\Viewerjs\viewer.min.js" />
     <Content Include="Scripts\Views\BlogList.js" />
+    <Content Include="Scripts\Views\BlogEdit.js" />
+    <Content Include="Scripts\Views\BlogNew.js" />
+    <Content Include="Scripts\Views\BlogView.js" />
     <Content Include="Scripts\Views\LayoutMain.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -282,7 +285,7 @@
     <Content Include="Views\Home\UserBlogPage.cshtml" />
     <Content Include="Views\Home\UserStarPage.cshtml" />
     <Content Include="Views\Home\UserMsgPage.cshtml" />
-    <Content Include="Views\Home\EditBlog.cshtml" />
+    <Content Include="Views\Home\BlogEdit.cshtml" />
     <Content Include="Views\Home\NewBeeList.cshtml" />
     <Content Include="Views\Home\NewBeePage.cshtml" />
     <Content Include="Views\Home\NewBeeView.cshtml" />

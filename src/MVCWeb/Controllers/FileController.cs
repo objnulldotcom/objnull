@@ -43,7 +43,8 @@ namespace MVCWeb.Controllers
             {
                 Directory.CreateDirectory(upPath);
             }
-            string newName = Guid.NewGuid().ToString() + Path.GetExtension(upFile.FileName);
+            string ext = upFile.FileName == "blob" ? ".png" : Path.GetExtension(upFile.FileName);
+            string newName = Guid.NewGuid().ToString() + ext;
             upFile.SaveAs(upPath + newName);
 
             return Json(new { error = "", path = date + ":" + newName });

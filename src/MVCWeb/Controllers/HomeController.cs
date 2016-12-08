@@ -102,7 +102,7 @@ namespace MVCWeb.Controllers
 
         #region 姿势blog
 
-        //新姿势 needlogin
+        //新姿势
         public ActionResult BlogNew()
         {
             string key = MyRedisKeys.Pre_BlogDraft + CurrentUser.ID;
@@ -115,26 +115,26 @@ namespace MVCWeb.Controllers
             return View();
         }
 
-        //保存草稿 needlogin
+        //保存草稿
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult SaveDraft(int type, string title, string mdTxt)
         {
-            if (string.IsNullOrEmpty(title) && string.IsNullOrEmpty(mdTxt))//内容空不保存草稿
+            if (string.IsNullOrEmpty(title) && string.IsNullOrEmpty(mdTxt))
             {
                 return Json(new { msg = "empty" });
             }
-            int tlength = Encoding.Default.GetByteCount(title);
-            int txtlength = Encoding.Default.GetByteCount(mdTxt);
+            int tlength = title.GetByteCount();
+            int txtlength = mdTxt.GetByteCount();
             if (tlength > 90 || txtlength > 50000)
             {
                 return Json(new { msg = "参数太长" });
             }
-
             if (type < 0 || type > 4)
             {
                 type = 0;
             }
+
             Blog nblog = new Blog();
             nblog.Type = type;
             nblog.Title = title;
@@ -144,7 +144,7 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done", date = DateTime.Now.ToString("HH:mm") });
         }
 
-        //发表新姿势 needlogin
+        //发表新姿势
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult BlogNew(int type, string title, string mdTxt, string mdValue)
@@ -159,14 +159,13 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "参数太长" });
             }
-
             if (type < 0 || type > 4)
             {
                 type = 0;
             }
-            //禁止脚本
-            mdTxt = mdTxt.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
-            mdValue = mdValue.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
+
+            //内容无害化
+            mdValue = HtmlST.Sanitize(mdValue);
             Blog nblog = new Blog();
             nblog.Type = type;
             nblog.Title = title;
@@ -180,8 +179,8 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done", url = Url.Action("BlogList") });
         }
 
-        //编辑姿势 needlogin
-        public ActionResult EditBlog(Guid id)
+        //编辑姿势
+        public ActionResult BlogEdit(Guid id)
         {
             Blog blog = BlogDataSvc.GetByID(id);
             if(blog.OwnerID != CurrentUser.ID)
@@ -192,10 +191,10 @@ namespace MVCWeb.Controllers
             return View();
         }
 
-        //完成编辑 needlogin
+        //完成编辑
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult EditBlog(Guid id, string mdTxt, string mdValue)
+        public ActionResult BlogEdit(Guid id, string mdTxt, string mdValue)
         {
             if (string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
             {
@@ -207,9 +206,8 @@ namespace MVCWeb.Controllers
                 return Json(new { msg = "参数太长" });
             }
 
-            //禁止脚本
-            mdTxt = mdTxt.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
-            mdValue = mdValue.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
+            //内容无害化
+            mdValue = HtmlST.Sanitize(mdValue);
             Blog nblog = BlogDataSvc.GetByID(id);
             nblog.MDText = mdTxt;
             nblog.MDValue = mdValue;
