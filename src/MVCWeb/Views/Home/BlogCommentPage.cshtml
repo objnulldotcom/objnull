@@ -11,10 +11,12 @@
             <div id="Comment@(comment.Order)" class="col-md-12" cmid="@comment.ID">
                 @Html.Raw(comment.MDValue)
             </div>
-            <div class="col-md-12" style="line-height: 32px;margin-top: -10px">
+        </div>
+        <div class="row">
+            <div class="col-md-12" style="line-height: 32px;padding-top: -10px">
                 <a><img class="img-rounded" src="@comment.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName"></a>
                 <a>@userName</a>
-                <span class="fs2"> at <span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToString("yyyy-MM-dd HH:mm")</span>
+                <span class="fs2" title="评论时间"><span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToBlurDate()</span>
                 <a id="ShowReply@(comment.Order)" href="javascript:;" style="text-decoration:none" onclick="ShowReply(@comment.Order, 1)" recount="@comment.ReplyCount">
                     @if (comment.ReplyCount > 0)
                     { @Html.Raw(comment.ReplyCount + "条回复") }
@@ -23,38 +25,47 @@
                 </a>
             </div>
         </div>
-        <div id="ReplyBox@(comment.Order)" class="row" style="padding-left: 40px; display:none;margin-top:10px">
-            <div id="Replys@(comment.Order)"></div>
-            <div id="ReplyPager@(comment.Order)" class="col-md-12 text-center" style="margin: -15px 0px">
-            </div>
-            @if (ViewBag.Login)
-            {
-                <div class="col-md-11">
-                    <div class="input-group">
-                        <div class="input-group-addon">
-                            <span id="ReplyToUser@(comment.Order)">@@@userName </span>
-                            <a id="DefaultUser@(comment.Order)" href="javascript:;" style="display:none" onclick="ReplyDefault(@comment.Order,'@userName','@comment.Owner.ID')"><span class="badge">x</span></a>
-                        </div>
-                        <input id="ReplyTxt@(comment.Order)" type="text" class="form-control" touser="@comment.OwnerID" />
+        <div id="ReplyBox@(comment.Order)" class="row" style="padding-left: 36px; display:none;padding-top:5px">
+            <div class="col-md-12">
+                <div class="row">
+                    <div id="Replys@(comment.Order)" class="col-md-12">
                     </div>
                 </div>
-                <div class="col-md-1">
-                    <button class="btn btn-default" onclick="AddReply(@comment.Order)">确定</button>
-                </div>
-            }
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <hr style="border: 1px dotted #eee; margin: 10px" />
+                @if (ViewBag.Login)
+                {
+                    <div class="row">
+                        <div class="col-md-11">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <span id="ReplyToUser@(comment.Order)">@@@userName </span>
+                                    <a id="DefaultUser@(comment.Order)" href="javascript:;" style="display:none" onclick="ReplyDefault(@comment.Order,'@userName','@comment.Owner.ID')">
+                                        <span class="badge">x</span>
+                                    </a>
+                                </div>
+                                <input id="ReplyTxt@(comment.Order)" type="text" class="form-control" touser="@comment.OwnerID" />
+                            </div>
+                        </div>
+                        <div class="col-md-1 text-right">
+                            <button id="BtnAddReply@(comment.Order)" class="btn btn-default" onclick="AddReply(@comment.Order)">确定</button>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
+        <hr style="border: 1px dotted #eee; margin: 5px 0px 10px 0px" />
     }
 }
 else
 {
-    <div class="col-md-12 text-center">
-        还没有人评论
+    <div class="row" style="padding-top: 30px; padding-bottom: 50px">
+        <div class="col-md-12 text-center">
+            还没有人评论
+        </div>
     </div>
 }
 <input type="hidden" id="CommentTotalCount" value="@ViewBag.TotalCount" />
 <input type="hidden" id="CommentCurrentPage" value="@ViewBag.CurrentPage" />
+<div class="row">
+    <div id="Pager" class="col-md-12 text-center">
+    </div>
+</div>

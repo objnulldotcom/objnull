@@ -89,11 +89,13 @@ $(function () {
             return;
         }
         var id = $("#ValBlogID").val();
+        $("#BtnConfirm").attr("disabled", true);
         $.ajax({
             url: "/Home/BlogEdit",
             data: { id: id, mdTxt: mdTxt, mdValue: marked(mdTxt) },
             type: "post",
             success: function (result) {
+                $("#BtnConfirm").attr("disabled", false);
                 if (result.msg == "done") {
                     window.location.href = result.url;
                 } else {

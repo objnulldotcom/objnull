@@ -1,109 +1,9 @@
-﻿$(function () {
-    SetViewer("MDValue");
-    $("#CommentBox").hide();
-    $("#PreBox").hide();
-    GetCommentPage(1);
-    //代码高亮插件
-    marked.setOptions({
-        highlight: function (code) {
-            return hljs.highlightAuto(code).value;
-        },
-        sanitize: true
-    });
-
-    //评论
-    $("#BtnComment").click(function () {
-        $("#CommentBox").show();
-        $(document).scrollTop(9999);
-    });
-    //取消
-    $("#BtnCancel").click(function () {
-        $("#CommentBox").hide();
-    });
-    //评论面板
-    $("#BtnCmt").click(function () {
-        $("#BtnCmt").parent().removeClass("active");
-        $("#BtnPre").parent().removeClass("active");
-        $("#BtnCmt").parent().addClass("active");
-        $("#PreBox").hide();
-        $("#EditBox").show();
-    });
-    //预览面板
-    $("#BtnPre").click(function () {
-        $("#BtnCmt").parent().removeClass("active");
-        $("#BtnPre").parent().removeClass("active");
-        $("#BtnPre").parent().addClass("active");
-        $("#EditBox").hide();
-        $("#PreBox").show();
-
-        $("#PreBox").html("");
-        $("#PreBox").html(marked($("#CmtTxt").val()));
-    });
-    //确定
-    $("#BtnConfirm").click(function () {
-        var txt = $("#CmtTxt").val();
-        if (txt.length == 0) {
-            swal("请填写评论内容");
-            return;
-        }
-        if (getBt(txt) > 2000) {
-            swal("评论最多2000字节，当前" + getBt(txt) + "字节");
-            return;
-        }
-        $.ajax({
-            url: "/Home/AddBlogComment",
-            data: { blogID: "5e04a400-ff5e-40a6-98ad-c52d5b175e45", mdTxt: txt, mdValue: marked(txt) },
-            type: "post",
-            success: function (result) {
-                if (result.msg == "done") {
-                    GetCommentPage(99999);
-                    $("#CmtTxt").val("");
-                    $("#BtnCmt").click();
-                    $("#CommentBox").hide();
-                    SendNewMsg("0ac4a4d3-b453-4e8b-9895-0ba07e0cf59c");
-                    $("#CommentCount").html(result.count);
-                } else {
-                    swal(result.msg);
-                }
-            }
-        });
-    });
-
-    //点赞
-    $("#BtnPro").click(function () {
-        $.ajax({
-            url: "/Home/ProBlog",
-            data: { id: "5e04a400-ff5e-40a6-98ad-c52d5b175e45" },
-            type: "post",
-            success: function (result) {
-                if (result.msg == "done") {
-                    $("#BtnPro").hide();
-                    $("#ProCount").html(result.count);
-                }
-            }
-        });
-    });
-
-    //收藏
-    $("#BtnStar").click(function () {
-        $.ajax({
-            url: "/Home/StarBlog",
-            data: { id: "5e04a400-ff5e-40a6-98ad-c52d5b175e45" },
-            type: "post",
-            success: function (result) {
-                if (result.msg == "done") {
-                    $("#BtnStar").hide();
-                }
-            }
-        });
-    });
-});
-
+﻿
 var FirstLoad = true;
 //获取评论
 function GetCommentPage(index) {
-    var pageSize = 10;
-    var postData = { blogID: "5e04a400-ff5e-40a6-98ad-c52d5b175e45", pageSize: pageSize, pageNum: index }
+    var pageSize = parseInt($("#ValCPageSize").val());
+    var postData = { blogID: $("#ValBlogID").val(), pageSize: pageSize, pageNum: index }
     $.ajax({
         url: "/Home/BlogCommentPage",
         type: "Post",
@@ -115,7 +15,7 @@ function GetCommentPage(index) {
                 $("html,body").animate({ scrollTop: $("#Status").offset().top }, 300)
             }
             FirstLoad = false;
-            if ($("#CommentTotalCount").val() == "0") {
+            if (parseInt($("#CommentTotalCount").val()) <= pageSize) {
                 return;
             }
             $("#Pager").pagination({
@@ -147,7 +47,7 @@ function ShowReply(corder, index) {
     } else {
         $("#ReplyBox" + corder).show();
         $("#ShowReply" + corder).html("收起回复");
-        if ($("#Replys" + corder).html() == "") {
+        if ($("#ReplyTotalCount" + corder).val() == null) {
             GetCommentReplyPage(index, corder);
         }
     }
@@ -166,14 +66,18 @@ function AddReply(corder) {
         swal("评论最多400字节，当前" + getBt(txt) + "字节");
         return;
     }
+    $("#BtnAddReply" + corder).attr("disabled", true);
     $.ajax({
         url: "/Home/AddBlogCommentReply",
         data: { commentID: cmid, toUserID: toUser, txt: txt },
         type: "post",
         success: function (result) {
+            $("#BtnAddReply" + corder).attr("disabled", false);
             if (result.msg == "done") {
                 GetCommentReplyPage(99999, corder);
                 $("#ReplyTxt" + corder).val("");
+                var recount = parseInt($("#ShowReply" + corder).attr("recount"));
+                $("#ShowReply" + corder).attr("recount", recount + 1);
                 SendNewMsg(toUser);
             } else {
                 swal(result.msg);
@@ -184,7 +88,7 @@ function AddReply(corder) {
 
 //获取评论回复
 function GetCommentReplyPage(index, corder) {
-    var pageSize = 10;
+    var pageSize = parseInt($("#ValRPageSize").val());
     var cmid = $("#Comment" + corder).attr("cmid");
     var postData = { commentID: cmid, corder: corder, pageSize: pageSize, pageNum: index }
     $.ajax({
@@ -203,8 +107,12 @@ function GetCommentReplyPage(index, corder) {
                     $(this).find("#BtnReply").hide();
                 });
             });
+            var totalCount = parseInt($("#ReplyTotalCount" + corder).val());
+            if (totalCount <= pageSize) {
+                return;
+            }
             $("#ReplyPager" + corder).pagination({
-                items: $("#ReplyTotalCount" + corder).val(),
+                items: totalCount,
                 itemsOnPage: pageSize,
                 currentPage: $("#ReplyCurrentPage" + corder).val(),
                 prevText: "<",
@@ -231,4 +139,135 @@ function ReplyDefault(corder, defaultName, defaultID) {
     $("#ReplyToUser" + corder).html("@" + defaultName);
     $("#ReplyTxt" + corder).attr("touser", defaultID);
     $("#DefaultUser" + corder).hide();
-}
+}
+
+$(function () {
+    SetViewer("MDValue");
+    $(".CommentBox").hide();
+    $("#PreBox").hide();
+
+    var co = parseInt($("#ValCOrder").val());
+    var ro = parseInt($("#ValROrder").val());
+    var cpsize = parseInt($("#ValCPageSize").val());
+    var rpsize = parseInt($("#ValRPageSize").val());
+
+    //消息定位查看
+    if (co > 0) {
+        var ct = Math.floor(co / cpsize);
+        var cindex = co % cpsize == 0 ? ct : ct + 1;
+        GetCommentPage(cindex);
+        $("html,body").animate({ scrollTop: $("#Comment" + co).offset().top - 100 }, 300)
+        if (ro > 0) {
+            var rt = Math.floor(ro / rpsize);
+            var rindex = ro % rpsize == 0 ? rt : rt + 1;
+            ShowReply(co, rindex);
+            $("html,body").animate({ scrollTop: $("#Replys" + co).offset().top - 100 }, 300)
+        }
+    } else {
+        GetCommentPage(1);
+    }
+
+    //marked
+    marked.setOptions({
+        highlight: function (code) {
+            return hljs.highlightAuto(code).value;
+        },
+        sanitize: true,
+        breaks: true
+    });
+
+    //评论
+    $("#BtnComment").click(function () {
+        $(".CommentBox").show();
+        $(document).scrollTop(9999);
+    });
+    //取消
+    $("#BtnCancel").click(function () {
+        $(".CommentBox").hide();
+    });
+    //评论面板
+    $("#BtnCmt").click(function () {
+        $("#BtnCmt").parent().removeClass("active");
+        $("#BtnPre").parent().removeClass("active");
+        $("#BtnCmt").parent().addClass("active");
+        $("#PreBox").hide();
+        $("#EditBox").show();
+    });
+    //预览面板
+    $("#BtnPre").click(function () {
+        $("#BtnCmt").parent().removeClass("active");
+        $("#BtnPre").parent().removeClass("active");
+        $("#BtnPre").parent().addClass("active");
+        $("#EditBox").hide();
+        $("#PreBox").show();
+
+        $("#PreBox").html("");
+        $("#PreBox").html(marked($("#CmtTxt").val()));
+    });
+
+    //添加评论
+    $("#BtnConfirm").click(function () {
+        var txt = $("#CmtTxt").val();
+        if (txt.length == 0) {
+            swal("请填写评论内容");
+            return;
+        }
+        if (getBt(txt) > 5000) {
+            swal("评论最多5000字节，当前" + getBt(txt) + "字节");
+            return;
+        }
+        $("#BtnConfirm").attr("disabled", true);
+        $.ajax({
+            url: "/Home/AddBlogComment",
+            data: { blogID: $("#ValBlogID").val(), mdTxt: txt, mdValue: marked(txt) },
+            type: "post",
+            success: function (result) {
+                $("#BtnConfirm").attr("disabled", false);
+                if (result.msg == "done") {
+                    GetCommentPage(99999);
+                    $("#CmtTxt").val("");
+                    $("#BtnCmt").click();
+                    $(".CommentBox").hide();
+                    SendNewMsg($("#ValBlogOwnerID").val());
+                    $("#CommentCount").html(result.count);
+                } else {
+                    swal(result.msg);
+                }
+            }
+        });
+    });
+
+    //点赞
+    $("#BtnPro").click(function () {
+        $("#BtnPro").attr("disabled", true);
+        $.ajax({
+            url: "/Home/ProBlog",
+            data: { id: $("#ValBlogID").val() },
+            type: "post",
+            success: function (result) {
+                $("#BtnPro").attr("disabled", false);
+                if (result.msg == "done") {
+                    $("#BtnPro").hide();
+                    $("#ProCount").html(result.count);
+                }
+            }
+        });
+    });
+
+    //收藏
+    $("#BtnStar").click(function () {
+        $("#BtnStar").attr("disabled", true);
+        $.ajax({
+            url: "/Home/StarBlog",
+            data: { id: $("#ValBlogID").val() },
+            type: "post",
+            success: function (result) {
+                $("#BtnStar").attr("disabled", false);
+                if (result.msg == "done") {
+                    $("#BtnStar").hide();
+                }
+            }
+        });
+    });
+
+});

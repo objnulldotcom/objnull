@@ -39,7 +39,18 @@ namespace MVCWeb
             }
 #endif
             filterContext.ExceptionHandled = true;
-            filterContext.HttpContext.Response.RedirectToRoute(new { controller = "Home", action = "Error" });
+            if(filterContext.HttpContext.Request.IsAjaxRequest())
+            {
+                filterContext.Result = new JsonResult
+                {
+                    Data = new { msg = "系统错误" },
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+            }
+            else
+            {
+                filterContext.HttpContext.Response.RedirectToRoute(new { controller = "Home", action = "Error" });
+            }
         }
     }
 

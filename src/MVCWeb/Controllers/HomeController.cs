@@ -153,9 +153,7 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "参数错误" });
             }
-            int tlength = Encoding.Default.GetByteCount(title);
-            int txtlength = Encoding.Default.GetByteCount(mdTxt);
-            if (tlength > 90 || txtlength > 50000)
+            if (title.GetByteCount() > 90 || mdTxt.GetByteCount() > 50000)
             {
                 return Json(new { msg = "参数太长" });
             }
@@ -200,8 +198,7 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "参数错误" });
             }
-            int txtlength = Encoding.Default.GetByteCount(mdTxt);
-            if (txtlength > 50000)
+            if (mdTxt.GetByteCount() > 50000)
             {
                 return Json(new { msg = "参数太长" });
             }
@@ -252,11 +249,10 @@ namespace MVCWeb.Controllers
             ViewBag.Blog = blog;
             ViewBag.Login = CurrentUser != null;
             ViewBag.Owner = CurrentUser != null ? CurrentUser.ID == blog.OwnerID : false;
-
             ViewBag.COrder = co;
             ViewBag.ROrder = ro;
 
-            ViewBag.ShowPro = false;
+            #region 查看点赞收藏是否显示
             if (CurrentUser != null)
             {
                 //查看次数
@@ -275,11 +271,14 @@ namespace MVCWeb.Controllers
                     blog.ViewCount += 1;
                     BlogDataSvc.Update(blog);
                 }
+
                 //点赞
+                ViewBag.ShowPro = false;
                 if (userRecords.Where(r => r.ObjID == blog.ID && r.type == (int)EnumRecordType.点赞).Count() == 0)
                 {
                     ViewBag.ShowPro = true;
                 }
+
                 //收藏
                 ViewBag.ShowStar = true;
                 string starKey = MyRedisKeys.Pre_UserStarCache + CurrentUser.ID;
@@ -289,27 +288,29 @@ namespace MVCWeb.Controllers
                     IEnumerable<UserStar> userStars = UserStarDataSvc.GetByCondition(s => s.OwnerID == CurrentUser.ID);
                     if (userStars.Count() > 0)
                     {
-                        if (userStars.Where(s => s.ObjID == blog.ID && s.ObjType == (int)EnumObjectType.姿势).Count() > 0)
+                        if (userStars.Where(s => s.ObjID == blog.ID).Count() > 0)
                         {
                             ViewBag.ShowStar = false;
                         }
-                        foreach (UserStar star in userStars)//添加收藏缓存
+                        //添加收藏缓存
+                        foreach (UserStar star in userStars)
                         {
                             MyRedisDB.SetAdd(starKey, new UserStarCache() { ObjID = blog.ID, ObjType = star.ObjType });
                         }
                         MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
                     }
                 }
-                else if (userStarCaches.Where(s => s.ObjID == blog.ID && s.ObjType == (int)EnumObjectType.姿势).Count() > 0)
+                else if (userStarCaches.Where(s => s.ObjID == blog.ID).Count() > 0)
                 {
                     ViewBag.ShowStar = false;
                 }
             }
+            #endregion
 
             return View();
         }
 
-        //点赞 needlogin
+        //点赞
         [HttpPost]
         public ActionResult ProBlog(Guid id)
         {
@@ -332,14 +333,15 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done", count = blog.ProCount });
         }
 
-        //收藏 needlogin
+        //收藏
         [HttpPost]
         public ActionResult StarBlog(Guid id)
         {
             Blog blog = BlogDataSvc.GetByID(id);
-            bool add = false;
             string starKey = MyRedisKeys.Pre_UserStarCache + CurrentUser.ID;
             IEnumerable<UserStarCache> userStarCaches = MyRedisDB.GetSet<UserStarCache>(starKey);
+
+            bool add = false;
             if (userStarCaches.Count() == 0)
             {
                 IEnumerable<UserStar> userStars = UserStarDataSvc.GetByCondition(s => s.OwnerID == CurrentUser.ID);
@@ -352,7 +354,7 @@ namespace MVCWeb.Controllers
                     }
                     MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
                     //添加收藏
-                    if (userStars.Where(s => s.ObjID == blog.ID && s.ObjType == (int)EnumObjectType.姿势).Count() == 0)
+                    if (userStars.Where(s => s.ObjID == blog.ID).Count() == 0)
                     {
                         add = true;
                     }
@@ -362,10 +364,11 @@ namespace MVCWeb.Controllers
                     add = true;
                 }
             }
-            else if (userStarCaches.Where(s => s.ObjID == blog.ID && s.ObjType == (int)EnumObjectType.姿势).Count() == 0)
+            else if (userStarCaches.Where(s => s.ObjID == blog.ID).Count() == 0)
             {
                 add = true;
             }
+
             if (add)
             {
                 //添加收藏
@@ -376,25 +379,32 @@ namespace MVCWeb.Controllers
                 star.ObjType = (int)EnumObjectType.姿势;
                 UserStarDataSvc.Add(star);
                 MyRedisDB.SetAdd(starKey, new UserStarCache() { ObjID = blog.ID, ObjType = star.ObjType });
+                MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
             }
-            return Json(new { msg = "done", count = blog.ProCount });
+            return Json(new { msg = "done"});
         }
 
-        //添加评论 needlogin
+        //添加评论
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult AddBlogComment(Guid blogID, string mdTxt, string mdValue)
         {
-            //禁止脚本
-            mdTxt = mdTxt.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
-            mdValue = mdValue.Replace("<script", "&lt;script").Replace("</script", "&lt;/script");
+            if (string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
+            {
+                return Json(new { msg = "参数错误" });
+            }
+            if (mdTxt.GetByteCount() > 5000)
+            {
+                return Json(new { msg = "参数太长" });
+            }
+
             Blog blog = BlogDataSvc.GetByID(blogID);
             blog.CommentCount += 1;
 
             BlogComment comment = new BlogComment();
             comment.BlogID = blogID;
             comment.MDText = mdTxt;
-            comment.MDValue = mdValue;
+            comment.MDValue = HtmlST.Sanitize(mdValue);
             comment.OwnerID = CurrentUser.ID;
             comment.Order = blog.CommentCount;
             BlogCommentDataSvc.Add(comment);
@@ -419,7 +429,7 @@ namespace MVCWeb.Controllers
                     bcmsg.Count = 1;
                     bcmsg.Date = DateTime.Now;
                     bcmsg.Order = comment.Order;
-                    bcmsg.Title = blog.Title.Length > 18 ? blog.Title.Substring(0, 18) + "……" : blog.Title;
+                    bcmsg.Title = blog.Title.GetByteCount() > 32 ? blog.Title.SubByteStr(32) + "……" : blog.Title;
                     MyRedisDB.SetAdd(key, bcmsg);
                 }
             }
@@ -439,18 +449,26 @@ namespace MVCWeb.Controllers
             return View();
         }
 
-        //添加评论回复 needlogin
+        //添加评论回复
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt)
         {
-            txt = HttpUtility.HtmlEncode(txt);
+            if (string.IsNullOrEmpty(txt))
+            {
+                return Json(new { msg = "参数错误" });
+            }
+            if (txt.GetByteCount() > 400)
+            {
+                return Json(new { msg = "参数太长" });
+            }
+            
             BlogComment comment = BlogCommentDataSvc.GetByID(commentID);
             comment.ReplyCount += 1;
             
             BlogCommentReply reply = new BlogCommentReply();
             reply.BlogCommentID = commentID;
-            reply.Content = txt;
+            reply.Content = HttpUtility.HtmlEncode(txt);
             reply.ToUserID = toUserID;
             reply.OwnerID = CurrentUser.ID;
             reply.Order = comment.ReplyCount;
@@ -468,7 +486,7 @@ namespace MVCWeb.Controllers
                 bcrmsg.From = CurrentUser.UserName;
                 bcrmsg.COrder = comment.Order;
                 bcrmsg.ROrder = reply.Order;
-                bcrmsg.Title = txt.Length > 18 ? txt.Substring(0, 18) + "……" : txt;
+                bcrmsg.Title = txt.GetByteCount() > 32 ? txt.SubByteStr(32) + "……" : txt;
                 MyRedisDB.SetAdd(key, bcrmsg);
             }
 

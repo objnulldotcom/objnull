@@ -99,11 +99,13 @@ $(function () {
             return;
         }
         var type = $("#SltType").val();
+        $("#BtnConfirm").attr("disabled", true);
         $.ajax({
             url: "/Home/BlogNew",
             data: { type: type, title: title, mdTxt: mdTxt, mdValue: marked(mdTxt) },
             type: "post",
             success: function (result) {
+                $("#BtnConfirm").attr("disabled", false);
                 if (result.msg == "done") {
                     window.location.href = result.url;
                 } else {
@@ -169,11 +171,13 @@ $(function () {
             return;
         }
         var type = $("#SltType").val();
+        $("#BtnDraft").attr("disabled", true);
         $.ajax({
             url: "/Home/SaveDraft",
             data: { type: type, title: title, mdTxt: mdTxt },
             type: "post",
             success: function (result) {
+                $("#BtnDraft").attr("disabled", false);
                 if (result.msg == "done") {
                     $("#DraftStatus").html("保存草稿成功 at " + result.date);
                 } else if (result.msg != "empty") {
