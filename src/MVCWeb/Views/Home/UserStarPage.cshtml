@@ -27,7 +27,7 @@
             @foreach (UserStar star in UserStars)
             {
                 <div class="col-md-12 fs3">
-                    <a href="@StarUrl/@star.TargetID" target="_blank" style="text-decoration:none">@(star.Title.Length > 35 ? star.Title.Substring(0, 35) + "……" : star.Title)</a>
+                    <a href="@StarUrl/@star.ObjID" target="_blank" style="text-decoration:none">@(star.Title.Length > 35 ? star.Title.Substring(0, 35) + "……" : star.Title)</a>
                     <div class="fs2" style="float:right">
                         <span class="glyphicon glyphicon-time"></span>@star.InsertDate.ToString("yyyy-MM-dd HH:mm")
                     </div>

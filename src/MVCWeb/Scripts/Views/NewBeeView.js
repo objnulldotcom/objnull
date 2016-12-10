@@ -7,6 +7,29 @@ function InsertAtCaret(id, val) {
 }
 
 var FirstLoad = true;
+//Ajax页面确保图片加载完成
+// Fn to allow an event to fire after all images are loaded
+$.fn.imagesLoaded = function () {
+    // get all the images (excluding those with no src attribute)
+    var $imgs = this.find('img[src!=""]');
+    // if there's no images, just return an already resolved promise
+    if (!$imgs.length) { return $.Deferred().resolve().promise(); }
+    // for each image, add a deferred object to the array which resolves when the image is loaded (or if loading fails)
+    var dfds = [];
+    $imgs.each(function () {
+        var dfd = $.Deferred();
+        dfds.push(dfd);
+        var img = new Image();
+        img.onload = function () { dfd.resolve(); }
+        img.onerror = function () { dfd.resolve(); }
+        img.src = this.src;
+
+    });
+    // return a master promise object which will resolve when all the deferred objects have resolved
+    // IE - when all the images are loaded
+    return $.when.apply($, dfds);
+
+}
 //NewBeeFloor分页
 function NewBeeFloorPage(index) {
     var pageSize = parseInt($("#ValCPageSize").val());
@@ -15,8 +38,19 @@ function NewBeeFloorPage(index) {
         url: "/Home/NewBeeFloorPage",
         type: "Post",
         data: postData,
+        async: false,
         success: function (result) {
-            $("#NewBeeFloorPage").html(result);
+            $("#NewBeeFloorPage").html(result).imagesLoaded().then(function () {
+                //等待图片加载完成跳转至消息
+                var co = parseInt($("#ValCOrder").val());
+                var ro = parseInt($("#ValROrder").val());
+                if (co > 0) {
+                    $("html,body").animate({ scrollTop: $("#Comment" + co).offset().top - 100 }, 500)
+                    if (ro > 0) {
+                        $("html,body").animate({ scrollTop: $("#Replys" + co).offset().top - 100 }, 300)
+                    }
+                }
+            });
             $(".FloorMDV").each(function () {
                 var id = $(this).children().attr("id");
                 SetTempViewer(id);
@@ -147,8 +181,26 @@ function ReplyDefault(corder, defaultName, defaultID) {
 }
 
 $(function () {
-    NewBeeFloorPage(1);
     $("#PreBox").hide();
+
+    var co = parseInt($("#ValCOrder").val());
+    var ro = parseInt($("#ValROrder").val());
+    var cpsize = parseInt($("#ValCPageSize").val());
+    var rpsize = parseInt($("#ValRPageSize").val());
+
+    //消息定位查看
+    if (co > 0) {
+        var ct = Math.floor(co / cpsize);
+        var cindex = co % cpsize == 0 ? ct : ct + 1;
+        NewBeeFloorPage(cindex);
+        if (ro > 0) {
+            var rt = Math.floor(ro / rpsize);
+            var rindex = ro % rpsize == 0 ? rt : rt + 1;
+            ShowReply(co, rindex);
+        }
+    } else {
+        NewBeeFloorPage(1);
+    }
 
     //代码高亮插件
     marked.setOptions({
@@ -252,6 +304,22 @@ $(function () {
                     NewBeeFloorPage(99999);
                 } else {
                     swal(result.msg);
+                }
+            }
+        });
+    });
+
+    //收藏
+    $("#BtnStar").click(function () {
+        $("#BtnStar").attr("disabled", true);
+        $.ajax({
+            url: "/Home/StarNewBee",
+            data: { id: $("#ValNewbeeID").val() },
+            type: "post",
+            success: function (result) {
+                $("#BtnStar").attr("disabled", false);
+                if (result.msg == "done") {
+                    $("#BtnStar").hide();
                 }
             }
         });

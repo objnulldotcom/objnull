@@ -187,7 +187,7 @@ namespace MVCWeb.Controllers
         public ActionResult BlogEdit(Guid id)
         {
             Blog blog = BlogDataSvc.GetByID(id);
-            if(blog.OwnerID != CurrentUser.ID)
+            if (blog.OwnerID != CurrentUser.ID)
             {
                 RedirectToAction("Error");
             }
@@ -231,15 +231,15 @@ namespace MVCWeb.Controllers
         {
             DateTime validDate = DateTime.Now.AddDays(days * -1);
             int totalCount = 0;
-            if(order == "new")
+            if (order == "new")
             {
                 ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.InsertDate, true, out totalCount).ToList();
             }
-            else if(order == "view")
+            else if (order == "view")
             {
                 ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.InsertDate > validDate, it => it.ViewCount, true, out totalCount).ToList();
             }
-            else if(order == "pro")
+            else if (order == "pro")
             {
                 ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.InsertDate > validDate, it => it.ProCount, true, out totalCount).ToList();
             }
@@ -389,7 +389,7 @@ namespace MVCWeb.Controllers
                 MyRedisDB.SetAdd(starKey, new UserStarCache() { ObjID = blog.ID, ObjType = star.ObjType });
                 MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
             }
-            return Json(new { msg = "done"});
+            return Json(new { msg = "done" });
         }
 
         //添加评论
@@ -470,10 +470,10 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "参数太长" });
             }
-            
+
             BlogComment comment = BlogCommentDataSvc.GetByID(commentID);
             comment.ReplyCount += 1;
-            
+
             BlogCommentReply reply = new BlogCommentReply();
             reply.BlogCommentID = commentID;
             reply.Content = HttpUtility.HtmlEncode(txt);
@@ -533,7 +533,7 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "参数错误" });
             }
-            
+
             if (title.GetByteCount() > 100 || mdTxt.GetByteCount() > 2500 || mdValue.GetByteCount() > 5000)
             {
                 return Json(new { msg = "参数太长" });
@@ -545,7 +545,7 @@ namespace MVCWeb.Controllers
             nb.FloorCount = 1;
             nb.LastFloorDate = DateTime.Now;
             NewBeeDataSvc.Add(nb);
-            
+
             NewBeeFloor nbf = new NewBeeFloor();
             nbf.MDText = mdTxt;
             nbf.MDValue = HtmlST.Sanitize(mdValue);
@@ -578,9 +578,107 @@ namespace MVCWeb.Controllers
             ViewBag.Owner = CurrentUser != null ? CurrentUser.ID == newBee.OwnerID : false;
             ViewBag.COrder = co;
             ViewBag.ROrder = ro;
+
+            if (CurrentUser != null)
+            {
+                //查看次数
+                string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
+                IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
+                if (userRecords.Count() == 0)
+                {
+                    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = newBee.ID, type = (int)EnumRecordType.查看 });
+                    MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
+                    newBee.ViewCount += 1;
+                    NewBeeDataSvc.Update(newBee);
+                }
+                else if (userRecords.Where(r => r.ObjID == newBee.ID && r.type == (int)EnumRecordType.查看).Count() == 0)
+                {
+                    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = newBee.ID, type = (int)EnumRecordType.查看 });
+                    newBee.ViewCount += 1;
+                    NewBeeDataSvc.Update(newBee);
+                }
+
+                //收藏
+                ViewBag.ShowStar = true;
+                string starKey = MyRedisKeys.Pre_UserStarCache + CurrentUser.ID;
+                IEnumerable<UserStarCache> userStarCaches = MyRedisDB.GetSet<UserStarCache>(starKey);
+                if (userStarCaches.Count() == 0)
+                {
+                    IEnumerable<UserStar> userStars = UserStarDataSvc.GetByCondition(s => s.OwnerID == CurrentUser.ID);
+                    if (userStars.Count() > 0)
+                    {
+                        if (userStars.Where(s => s.ObjID == newBee.ID).Count() > 0)
+                        {
+                            ViewBag.ShowStar = false;
+                        }
+                        //添加收藏缓存
+                        foreach (UserStar star in userStars)
+                        {
+                            MyRedisDB.SetAdd(starKey, new UserStarCache() { ObjID = newBee.ID, ObjType = star.ObjType });
+                        }
+                        MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
+                    }
+                }
+                else if (userStarCaches.Where(s => s.ObjID == newBee.ID).Count() > 0)
+                {
+                    ViewBag.ShowStar = false;
+                }
+            }
+
             return View();
         }
-        
+
+        //收藏
+        [HttpPost]
+        public ActionResult StarNewBee(Guid id)
+        {
+            NewBee newBee = NewBeeDataSvc.GetByID(id);
+            string starKey = MyRedisKeys.Pre_UserStarCache + CurrentUser.ID;
+            IEnumerable<UserStarCache> userStarCaches = MyRedisDB.GetSet<UserStarCache>(starKey);
+
+            bool add = false;
+            if (userStarCaches.Count() == 0)
+            {
+                IEnumerable<UserStar> userStars = UserStarDataSvc.GetByCondition(s => s.OwnerID == CurrentUser.ID);
+                if (userStars.Count() > 0)
+                {
+                    //添加收藏缓存
+                    foreach (UserStar star in userStars)
+                    {
+                        MyRedisDB.SetAdd(starKey, new UserStarCache() { ObjID = newBee.ID, ObjType = star.ObjType });
+                    }
+                    MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
+                    //添加收藏
+                    if (userStars.Where(s => s.ObjID == newBee.ID).Count() == 0)
+                    {
+                        add = true;
+                    }
+                }
+                else
+                {
+                    add = true;
+                }
+            }
+            else if (userStarCaches.Where(s => s.ObjID == newBee.ID).Count() == 0)
+            {
+                add = true;
+            }
+
+            if (add)
+            {
+                //添加收藏
+                UserStar star = new UserStar();
+                star.OwnerID = CurrentUser.ID;
+                star.ObjID = newBee.ID;
+                star.Title = newBee.Title;
+                star.ObjType = (int)EnumObjectType.NewBee;
+                UserStarDataSvc.Add(star);
+                MyRedisDB.SetAdd(starKey, new UserStarCache() { ObjID = newBee.ID, ObjType = star.ObjType });
+                MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
+            }
+            return Json(new { msg = "done" });
+        }
+
         //添加NewBeeFloor
         [HttpPost]
         [ValidateInput(false)]
@@ -598,7 +696,7 @@ namespace MVCWeb.Controllers
             NewBee newBee = NewBeeDataSvc.GetByID(NewBeeID);
             newBee.FloorCount += 1;
             newBee.LastFloorDate = DateTime.Now;
-            
+
             NewBeeFloor floor = new NewBeeFloor();
             floor.NewBeeID = NewBeeID;
             floor.MDText = mdTxt;
@@ -647,7 +745,7 @@ namespace MVCWeb.Controllers
             ViewBag.ShowPager = totalCount > pageSize;
             return View();
         }
-        
+
         //添加楼层回复
         [HttpPost]
         [ValidateInput(false)]
@@ -661,7 +759,7 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "参数太长" });
             }
-            
+
             NewBeeFloor floor = NewBeeFloorDataSvc.GetByID(floorID);
             floor.ReplyCount += 1;
 
@@ -691,7 +789,7 @@ namespace MVCWeb.Controllers
 
             return Json(new { msg = "done" });
         }
-        
+
         //楼层回复分页
         [HttpPost]
         public ActionResult NewBeeFloorReplyPage(Guid floorID, int corder, int pageSize, int pageNum = 1)

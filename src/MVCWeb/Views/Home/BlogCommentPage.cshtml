@@ -15,7 +15,7 @@
         <div class="row">
             <div class="col-md-12" style="line-height: 32px;padding-top: -10px">
                 <a href="@Url.Action("UserProfile", "Home", new { id = comment.Owner.ID })" target="_blank" style="text-decoration:none">
-                    <img class="img-rounded" src="@comment.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName">
+                    <img class="img-rounded" style="max-width: 32px" src="@comment.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName">
                 </a>
                 <a href="@Url.Action("UserProfile", "Home", new { id = comment.Owner.ID })" target="_blank" >@userName</a>
                 <span class="fs2" title="评论时间"><span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToBlurDate()</span>

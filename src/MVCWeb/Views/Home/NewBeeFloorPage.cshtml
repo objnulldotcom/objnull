@@ -10,7 +10,7 @@
     <div class="row" style="padding: 15px 0px; border-top:1px solid #eee">
         <div class="col-md-2 text-right">
             <a href="@Url.Action("UserProfile", "Home", new { id = floor.Owner.ID })" target="_blank">
-                <img class="img-rounded" src="@floor.Owner.AvatarUrl&s=96" alt="@userName" title="@userName">
+                <img class="img-rounded" style="max-width: 96px" src="@floor.Owner.AvatarUrl&s=96" alt="@userName" title="@userName">
             </a>
             <div class="fs2" style="margin-top:5px;">
                 <a href="@Url.Action("UserProfile", "Home", new { id = floor.Owner.ID })" target="_blank">@userName</a>

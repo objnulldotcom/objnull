@@ -3,8 +3,6 @@
     NewBee NewBee = ViewBag.NewBee as NewBee;
     ViewBag.Title = NewBee.Title + " - 象空";
     Layout = "~/Views/Shared/_LayoutMain.cshtml";
-    int FPageSize = 20;
-    int RPageSize = 10;
 }
 @section head{
     <!--fileupload-->
@@ -22,8 +20,16 @@
     <script src="~/Scripts/Views/NewBeeView.js"></script>
 }
 <div class="row" style="padding: 15px 0px">
-    <div id="MDTitle" class="col-md-12 text-center fs1">
+    <div id="MDTitle" class="col-md-11 text-center fs1">
         @NewBee.Title
+    </div>
+    <div class="col-md-1 text-right">
+        @if (!ViewBag.Owner && ViewBag.ShowStar)
+        {
+            <button id="BtnStar" type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-bookmark"></span> 收藏
+            </button>
+        }
     </div>
 </div>
 <div class="row">
@@ -67,5 +73,5 @@
 <input id="ValCOrder" type="hidden" value="@ViewBag.COrder" />
 <input id="ValROrder" type="hidden" value="@ViewBag.ROrder" />
 <input id="ValCPageSize" type="hidden" value="20" />
-<input type="hidden" id="ValRPageSize" value="10" />
+<input id="ValRPageSize" type="hidden" value="10" />
 

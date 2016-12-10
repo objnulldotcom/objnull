@@ -39,7 +39,7 @@
                         }
                     </div>
                     <a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank">
-                        <img class="img-rounded" src="@blog.Owner.AvatarUrl&s=48" height="48" width="48" alt="@blog.Owner.Name" title="@blog.Owner.Name">
+                        <img class="img-rounded" style="max-width: 48px" src="@blog.Owner.AvatarUrl&s=48" height="48" width="48" alt="@blog.Owner.Name" title="@blog.Owner.Name">
                     </a>
                 </div>
                 <div class="media-body">

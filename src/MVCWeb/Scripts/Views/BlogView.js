@@ -1,5 +1,28 @@
 ﻿
 var FirstLoad = true;
+//Ajax页面确保图片加载完成
+// Fn to allow an event to fire after all images are loaded
+$.fn.imagesLoaded = function () {
+    // get all the images (excluding those with no src attribute)
+    var $imgs = this.find('img[src!=""]');
+    // if there's no images, just return an already resolved promise
+    if (!$imgs.length) { return $.Deferred().resolve().promise(); }
+    // for each image, add a deferred object to the array which resolves when the image is loaded (or if loading fails)
+    var dfds = [];
+    $imgs.each(function () {
+        var dfd = $.Deferred();
+        dfds.push(dfd);
+        var img = new Image();
+        img.onload = function () { dfd.resolve(); }
+        img.onerror = function () { dfd.resolve(); }
+        img.src = this.src;
+
+    });
+    // return a master promise object which will resolve when all the deferred objects have resolved
+    // IE - when all the images are loaded
+    return $.when.apply($, dfds);
+
+}
 //获取评论
 function GetCommentPage(index) {
     var pageSize = parseInt($("#ValCPageSize").val());
@@ -10,7 +33,17 @@ function GetCommentPage(index) {
         async: false,
         data: postData,
         success: function (result) {
-            $("#Comments").html(result);
+            $("#Comments").html(result).imagesLoaded().then(function () {
+                //等待图片加载完成跳转至消息
+                var co = parseInt($("#ValCOrder").val());
+                var ro = parseInt($("#ValROrder").val());
+                if (co > 0) {
+                    $("html,body").animate({ scrollTop: $("#Comment" + co).offset().top - 100 }, 500)
+                    if (ro > 0) {
+                        $("html,body").animate({ scrollTop: $("#Replys" + co).offset().top - 100 }, 300)
+                    }
+                }
+            });
             if (!FirstLoad) {
                 $("html,body").animate({ scrollTop: $("#Status").offset().top }, 300)
             }
@@ -148,17 +181,15 @@ $(function () {
     var cpsize = parseInt($("#ValCPageSize").val());
     var rpsize = parseInt($("#ValRPageSize").val());
 
-    //消息定位查看
+    //消息查看定位页码
     if (co > 0) {
         var ct = Math.floor(co / cpsize);
         var cindex = co % cpsize == 0 ? ct : ct + 1;
         GetCommentPage(cindex);
-        $("html,body").animate({ scrollTop: $("#Comment" + co).offset().top - 100 }, 300)
         if (ro > 0) {
             var rt = Math.floor(ro / rpsize);
             var rindex = ro % rpsize == 0 ? rt : rt + 1;
             ShowReply(co, rindex);
-            $("html,body").animate({ scrollTop: $("#Replys" + co).offset().top - 100 }, 300)
         }
     } else {
         GetCommentPage(1);

@@ -11,7 +11,7 @@
         <div class="ReplyBar col-md-12 fs2">
             <div style="float:left;">
                 <a href="@Url.Action("UserProfile", "Home", new { id = reply.Owner.ID })" target="_blank" style="text-decoration:none">
-                    <img class="img-rounded" src="@reply.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName" title="@userName">
+                    <img class="img-rounded" style="max-width: 32px" src="@reply.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName" title="@userName">
                 </a>
             </div>
             <div style="padding-left:40px">
