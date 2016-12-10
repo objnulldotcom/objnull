@@ -98,6 +98,14 @@ namespace MVCWeb.Controllers
             return View();
         }
 
+        //用户加赞
+        public void ProUser(Guid id)
+        {
+            NullUser user = NullUserDataSvc.GetByID(id);
+            user.ProCount += 1;
+            NullUserDataSvc.Update(user);
+        }
+
         #endregion
 
         #region 姿势blog
@@ -124,9 +132,7 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "empty" });
             }
-            int tlength = title.GetByteCount();
-            int txtlength = mdTxt.GetByteCount();
-            if (tlength > 90 || txtlength > 50000)
+            if (title.GetByteCount() > 90 || mdTxt.GetByteCount() > 50000)
             {
                 return Json(new { msg = "参数太长" });
             }
@@ -153,7 +159,7 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "参数错误" });
             }
-            if (title.GetByteCount() > 90 || mdTxt.GetByteCount() > 50000)
+            if (title.GetByteCount() > 90 || mdTxt.GetByteCount() > 50000 || mdValue.GetByteCount() > 100000)
             {
                 return Json(new { msg = "参数太长" });
             }
@@ -198,7 +204,7 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "参数错误" });
             }
-            if (mdTxt.GetByteCount() > 50000)
+            if (mdTxt.GetByteCount() > 50000 || mdValue.GetByteCount() > 100000)
             {
                 return Json(new { msg = "参数太长" });
             }
@@ -323,12 +329,14 @@ namespace MVCWeb.Controllers
                 MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
                 blog.ProCount += 1;
                 BlogDataSvc.Update(blog);
+                ProUser(blog.OwnerID);
             }
             else if (userRecords.Where(r => r.ObjID == blog.ID && r.type == (int)EnumRecordType.点赞).Count() == 0)
             {
                 MyRedisDB.SetAdd(key, new UserRecord() { ObjID = blog.ID, type = (int)EnumRecordType.点赞 });
                 blog.ProCount += 1;
                 BlogDataSvc.Update(blog);
+                ProUser(blog.OwnerID);
             }
             return Json(new { msg = "done", count = blog.ProCount });
         }
@@ -393,7 +401,7 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "参数错误" });
             }
-            if (mdTxt.GetByteCount() > 5000)
+            if (mdTxt.GetByteCount() > 5000 || mdValue.GetByteCount() > 10000)
             {
                 return Json(new { msg = "参数太长" });
             }
@@ -509,12 +517,14 @@ namespace MVCWeb.Controllers
 
         #region NewBee
 
+        //TreeNewBee
         public ActionResult NewBeeList()
         {
             ViewBag.Login = CurrentUser != null;
             return View();
         }
 
+        //添加NewBee
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult NewNewBee(string title, string mdTxt, string mdValue)
@@ -523,11 +533,8 @@ namespace MVCWeb.Controllers
             {
                 return Json(new { msg = "参数错误" });
             }
-
-            int tlength = Encoding.Default.GetByteCount(title);
-            int txtlength = Encoding.Default.GetByteCount(mdTxt);
-            int vallength = Encoding.Default.GetByteCount(mdValue);
-            if (tlength > 100 || txtlength > 5000 || vallength > 10000)
+            
+            if (title.GetByteCount() > 100 || mdTxt.GetByteCount() > 2500 || mdValue.GetByteCount() > 5000)
             {
                 return Json(new { msg = "参数太长" });
             }
@@ -550,6 +557,7 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done" });
         }
 
+        //NewBee分页
         [HttpPost]
         public ActionResult NewBeePage(int pageSize, int pageNum = 1)
         {
@@ -557,19 +565,36 @@ namespace MVCWeb.Controllers
             ViewBag.NewBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.LastFloorDate, true, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
+            ViewBag.ShowPager = totalCount > pageSize;
             return View();
         }
 
-        public ActionResult NewBeeView(Guid id)
+        //NewBee详情
+        public ActionResult NewBeeView(Guid id, int co = 0, int ro = 0)
         {
-            ViewBag.NewBee = NewBeeDataSvc.GetByID(id);
+            NewBee newBee = NewBeeDataSvc.GetByID(id);
+            ViewBag.NewBee = newBee;
+            ViewBag.Login = CurrentUser != null;
+            ViewBag.Owner = CurrentUser != null ? CurrentUser.ID == newBee.OwnerID : false;
+            ViewBag.COrder = co;
+            ViewBag.ROrder = ro;
             return View();
         }
         
+        //添加NewBeeFloor
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult AddNewBeeFloor(Guid NewBeeID, string mdTxt, string mdValue)
         {
+            if (string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
+            {
+                return Json(new { msg = "参数错误" });
+            }
+            if (mdTxt.GetByteCount() > 2500 || mdValue.GetByteCount() > 5000)
+            {
+                return Json(new { msg = "参数太长" });
+            }
+
             NewBee newBee = NewBeeDataSvc.GetByID(NewBeeID);
             newBee.FloorCount += 1;
             newBee.LastFloorDate = DateTime.Now;
@@ -602,7 +627,7 @@ namespace MVCWeb.Controllers
                     bcmsg.Count = 1;
                     bcmsg.Date = DateTime.Now;
                     bcmsg.Order = floor.Order;
-                    bcmsg.Title = newBee.Title.Length > 18 ? newBee.Title.Substring(0, 18) + "……" : newBee.Title;
+                    bcmsg.Title = newBee.Title.GetByteCount() > 36 ? newBee.Title.SubByteStr(36) + "……" : newBee.Title;
                     MyRedisDB.SetAdd(key, bcmsg);
                 }
             }
@@ -610,28 +635,39 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done", count = newBee.FloorCount });
         }
 
+        //NewBeeFloor分页
         [HttpPost]
         public ActionResult NewBeeFloorPage(Guid nbID, int pageSize, int pageNum = 1)
         {
             int totalCount = 0;
             ViewBag.Login = CurrentUser != null;
-            ViewBag.NewBeeFloorList = NewBeeFloorDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.NewBeeID == nbID, it => it.InsertDate, true, out totalCount).ToList();
+            ViewBag.NewBeeFloorList = NewBeeFloorDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.NewBeeID == nbID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
+            ViewBag.ShowPager = totalCount > pageSize;
             return View();
         }
         
+        //添加楼层回复
         [HttpPost]
         [ValidateInput(false)]
         public ActionResult AddNewBeeFloorReply(Guid floorID, Guid toUserID, string txt)
         {
-            txt = HttpUtility.HtmlEncode(txt);
+            if (string.IsNullOrEmpty(txt))
+            {
+                return Json(new { msg = "参数错误" });
+            }
+            if (txt.GetByteCount() > 400)
+            {
+                return Json(new { msg = "参数太长" });
+            }
+            
             NewBeeFloor floor = NewBeeFloorDataSvc.GetByID(floorID);
             floor.ReplyCount += 1;
 
             NewBeeFloorReply reply = new NewBeeFloorReply();
             reply.NewBeeFloorID = floorID;
-            reply.Content = txt;
+            reply.Content = HttpUtility.HtmlEncode(txt);
             reply.ToUserID = toUserID;
             reply.OwnerID = CurrentUser.ID;
             reply.Order = floor.ReplyCount;
@@ -649,13 +685,14 @@ namespace MVCWeb.Controllers
                 bcrmsg.From = CurrentUser.UserName;
                 bcrmsg.COrder = floor.Order;
                 bcrmsg.ROrder = reply.Order;
-                bcrmsg.Title = txt.Length > 18 ? txt.Substring(0, 18) + "……" : txt;
+                bcrmsg.Title = txt.GetByteCount() > 32 ? txt.SubByteStr(32) + "……" : txt;
                 MyRedisDB.SetAdd(key, bcrmsg);
             }
 
             return Json(new { msg = "done" });
         }
         
+        //楼层回复分页
         [HttpPost]
         public ActionResult NewBeeFloorReplyPage(Guid floorID, int corder, int pageSize, int pageNum = 1)
         {

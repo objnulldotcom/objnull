@@ -234,6 +234,8 @@
     <Content Include="Scripts\Views\BlogNew.js" />
     <Content Include="Scripts\Views\BlogView.js" />
     <Content Include="Scripts\Views\LayoutMain.js" />
+    <Content Include="Scripts\Views\NewBeeList.js" />
+    <Content Include="Scripts\Views\NewBeeView.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

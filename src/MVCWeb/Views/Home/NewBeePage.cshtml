@@ -8,26 +8,26 @@
 {
     string userName = string.IsNullOrEmpty(newBee.Owner.Name) ? newBee.Owner.GitHubLogin : newBee.Owner.Name;
     <div class="row" style="margin-top: 10px">
-        <div class="col-md-1 text-center">
-            <span><span class="glyphicon glyphicon-comment"></span>&nbsp;@newBee.FloorCount</span>
+        <div class="col-md-2 text-right fs2">
+            <span class="glyphicon glyphicon-user"></span>
+            <a href="@Url.Action("UserProfile", "Home", new { id = newBee.Owner.ID })" style="text-decoration:none" target="_blank">@userName</a>
         </div>
         <div class="col-md-8">
-            <a href="@Url.Action("NewBeeView", "Home", new { id = newBee.ID })" style="text-decoration:none">@newBee.Title</a>
+            <a href="@Url.Action("NewBeeView", "Home", new { id = newBee.ID })" style="text-decoration:none" target="_blank">@newBee.Title</a>
         </div>
-        <div class="col-md-3 text-right fs2">
-            <span>
-                <span class="glyphicon glyphicon-user"></span>
-                <a href="@Url.Action("UserProfile", "Home", new { id = newBee.Owner.ID })" style="text-decoration:none" target="_blank">@userName</a>
-            </span>&nbsp;&nbsp;
-            <span><span class="glyphicon glyphicon-time"></span>@newBee.LastFloorDate.ToBlurDate()</span>&nbsp;&nbsp;
-            <span><span class="glyphicon glyphicon-eye-open"></span>@newBee.ViewCount</span>
+        <div class="col-md-2 text-right">
+            <span title="回复数"><span class="glyphicon glyphicon-comment"></span>&nbsp;@newBee.FloorCount</span>&nbsp;
+            <span title="查看次数"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;@newBee.ViewCount</span>&nbsp;
+            <span title="最后回复时间"><span class="glyphicon glyphicon-time"></span>&nbsp;@newBee.LastFloorDate.ToBlurDate()</span>
         </div>
     </div>
 }
 <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
 <input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
-<div class="row">
-    <div id="NBPager" class="col-md-8 col-md-offset-1 text-center">
-
+@if (ViewBag.ShowPager)
+{
+    <div class="row" style="margin-bottom: -20px">
+        <div id="NBPager" class="col-md-8 col-md-offset-2 text-center">
+        </div>
     </div>
-</div>
+}

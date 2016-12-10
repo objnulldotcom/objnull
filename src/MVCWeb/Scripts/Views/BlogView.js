@@ -97,9 +97,6 @@ function GetCommentReplyPage(index, corder) {
         data: postData,
         success: function (result) {
             $("#Replys" + corder).html(result);
-            if ($("#ReplyTotalCount" + corder).val() == "0") {
-                return;
-            }
             $(".ReplyBar").each(function () {
                 $(this).hover(function () {
                     $(this).find("#BtnReply").show();

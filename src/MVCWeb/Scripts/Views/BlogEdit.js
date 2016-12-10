@@ -22,6 +22,9 @@ $(function () {
         breaks: true
     });
 
+    UpateMDV();
+    ShowType();
+
     //实时更新
     $("#TxtTitle").bind("input propertychange", function () {
         $("#MDTitle").html($("#TxtTitle").val());
@@ -30,6 +33,10 @@ $(function () {
         UpateMDV();
     });
 
+    //选择文件
+    $("#TxtChoseFile").click(function () {
+        $("#JqueryUpload").click();
+    });
     //阻止全局拖拽，使自定义区域拖拽上传生效
     $(document).bind("drop dragover", function (e) {
         e.preventDefault();
@@ -62,7 +69,7 @@ $(function () {
         done: function (e, data) {
             $("#UpPercent").html("");
             if (data.result.error != "") {
-                alert(data.result.error);
+                swal(data.result.error);
             } else {
                 var link = "![](http://" + window.location.host + "/File/DownloadImg?pt="+ pt + "&path=" + data.result.path + ")";
                 InsertAtCaret("TxtMD", link);
@@ -104,14 +111,6 @@ $(function () {
             }
         });
     });
-
-    //选择文件
-    $("#TxtChoseFile").click(function () {
-        $("#JqueryUpload").click();
-    });
-
-    UpateMDV();
-    ShowType();
 });
 
 //显示类型

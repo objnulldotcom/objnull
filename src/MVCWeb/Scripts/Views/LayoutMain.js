@@ -7,6 +7,11 @@ function SetViewer(id) {
     }
     viewer = new Viewer(document.getElementById(id), null);
 }
+//设置临时图片查看器
+function SetTempViewer(id) {
+   var v = new Viewer(document.getElementById(id), null);
+}
+
 //获取字节数
 function getBt(str) {
     var char = str.replace(/[^\x00-\xff]/g, '**');

@@ -14,8 +14,10 @@
         </div>
         <div class="row">
             <div class="col-md-12" style="line-height: 32px;padding-top: -10px">
-                <a><img class="img-rounded" src="@comment.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName"></a>
-                <a>@userName</a>
+                <a href="@Url.Action("UserProfile", "Home", new { id = comment.Owner.ID })" target="_blank" style="text-decoration:none">
+                    <img class="img-rounded" src="@comment.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName">
+                </a>
+                <a href="@Url.Action("UserProfile", "Home", new { id = comment.Owner.ID })" target="_blank" >@userName</a>
                 <span class="fs2" title="评论时间"><span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToBlurDate()</span>
                 <a id="ShowReply@(comment.Order)" href="javascript:;" style="text-decoration:none" onclick="ShowReply(@comment.Order, 1)" recount="@comment.ReplyCount">
                     @if (comment.ReplyCount > 0)

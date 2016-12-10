@@ -10,11 +10,13 @@
     <div class="row">
         <div class="ReplyBar col-md-12 fs2">
             <div style="float:left;">
-                <a><img class="img-rounded" src="@reply.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName" title="@userName"></a>
+                <a href="@Url.Action("UserProfile", "Home", new { id = reply.Owner.ID })" target="_blank" style="text-decoration:none">
+                    <img class="img-rounded" src="@reply.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName" title="@userName">
+                </a>
             </div>
             <div style="padding-left:40px">
                 <span>
-                    <a>@userName</a>&nbsp;回复&nbsp;<a>@toUserName</a>&nbsp;
+                    <a href="@Url.Action("UserProfile", "Home", new { id = reply.Owner.ID })" target="_blank">@userName</a>&nbsp;回复&nbsp;<a>@toUserName</a>&nbsp;
                     <span title="回复时间"><span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToBlurDate()</span>&nbsp;
                     <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.COrder, '@userName', '@reply.Owner.ID')">回复</a>
                 </span>

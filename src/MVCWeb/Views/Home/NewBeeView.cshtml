@@ -7,6 +7,10 @@
     int RPageSize = 10;
 }
 @section head{
+    <!--fileupload-->
+    <script src="~/Scripts/FileUpload/vendor/jquery.ui.widget.js"></script>
+    <script src="~/Scripts/FileUpload/jquery.iframe-transport.js"></script>
+    <script src="~/Scripts/FileUpload/jquery.fileupload.js"></script>
     <!--highlight.js-->
     <link href="~/Scripts/HighlightJs/default.min.css" rel="stylesheet" />
     <script src="~/Scripts/HighlightJs/highlight.min.js"></script>
@@ -14,231 +18,54 @@
     <script src="~/Scripts/Marked/marked.js"></script>
     <!--simplePagination-->
     <script src="~/Scripts/SimplePagination/jquery.simplePagination.js"></script>
-    <script>
-        $(function() {
-            NewBeeFloorPage(1);
-
-            $("#PreBox").hide();
-            //代码高亮插件
-            marked.setOptions({
-                highlight: function (code) {
-                    return hljs.highlightAuto(code).value;
-                },
-                breaks: true,
-                sanitize: false
-            });
-            //评论面板
-            $("#BtnCmt").click(function () {
-                $("#BtnCmt").parent().removeClass("active");
-                $("#BtnPre").parent().removeClass("active");
-                $("#BtnCmt").parent().addClass("active");
-                $("#PreBox").hide();
-                $("#EditBox").show();
-            });
-            //预览面板
-            $("#BtnPre").click(function () {
-                $("#BtnCmt").parent().removeClass("active");
-                $("#BtnPre").parent().removeClass("active");
-                $("#BtnPre").parent().addClass("active");
-                $("#EditBox").hide();
-                $("#PreBox").show();
-
-                $("#PreBox").html("");
-                $("#PreBox").html(marked($("#CmtTxt").val()));
-            });
-            //确定
-            $("#BtnConfirm").click(function () {
-                var title = $("#TxtTitle").val();
-                var txt = $("#CmtTxt").val();
-                if (txt.length == 0) {
-                    swal("请填写评论内容");
-                    return;
-                }
-                if (getBt(txt) > 2000) {
-                    swal("评论最多2000字节，当前" + getBt(txt) + "字节");
-                    return;
-                }
-                $.ajax({
-                    url: "@Url.Action("AddNewBeeFloor", "Home")",
-                    data: { NewBeeID: "@NewBee.ID", mdTxt: txt, mdValue: marked(txt) },
-                    type: "post",
-                    success: function (result) {
-                        if (result.msg == "done") {
-                            NewBeeFloorPage(99999);
-                            $("#CmtTxt").val("");
-                            $("#BtnCmt").click();
-                            $("#CommentBox").hide();
-                            SendNewMsg("@NewBee.OwnerID");
-                            $("#CommentCount").html(result.count);
-                        } else {
-                            swal(result.msg);
-                        }
-                    }
-                });
-            });
-        });
-
-        function NewBeeFloorPage(index) {
-            var pageSize = @FPageSize;
-            var postData = { nbID:"@NewBee.ID", pageSize: pageSize, pageNum: index }
-            $.ajax({
-                url: "@Url.Action("NewBeeFloorPage", "Home")",
-                type: "Post",
-                data: postData,
-                success: function (result) {
-                    $("#NewBeeFloorPage").html(result);
-                    $("#NBFPager").pagination({
-                        items: $("#TotalCount").val(),
-                        itemsOnPage: pageSize,
-                        currentPage: $("#CurrentPage").val(),
-                        prevText: "<",
-                        nextText: ">",
-                        listStyle: "pagination",
-                        hrefTextPrefix: "javascript:;",
-                        onPageClick: function (pageNumber, event) {
-                            NewBeeFloorPage(pageNumber);
-                        }
-                    });
-                }
-            });
-        }
-
-        //显示回复
-        function ShowReply(corder, index) {
-            if ($("#ShowReply" + corder).html() == "收起回复") {
-                $("#ReplyBox" + corder).hide();
-                var recount = $("#ShowReply" + corder).attr("recount");
-                if (recount == "0") {
-                    $("#ShowReply" + corder).html("回复");
-                } else {
-                    $("#ShowReply" + corder).html(recount + "条回复");
-                }
-            } else {
-                $("#ReplyBox" + corder).show();
-                $("#ShowReply" + corder).html("收起回复");
-                if ($("#Replys" + corder).html() == "") {
-                    GetCommentReplyPage(index, corder);
-                }
-            }
-        }
-
-        //添加回复
-        function AddReply(corder) {
-            var txt = $("#ReplyTxt" + corder).val();
-            var toUser = $("#ReplyTxt" + corder).attr("touser");
-            var cmid = $("#Comment" + corder).attr("cmid");
-            if (txt.length == 0) {
-                swal("请填写回复内容");
-                return;
-            }
-            if (getBt(txt) > 400) {
-                swal("评论最多400字节，当前" + getBt(txt) + "字节");
-                return;
-            }
-            $.ajax({
-                url: "@Url.Action("AddNewBeeFloorReply", "Home")",
-                data: { floorID: cmid, toUserID: toUser, txt: txt },
-                type: "post",
-                success: function (result) {
-                    if (result.msg == "done") {
-                        GetCommentReplyPage(99999, corder);
-                        $("#ReplyTxt" + corder).val("");
-                        SendNewMsg(toUser);
-                    } else {
-                        swal(result.msg);
-                    }
-                }
-            });
-        }
-
-        //获取评论回复
-        function GetCommentReplyPage(index, corder) {
-            var pageSize = @Html.Raw(RPageSize) ;
-            var cmid = $("#Comment" + corder).attr("cmid");
-            var postData = { floorID: cmid, corder: corder, pageSize: pageSize, pageNum: index }
-            $.ajax({
-                url: "@Url.Action("NewBeeFloorReplyPage", "Home")",
-                type: "Post",
-                data: postData,
-                success: function (result) {
-                    $("#Replys" + corder).html(result);
-                    if ($("#ReplyTotalCount" + corder).val() == "0") {
-                        return;
-                    }
-                    $(".ReplyBar").each(function () {
-                        $(this).hover(function () {
-                            $(this).find("#BtnReply").show();
-                        }, function () {
-                            $(this).find("#BtnReply").hide();
-                        });
-                    });
-                    $("#ReplyPager" + corder).pagination({
-                        items: $("#ReplyTotalCount" + corder).val(),
-                        itemsOnPage: pageSize,
-                        currentPage: $("#ReplyCurrentPage" + corder).val(),
-                        prevText: "<",
-                        nextText: ">",
-                        listStyle: "pagination pagination-sm",
-                        hrefTextPrefix: "javascript:;",
-                        onPageClick: function (pageNumber, event) {
-                            GetCommentReplyPage(pageNumber, corder);
-                        }
-                    });
-                }
-            });
-        }
-
-        //回复指定用户
-        function ReplyToUser(corder, userName, userID) {
-            $("#ReplyToUser" + corder).html("@@" + userName);
-            $("#ReplyTxt" + corder).attr("touser", userID);
-            $("#DefaultUser" + corder).show();
-        }
-
-        //回复默认用户
-        function ReplyDefault(corder, defaultName, defaultID) {
-            $("#ReplyToUser" + corder).html("@@" + defaultName);
-            $("#ReplyTxt" + corder).attr("touser", defaultID);
-            $("#DefaultUser" + corder).hide();
-        }
-    </script>
+    <!--Page-->
+    <script src="~/Scripts/Views/NewBeeView.js"></script>
 }
-<div class="row" style="padding-top: 15px">
-    <div id="MDTitle" class="col-md-12 fs1">
-        <div class="well well-sm">
-            @Html.Raw(NewBee.Title)
-        </div>
+<div class="row" style="padding: 15px 0px">
+    <div id="MDTitle" class="col-md-12 text-center fs1">
+        @NewBee.Title
     </div>
 </div>
 <div class="row">
     <div id="NewBeeFloorPage" class="col-md-12">
-
-    </div>
-    <div id="NBFPager" class="col-md-12">
-
     </div>
 </div>
-
+<hr />
 <div class="row">
-    <div class="col-md-8 col-md-offset-1">
-        <div class="row">
-            <div class="col-md-12" style="margin-bottom: 10px">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="javascript:;" id="BtnCmt">评论</a></li>
+    <div class="col-md-8 col-md-offset-2">
+        <div class="row" style="padding-bottom: 10px">
+            <div class="col-md-3">
+                <ul class="nav nav-pills" role="tablist">
+                    <li role="presentation" class="active"><a href="javascript:;" id="BtnCmt">回帖</a></li>
                     <li role="presentation"><a href="javascript:;" id="BtnPre">预览</a></li>
                 </ul>
             </div>
+            <div class="col-md-9 text-right" style="line-height: 40px">
+                <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法，</a></span>
+                <input id="JqueryUpload" class="uploader" type="file" name="upFile" data-url="@Url.Action("JqueryUploadImg", "File", new { pt = (int)EnumObjectType.NewBee })" style="display:none">
+                <span>拖拽或<a id="TxtChoseFile" href="javascript:;">选择图片</a>上传（chrome内核支持截图粘贴）</span>
+                <span id="UpPercent" style="color:#ff6a00"></span>
+            </div>
+            <input id="ValPt" type="hidden" value="@((int)EnumObjectType.NewBee)" />
+        </div>
+        <div class="row">
             <div id="PreBox" class="col-md-12 mdv" style="min-height: 50px">
-
             </div>
             <div id="EditBox" class="col-md-12">
-                <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法</a></span>
                 <textarea id="CmtTxt" class="form-control" rows="5" style="resize:vertical;"></textarea>
             </div>
-            <div class="col-md-12 text-center" style="margin: 10px 0px">
+        </div>
+        <div class="row" style="padding: 10px 0px">
+            <div class="col-md-12 text-center">
                 <button id="BtnConfirm" class="btn btn-default">确定</button>
             </div>
         </div>
     </div>
 </div>
+<input type="hidden" id="ValNewbeeID" value="@NewBee.ID" />
+<input type="hidden" id="ValNBOwnerID" value="@NewBee.OwnerID" />
+<input id="ValCOrder" type="hidden" value="@ViewBag.COrder" />
+<input id="ValROrder" type="hidden" value="@ViewBag.ROrder" />
+<input id="ValCPageSize" type="hidden" value="20" />
+<input type="hidden" id="ValRPageSize" value="10" />
 

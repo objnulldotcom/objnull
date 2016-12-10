@@ -6,18 +6,28 @@
 @foreach (NewBeeFloorReply reply in NewBeeFloorReplyList)
 {
     string userName = string.IsNullOrEmpty(reply.Owner.Name) ? reply.Owner.GitHubLogin : reply.Owner.Name;
-    <div class="ReplyBar col-md-12 fs2">
-        <div style="float:left;">
-            <a><img class="img-rounded" src="@reply.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName" title="@userName"></a>
-        </div>
-        <div style="padding-left:40px">
-            <span>
-                <a>@userName</a>回复<a>@(string.IsNullOrEmpty(reply.ToUser.Name) ? reply.ToUser.GitHubLogin : reply.ToUser.Name)</a> at @reply.InsertDate.ToString("yyyy-MM-dd HH:mm")
-                <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.COrder, '@userName', '@reply.Owner.ID')">回复</a>
-            </span>
-            <p>@Html.Raw(reply.Content)</p>
+    string toUserName = string.IsNullOrEmpty(reply.ToUser.Name) ? reply.ToUser.GitHubLogin : reply.ToUser.Name;
+    <div class="row">
+        <div class="ReplyBar col-md-12 fs2">
+            <div style="float:left;">
+                <a href="@Url.Action("UserProfile", "Home", new { id = reply.Owner.ID })" target="_blank" style="text-decoration:none">
+                    <img class="img-rounded" src="@reply.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName" title="@userName">
+                </a>
+            </div>
+            <div style="padding-left:40px">
+                <span>
+                    <a href="@Url.Action("UserProfile", "Home", new { id = reply.Owner.ID })" target="_blank">@userName</a>&nbsp;回复&nbsp;<a>@toUserName</a>&nbsp;
+                    <span title="回复时间"><span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToBlurDate()</span>&nbsp;
+                    <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.COrder, '@userName', '@reply.Owner.ID')">回复</a>
+                </span>
+                <p>@Html.Raw(reply.Content)</p>
+            </div>
         </div>
     </div>
 }
 <input type="hidden" id="ReplyTotalCount@(ViewBag.COrder)" value="@ViewBag.TotalCount" />
 <input type="hidden" id="ReplyCurrentPage@(ViewBag.COrder)" value="@ViewBag.CurrentPage" />
+<div class="row">
+    <div id="ReplyPager@(ViewBag.COrder)" class="col-md-12 text-center" style="margin: -15px 0px">
+    </div>
+</div>

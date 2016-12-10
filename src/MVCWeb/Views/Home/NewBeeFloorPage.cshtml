@@ -8,23 +8,24 @@
 {
     string userName = string.IsNullOrEmpty(floor.Owner.Name) ? floor.Owner.GitHubLogin : floor.Owner.Name;
     <div class="row" style="padding: 15px 0px; border-top:1px solid #eee">
-        <div class="col-md-1">
+        <div class="col-md-2 text-right">
             <a href="@Url.Action("UserProfile", "Home", new { id = floor.Owner.ID })" target="_blank">
-                <img class="img-rounded" style="width:100%" src="@floor.Owner.AvatarUrl&s=96" alt="@userName" title="@userName">
+                <img class="img-rounded" src="@floor.Owner.AvatarUrl&s=96" alt="@userName" title="@userName">
             </a>
-            <div class="fs2" style="margin-top:10px;word-break:break-all">
+            <div class="fs2" style="margin-top:5px;">
                 <a href="@Url.Action("UserProfile", "Home", new { id = floor.Owner.ID })" target="_blank">@userName</a>
             </div>
         </div>
-        <div class="col-md-8 FloorContent" id="Comment@(floor.Order)" cmid="@floor.ID">
-            <div class="row">
-                <div class="col-md-12">
+        <div class="col-md-8 mdv" id="Comment@(floor.Order)" cmid="@floor.ID">
+            <div class="row FloorMDV">
+                <div class="col-md-12" id="ImgV@(floor.Order)">
                     @Html.Raw(floor.MDValue)
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12 text-right fs2">
-                    <span><span class="glyphicon glyphicon-time"></span>@floor.InsertDate.ToString("yyyy-MM-dd HH:mm")</span>
+                <div class="col-md-12 text-right">
+                    <span><span class="glyphicon glyphicon-list"></span>&nbsp;@floor.Order 楼</span>&nbsp;
+                    <span><span class="glyphicon glyphicon-time"></span>&nbsp;@floor.InsertDate.ToString("yyyy-MM-dd HH:mm")</span>&nbsp;
                     <a id="ShowReply@(floor.Order)" href="javascript:;" style="text-decoration:none" onclick="ShowReply(@floor.Order, 1)" recount="@floor.ReplyCount">
                         @if (floor.ReplyCount > 0)
                         { @Html.Raw(floor.ReplyCount + "条回复") }
@@ -33,28 +34,39 @@
                     </a>
                 </div>
             </div>
-            <div id="ReplyBox@(floor.Order)" class="row" style="padding-left: 40px; display:none;margin-top:10px">
-                <div id="Replys@(floor.Order)"></div>
-                <div id="ReplyPager@(floor.Order)" class="col-md-12 text-center" style="margin: -15px 0px">
-                </div>
-                @if (ViewBag.Login)
-                {
-                    <div class="col-md-11">
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <span id="ReplyToUser@(floor.Order)">@@@userName </span>
-                                <a id="DefaultUser@(floor.Order)" href="javascript:;" style="display:none" onclick="ReplyDefault(@floor.Order,'@userName','@floor.Owner.ID')"><span class="badge">x</span></a>
+            <div id="ReplyBox@(floor.Order)" class="row" style="display:none;padding-top:10px">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div id="Replys@(floor.Order)" class="col-md-12"></div>
+                    </div>
+                    <div class="row">
+                        @if (ViewBag.Login)
+                        {
+                            <div class="col-md-10">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <span id="ReplyToUser@(floor.Order)">@@@userName </span>
+                                        <a id="DefaultUser@(floor.Order)" href="javascript:;" style="display:none" onclick="ReplyDefault(@floor.Order,'@userName','@floor.Owner.ID')"><span class="badge">x</span></a>
+                                    </div>
+                                    <input id="ReplyTxt@(floor.Order)" type="text" class="form-control" touser="@floor.OwnerID" />
+                                </div>
                             </div>
-                            <input id="ReplyTxt@(floor.Order)" type="text" class="form-control" touser="@floor.OwnerID" />
-                        </div>
+                            <div class="col-md-2 text-right">
+                                <button class="btn btn-default" onclick="AddReply(@floor.Order)">确定</button>
+                            </div>
+                        }
                     </div>
-                    <div class="col-md-1">
-                        <button class="btn btn-default" onclick="AddReply(@floor.Order)">确定</button>
-                    </div>
-                }
+                </div>
             </div>
         </div>
     </div>
 }
 <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
 <input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
+@if (ViewBag.ShowPager)
+{
+    <div class="row" style="margin-bottom: -20px">
+        <div id="NBFPager" class="col-md-8 col-md-offset-2 text-center">
+        </div>
+    </div>
+}
