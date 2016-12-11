@@ -1,24 +1,61 @@
 ﻿@using MVCWeb;
 @using MVCWeb.Model.Models;
+@using HtmlAgilityPack;
 @{
     List<NewBee> NewBeeList = ViewBag.NewBeeList as List<NewBee>;
+    List<NewBeeFloor> FirstFloors = ViewBag.FirstFloors as List<NewBeeFloor>;
 }
 
 @foreach (NewBee newBee in NewBeeList)
 {
     string userName = string.IsNullOrEmpty(newBee.Owner.Name) ? newBee.Owner.GitHubLogin : newBee.Owner.Name;
-    <div class="row" style="margin-top: 10px">
-        <div class="col-md-2 text-right fs2">
+    //提取预览内容
+    HtmlDocument htmlDoc = new HtmlDocument();
+    htmlDoc.LoadHtml(FirstFloors.Where(f => f.NewBeeID == newBee.ID).FirstOrDefault().MDValue);
+    string innerText = htmlDoc.DocumentNode.InnerText;
+    string result = innerText.GetByteCount() > 100 ? innerText.SubByteStr(100) : innerText;
+
+    string[] imgtags = new string[3];
+    HtmlNodeCollection fimgs = htmlDoc.DocumentNode.SelectNodes("//img");
+    if(fimgs != null)
+    {
+        int i = 0;
+        foreach(HtmlNode node in fimgs)
+        {
+            if(i > 2)
+            {
+                break;
+            }
+            node.Attributes.Add("style", "max-width: 180px; max-height: 120px; margin-right: 30px");
+            node.Attributes["src"].Value = node.Attributes["src"].Value + "&w=180&h=120";
+            imgtags[i] = node.OuterHtml;
+            i++;
+        }
+    }
+    <hr style="margin: 5px;" />
+    <div class="row">
+        <div class="col-md-2 text-left fs2">
             <span class="glyphicon glyphicon-user"></span>
             <a href="@Url.Action("UserProfile", "Home", new { id = newBee.Owner.ID })" style="text-decoration:none" target="_blank">@userName</a>
         </div>
         <div class="col-md-8">
             <a href="@Url.Action("NewBeeView", "Home", new { id = newBee.ID })" style="text-decoration:none" target="_blank">@newBee.Title</a>
         </div>
-        <div class="col-md-2 text-right">
+        <div class="col-md-2 text-left">
+            <span title="最后回复时间"><span class="glyphicon glyphicon-time"></span>&nbsp;@newBee.LastFloorDate.ToBlurDate()</span>&nbsp;
             <span title="回复数"><span class="glyphicon glyphicon-comment"></span>&nbsp;@newBee.FloorCount</span>&nbsp;
-            <span title="查看次数"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;@newBee.ViewCount</span>&nbsp;
-            <span title="最后回复时间"><span class="glyphicon glyphicon-time"></span>&nbsp;@newBee.LastFloorDate.ToBlurDate()</span>
+            <span title="查看次数"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;@newBee.ViewCount</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2 fs2">
+            <div>@result ……</div>
+            <div style="text-align:center">
+                @foreach(string img in imgtags)
+                {
+                    @Html.Raw(img)
+                }
+            </div>
         </div>
     </div>
 }

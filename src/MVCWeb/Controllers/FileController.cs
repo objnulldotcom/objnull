@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.IO;
 using System.Configuration;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace MVCWeb.Controllers
 {
@@ -51,7 +53,7 @@ namespace MVCWeb.Controllers
         }
 
         //下载图片
-        public ActionResult DownloadImg(string path, int pt)
+        public ActionResult DownloadImg(string path, int pt, int w = 0, int h = 0)
         {
             string fPath = "";
             switch (pt)
@@ -73,7 +75,39 @@ namespace MVCWeb.Controllers
                     break;
             }
             fPath = fPath + path.Replace(":", "\\");
-            return File(fPath, "application/octet-stream", "temp");
+            if(w == 0 || h == 0)
+            {
+                return File(fPath, "application/octet-stream", "temp");
+            }
+            else
+            {
+                //下载缩略图
+                using (Image image = Image.FromFile(fPath))
+                {
+                    float iw = image.Width;
+                    float ih = image.Height;
+                    if (iw > ih)
+                    {
+                        h = (int)(ih / iw * w);
+                    }
+                    else
+                    {
+                        w = (int)(iw / ih * h);
+                    }
+
+                    Bitmap newImag = new Bitmap(w, h);
+                    Graphics g = Graphics.FromImage(newImag);
+                    g.DrawImage(image, new Rectangle(0, 0, w, h), new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
+
+                    MemoryStream ms = new MemoryStream();
+                    newImag.Save(ms, ImageFormat.Jpeg);
+
+                    Image temp = Image.FromStream(ms);
+                    ImageConverter converter = new ImageConverter();
+                    byte[] imgbytes = (byte[])converter.ConvertTo(temp, typeof(byte[]));
+                    return File(imgbytes, "application/octet-stream", "temp");
+                }
+            }
         }
     }
 }

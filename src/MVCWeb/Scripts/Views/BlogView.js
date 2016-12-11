@@ -38,9 +38,11 @@ function GetCommentPage(index) {
                 var co = parseInt($("#ValCOrder").val());
                 var ro = parseInt($("#ValROrder").val());
                 if (co > 0) {
-                    $("html,body").animate({ scrollTop: $("#Comment" + co).offset().top - 100 }, 500)
+                    $("html,body").animate({ scrollTop: $("#Comment" + co).offset().top - 100 }, 500);
+                    $("#ValCOrder").val(0);
                     if (ro > 0) {
-                        $("html,body").animate({ scrollTop: $("#Replys" + co).offset().top - 100 }, 300)
+                        $("html,body").animate({ scrollTop: $("#Replys" + co).offset().top - 100 }, 300);
+                        $("#ValROrder").val(0);
                     }
                 }
             });

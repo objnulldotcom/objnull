@@ -45,10 +45,17 @@ function NewBeeFloorPage(index) {
                 var co = parseInt($("#ValCOrder").val());
                 var ro = parseInt($("#ValROrder").val());
                 if (co > 0) {
-                    $("html,body").animate({ scrollTop: $("#Comment" + co).offset().top - 100 }, 500)
+                    $("html,body").animate({ scrollTop: $("#Comment" + co).offset().top - 100 }, 300);
+                    $("#ValCOrder").val(0);
                     if (ro > 0) {
-                        $("html,body").animate({ scrollTop: $("#Replys" + co).offset().top - 100 }, 300)
+                        $("html,body").animate({ scrollTop: $("#Replys" + co).offset().top - 100 }, 500);
+                        $("#ValROrder").val(0);
                     }
+                }
+            });
+            $(".BtnShowReply").each(function () {
+                if ($(this).html().trim() != "回复") {
+                    $(this).click();
                 }
             });
             $(".FloorMDV").each(function () {
@@ -196,7 +203,9 @@ $(function () {
         if (ro > 0) {
             var rt = Math.floor(ro / rpsize);
             var rindex = ro % rpsize == 0 ? rt : rt + 1;
-            ShowReply(co, rindex);
+            if (rindex > 1) {
+                GetCommentReplyPage(rindex, co);
+            }
         }
     } else {
         NewBeeFloorPage(1);
@@ -301,6 +310,7 @@ $(function () {
                     $("#CmtTxt").val("");
                     $("#BtnCmt").click();
                     SendNewMsg($("#ValNBOwnerID").val());
+                    FirstLoad = true;
                     NewBeeFloorPage(99999);
                 } else {
                     swal(result.msg);

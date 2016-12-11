@@ -16,7 +16,8 @@
             </div>
             <div style="padding-left:40px">
                 <span>
-                    <a href="@Url.Action("UserProfile", "Home", new { id = reply.Owner.ID })" target="_blank">@userName</a>&nbsp;回复&nbsp;<a>@toUserName</a>&nbsp;
+                    <a href="@Url.Action("UserProfile", "Home", new { id = reply.Owner.ID })" target="_blank">@userName</a>&nbsp;回复&nbsp;
+                    <a href="@Url.Action("UserProfile", "Home", new { id = reply.ToUserID })" target="_blank">@toUserName</a>&nbsp;
                     <span title="回复时间"><span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToBlurDate()</span>&nbsp;
                     <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.COrder, '@userName', '@reply.Owner.ID')">回复</a>
                 </span>

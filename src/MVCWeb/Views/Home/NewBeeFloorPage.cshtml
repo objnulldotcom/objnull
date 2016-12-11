@@ -7,7 +7,8 @@
 @foreach (NewBeeFloor floor in NewBeeFloorList)
 {
     string userName = string.IsNullOrEmpty(floor.Owner.Name) ? floor.Owner.GitHubLogin : floor.Owner.Name;
-    <div class="row" style="padding: 15px 0px; border-top:1px solid #eee">
+    <hr />
+    <div class="row">
         <div class="col-md-2 text-right">
             <a href="@Url.Action("UserProfile", "Home", new { id = floor.Owner.ID })" target="_blank">
                 <img class="img-rounded" style="max-width: 96px" src="@floor.Owner.AvatarUrl&s=96" alt="@userName" title="@userName">
@@ -17,21 +18,21 @@
             </div>
         </div>
         <div class="col-md-8 mdv" id="Comment@(floor.Order)" cmid="@floor.ID">
-            <div class="row FloorMDV">
+            <div class="row FloorMDV" style="min-height: 96px">
                 <div class="col-md-12" id="ImgV@(floor.Order)">
                     @Html.Raw(floor.MDValue)
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12 text-right">
-                    <span><span class="glyphicon glyphicon-list"></span>&nbsp;@floor.Order 楼</span>&nbsp;
-                    <span><span class="glyphicon glyphicon-time"></span>&nbsp;@floor.InsertDate.ToString("yyyy-MM-dd HH:mm")</span>&nbsp;
-                    <a id="ShowReply@(floor.Order)" href="javascript:;" style="text-decoration:none" onclick="ShowReply(@floor.Order, 1)" recount="@floor.ReplyCount">
+                    <a id="ShowReply@(floor.Order)" class="BtnShowReply" href="javascript:;" style="text-decoration:none" onclick="ShowReply(@floor.Order, 1)" recount="@floor.ReplyCount">
                         @if (floor.ReplyCount > 0)
                         { @Html.Raw(floor.ReplyCount + "条回复") }
                         else if (ViewBag.Login)
                         { @Html.Raw("回复") }
-                    </a>
+                    </a>&nbsp;
+                    <span><span class="glyphicon glyphicon-list"></span>&nbsp;@floor.Order 楼</span>&nbsp;
+                    <span><span class="glyphicon glyphicon-time"></span>&nbsp;@floor.InsertDate.ToString("yyyy-MM-dd HH:mm")</span>
                 </div>
             </div>
             <div id="ReplyBox@(floor.Order)" class="row" style="display:none;padding-top:10px">

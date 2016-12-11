@@ -562,10 +562,14 @@ namespace MVCWeb.Controllers
         public ActionResult NewBeePage(int pageSize, int pageNum = 1)
         {
             int totalCount = 0;
-            ViewBag.NewBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.LastFloorDate, true, out totalCount).ToList();
+            List<NewBee> NewBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.LastFloorDate, true, out totalCount).ToList();
+            ViewBag.NewBeeList = NewBeeList;
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             ViewBag.ShowPager = totalCount > pageSize;
+
+            IEnumerable<Guid> NewBeeIDs = NewBeeList.Select(n => n.ID);
+            ViewBag.FirstFloors = NewBeeFloorDataSvc.GetByCondition(f => NewBeeIDs.Contains(f.NewBeeID) && f.Order == 1).ToList();
             return View();
         }
 
