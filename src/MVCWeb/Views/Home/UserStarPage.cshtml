@@ -12,29 +12,42 @@
     </div>
     <div class="col-md-10">
         <div class="row">
-            @{
-                string StarUrl = "";
-                switch ((int)ViewBag.Type)
-                {
-                    case (int)EnumObjectType.姿势:
-                        StarUrl = Url.Action("BlogView", "Home");
-                        break;
-                    case (int)EnumObjectType.NewBee:
-                        StarUrl = Url.Action("NewBeeView", "Home");
-                        break;
+            <div class="col-md-12">
+                @{
+                    string StarUrl = "";
+                    switch ((int)ViewBag.Type)
+                    {
+                        case (int)EnumObjectType.姿势:
+                            StarUrl = Url.Action("BlogView", "Home");
+                            break;
+                        case (int)EnumObjectType.NewBee:
+                            StarUrl = Url.Action("NewBeeView", "Home");
+                            break;
+                    }
                 }
-            }
-            @foreach (UserStar star in UserStars)
-            {
-                <div class="col-md-12 fs3">
-                    <a href="@StarUrl/@star.ObjID" target="_blank" style="text-decoration:none">@(star.Title.Length > 35 ? star.Title.Substring(0, 35) + "……" : star.Title)</a>
-                    <div class="fs2" style="float:right">
-                        <span class="glyphicon glyphicon-time"></span>@star.InsertDate.ToString("yyyy-MM-dd HH:mm")
+                @foreach (UserStar star in UserStars)
+                {
+                    <div class="row StarInfo" style="padding: 5px 0px">
+                        <div class="col-md-12">
+                            <div style="float:left">
+                                <a class="fs3" href="@StarUrl/@star.ObjID" target="_blank" style="text-decoration:none">@(star.Title.GetByteCount() > 70 ? star.Title.SubByteStr(70) + "…" : star.Title)</a>
+                                &nbsp;
+                                <span style="display:none" id="TxtModify">
+                                    <a href="javascript:;" onclick="StarDelete('@star.ID', @ViewBag.CurrentPage, @ViewBag.Type)">删</a>
+                                </span>
+                            </div>
+                            <div class="fs2" style="float:right">
+                                <span title="收藏日期"><span class="glyphicon glyphicon-time"></span>&nbsp;@star.InsertDate.ToBlurDate()</span>
+                            </div>
+                        </div>
                     </div>
+                }
+                <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
+                <input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
+                <div class="row" style="margin-bottom: -15px">
+                    <div id="UserPager" class="col-md-12 text-center"></div>
                 </div>
-            }
+            </div>
         </div>
-        <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
-        <input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
     </div>
 </div>

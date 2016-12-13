@@ -3,42 +3,50 @@
 @{
     List<Blog> UserBlogs = ViewBag.UserBlogs as List<Blog>;
 }
-
 @foreach (Blog blog in UserBlogs)
 {
-    <div class="media" style="margin-top:5px">
-        <div class="media-left">
-            @switch (blog.Type)
+    <div class="row BlogInfo" style="padding: 5px 0px">
+        <div class="col-md-12" style="line-height: 25px; height:25px">
+            <div style="float:left; margin-top: -2px">
+                @switch (blog.Type)
                 {
                     case (int)EnumBlogType.姿势:
-                    <span class="label label-primary" style="font-weight: 400">姿势</span>
-                    break;
-                case (int)EnumBlogType.宣传:
-                    <span class="label label-danger" style="font-weight: 400">宣传</span>
-                    break;
-                case (int)EnumBlogType.心得:
-                    <span class="label label-info" style="font-weight: 400">心得</span>
-                    break;
-                case (int)EnumBlogType.科普:
-                    <span class="label label-success" style="font-weight: 400">科普</span>
-                    break;
-                case (int)EnumBlogType.搬运:
-                    <span class="label label-warning" style="font-weight: 400">搬运</span>
-                    break;
-            }
-        </div>
-        <div class="media-body">
-            <div class="media-heading fs3">
-                <a href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank" style="text-decoration:none">@(blog.Title.Length > 35 ? blog.Title.Substring(0, 35) + "……" : blog.Title)</a>
-                <div class="fs2" style="padding-top:2px;float:right">
-                    <span class="glyphicon glyphicon-time"></span>@blog.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;
-                    <span class="glyphicon glyphicon-eye-open"></span>@blog.ViewCount&nbsp;
-                    <span class="glyphicon glyphicon-comment"></span>@blog.CommentCount&nbsp;
-                    <span class="glyphicon glyphicon-thumbs-up"></span>@blog.ProCount
-                </div>
+                        <span class="label label-primary" style="font-weight: 400">姿势</span>
+                        break;
+                    case (int)EnumBlogType.宣传:
+                        <span class="label label-danger" style="font-weight: 400">宣传</span>
+                        break;
+                    case (int)EnumBlogType.心得:
+                        <span class="label label-info" style="font-weight: 400">心得</span>
+                        break;
+                    case (int)EnumBlogType.科普:
+                        <span class="label label-success" style="font-weight: 400">科普</span>
+                        break;
+                    case (int)EnumBlogType.搬运:
+                        <span class="label label-warning" style="font-weight: 400">搬运</span>
+                        break;
+                }
+            </div>
+            <div style="float: left;padding: 0px 5px">
+                <a class="fs3" href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank" style="text-decoration:none">
+                    @(blog.Title.GetByteCount() > 54 ? blog.Title.SubByteStr(54) + "…" : blog.Title)
+                </a>&nbsp;
+                <span style="display:none" id="TxtModify">
+                    <a href="@Url.Action("BlogEdit", "Home", new { id = blog.ID })" target="_blank">改</a>&nbsp;
+                    <a href="javascript:;" onclick="BlogDelete('@blog.ID', @ViewBag.CurrentPage)">删</a>
+                </span>
+            </div>
+            <div class="fs2" style="float:right">
+                <span title="查看次数"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;@blog.ViewCount</span>&nbsp;
+                <span title="评论次数"><span class="glyphicon glyphicon-comment"></span>&nbsp;@blog.CommentCount</span>&nbsp;
+                <span title="点赞次数"><span class="glyphicon glyphicon-thumbs-up"></span>&nbsp;@blog.ProCount</span>&nbsp;
+                <span title="发布日期"><span class="glyphicon glyphicon-time"></span>&nbsp;@blog.InsertDate.ToBlurDate()</span>
             </div>
         </div>
     </div>
 }
 <input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
 <input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
+<div class="row" style="margin-bottom: -15px">
+    <div id="UserPager" class="col-md-12 text-center"></div>
+</div>

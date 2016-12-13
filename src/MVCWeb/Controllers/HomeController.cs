@@ -96,7 +96,7 @@ namespace MVCWeb.Controllers
             ViewBag.CurrentPage = pageNum;
             ViewBag.Type = type;
             return View();
-        }
+        } 
 
         //用户加赞
         public void ProUser(Guid id)
@@ -388,6 +388,42 @@ namespace MVCWeb.Controllers
                 UserStarDataSvc.Add(star);
                 MyRedisDB.SetAdd(starKey, new UserStarCache() { ObjID = blog.ID, ObjType = star.ObjType });
                 MyRedisDB.RedisDB.KeyExpire(starKey, DateTime.Now.AddHours(3));
+            }
+            return Json(new { msg = "done" });
+        }
+        
+        //删除
+        [HttpPost]
+        public ActionResult BlogDelete(Guid id)
+        {
+            Blog blog = BlogDataSvc.GetByID(id);
+            if(blog.OwnerID != CurrentUser.ID)
+            {
+                return Json(new { msg = "小伙子你想干嘛" });
+            }
+            BlogDataSvc.DeleteByID(id);
+            return Json(new { msg = "done" });
+        }
+
+        //删除
+        [HttpPost]
+        public ActionResult StarDelete(Guid id)
+        {
+            UserStar star = UserStarDataSvc.GetByID(id);
+            if (star.OwnerID != CurrentUser.ID)
+            {
+                return Json(new { msg = "小伙子你想干嘛" });
+            }
+            UserStarDataSvc.DeleteByID(id);
+            string starKey = MyRedisKeys.Pre_UserStarCache + CurrentUser.ID;
+            IEnumerable<UserStarCache> userStarCaches = MyRedisDB.GetSet<UserStarCache>(starKey);
+            if(userStarCaches.Count() > 0)
+            {
+                UserStarCache starCache = userStarCaches.Where(s => s.ObjID == star.ObjID).FirstOrDefault();
+                if(starCache != null)
+                {
+                    MyRedisDB.SetRemove(starKey, starCache);
+                }
             }
             return Json(new { msg = "done" });
         }
