@@ -142,5 +142,16 @@ namespace MVCWeb
             }
             return result;
         }
+
+        /// <summary>
+        /// 限制字符串最大字节长度
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public static string MaxByteLength(this string text, int length)
+        {
+            return text.GetByteCount() > length ? text.SubByteStr(length) + "…" : text;
+        }
     }
 }

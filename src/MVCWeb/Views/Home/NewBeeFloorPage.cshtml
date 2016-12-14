@@ -14,7 +14,7 @@
                 <img class="img-rounded" style="max-width: 96px" src="@floor.Owner.AvatarUrl&s=96" alt="@userName" title="@userName">
             </a>
             <div class="fs2" style="margin-top:5px;">
-                <a href="@Url.Action("UserProfile", "Home", new { id = floor.Owner.ID })" target="_blank">@userName</a>
+                <a href="@Url.Action("UserProfile", "Home", new { id = floor.Owner.ID })" target="_blank">@userName.MaxByteLength(20)</a>
             </div>
         </div>
         <div class="col-md-8 mdv" id="Comment@(floor.Order)" cmid="@floor.ID">
@@ -46,8 +46,8 @@
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-addon">
-                                        <span id="ReplyToUser@(floor.Order)">@@@userName </span>
-                                        <a id="DefaultUser@(floor.Order)" href="javascript:;" style="display:none" onclick="ReplyDefault(@floor.Order,'@userName','@floor.Owner.ID')"><span class="badge">x</span></a>
+                                        <span id="ReplyToUser@(floor.Order)">@@@userName.MaxByteLength(20) </span>
+                                        <a id="DefaultUser@(floor.Order)" href="javascript:;" style="display:none" onclick="ReplyDefault(@floor.Order,'@userName.MaxByteLength(20)','@floor.Owner.ID')"><span class="badge">x</span></a>
                                     </div>
                                     <input id="ReplyTxt@(floor.Order)" type="text" class="form-control" touser="@floor.OwnerID" />
                                 </div>

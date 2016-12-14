@@ -47,7 +47,7 @@
         }
         <div id="RMsgBar@(j)" class="MsgBar">
             <div>
-                <div style="max-width:150px; height: 17px; overflow:hidden; float: left; color: #ea8414">@reply.From</div>&nbsp;回复你
+                <div style="max-width:150px; height: 17px; overflow:hidden; float: left; color: #ea8414">@reply.From.MaxByteLength(17)</div>&nbsp;回复你
                 <span style="float:right">
                     <a id="BtnDelMsg" style="display:none; text-decoration:none" href="javascript:;" onclick="DelRMsg('@reply.ObjID', @reply.COrder, @reply.ROrder, @j)">删除</a>
                     @reply.Date.ToBlurDate()

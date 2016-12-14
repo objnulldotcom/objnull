@@ -53,7 +53,7 @@
         <a href="@Url.Action("UserProfile", "Home", new { id = Blog.Owner.ID })" target="_blank" style="text-decoration:none">
             <img class="img-rounded" style="max-width: 32px" src="@Blog.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName" title="@userName">
         </a>
-        <span><a href="@Url.Action("UserProfile", "Home", new { id = Blog.Owner.ID })" target="_blank">@userName</a> post at&nbsp;</span> 
+        <span><a href="@Url.Action("UserProfile", "Home", new { id = Blog.Owner.ID })" target="_blank">@userName.MaxByteLength(20)</a> post at&nbsp;</span> 
         <span title="发布日期"><span class="glyphicon glyphicon-time"></span>@Blog.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;</span>
         <span title="查看次数"><span class="glyphicon glyphicon-eye-open"></span>@Blog.ViewCount&nbsp;</span>
         <span title="评论次数"><span class="glyphicon glyphicon-comment"></span><span id="CommentCount">@Blog.CommentCount</span>&nbsp;</span>

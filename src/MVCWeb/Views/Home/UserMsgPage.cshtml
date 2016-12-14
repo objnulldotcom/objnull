@@ -1,14 +1,21 @@
 ﻿@using MVCWeb;
 @using MVCWeb.Model.Models;
+@using HtmlAgilityPack;
 @{
     List<UserStar> UserStars = ViewBag.UserStars as List<UserStar>;
 }
 <div class="row">
     <div class="col-md-2">
+        <div class="text-center" style="padding-bottom: 7px;"><span class="label label-default" style="font-weight: 300">姿势</span></div>
         <ul class="nav nav-pills nav-stacked text-center">
-            <li class="@(ViewBag.Type == "replyme" ? "active" : "")"><a href="javascript:;" onclick="UserMsgPage(1, 'replyme')">回复我的</a></li>
-            <li class="@(ViewBag.Type == "myreply" ? "active" : "")"><a href="javascript:;" onclick="UserMsgPage(1, 'myreply')">我回复的</a></li>
-            <li class="@(ViewBag.Type == "mycomment" ? "active" : "")"><a href="javascript:;" onclick="UserMsgPage(1, 'mycomment')">我评论的</a></li>
+            <li class="@(ViewBag.Type == "Breply" ? "active" : "")"><a href="javascript:;" onclick="UserMsgPage(1, 'Breply')">我的回复</a></li>
+            <li class="@(ViewBag.Type == "Bcomment" ? "active" : "")"><a href="javascript:;" onclick="UserMsgPage(1, 'Bcomment')">我的评论</a></li>
+        </ul>
+        <hr style="margin-top: 5px; margin-bottom: 5px" />
+        <div class="text-center" style="padding-bottom: 7px;"><span class="label label-default" style="font-weight: 300">NewBee</span></div>
+        <ul class="nav nav-pills nav-stacked text-center">
+            <li class="@(ViewBag.Type == "Nreply" ? "active" : "")"><a href="javascript:;" onclick="UserMsgPage(1, 'Nreply')">我的回复</a></li>
+            <li class="@(ViewBag.Type == "Ncomment" ? "active" : "")"><a href="javascript:;" onclick="UserMsgPage(1, 'Ncomment')">我的评论</a></li>
         </ul>
     </div>
     <div class="col-md-10">
@@ -16,50 +23,138 @@
             <div class="col-md-12">
                 @switch ((string)ViewBag.Type)
                 {
-                    case "replyme":
-                        List<BlogCommentReply> ReplyMes = ViewBag.ReplyMes as List<BlogCommentReply>;
-                        foreach (BlogCommentReply reply in ReplyMes)
+                    case "Breply":
+                        List<BlogCommentReply> Breplys = ViewBag.Breplys as List<BlogCommentReply>;
+                        foreach (BlogCommentReply reply in Breplys)
                         {
-                            string userName = string.IsNullOrEmpty(reply.Owner.Name) ? reply.Owner.GitHubLogin : reply.Owner.Name;
-                            <div class="row">
+                            string userName = "";
+                            <div class="row" style="padding-top: 10px">
                                 <div class="col-md-12">
-                                    @userName 回复你
-                                    <a href="@Url.Action("BlogView", "Home", new { id = reply.BlogComment.BlogID, co = reply.BlogComment.Order, ro = reply.Order })" target="_blank" style="text-decoration:none">@(reply.Content.Length > 35 ? reply.Content.Substring(0, 35) + "……" : reply.Content)</a>
+                                    <div style="float:left">
+                                        @if (reply.OwnerID == ViewBag.CUserID)
+                                        {
+                                            userName = string.IsNullOrEmpty(reply.ToUser.Name) ? reply.ToUser.GitHubLogin : reply.ToUser.Name;
+                                            <span class="fs2">我回复&nbsp;<a href="@Url.Action("UserProfile", "Home", new { id = reply.ToUserID })" target="_blank">@userName.MaxByteLength(25)</a>：</span>
+                                        }
+                                        else
+                                        {
+                                            userName = string.IsNullOrEmpty(reply.Owner.Name) ? reply.Owner.GitHubLogin : reply.Owner.Name;
+                                            <span class="fs2"><a href="@Url.Action("UserProfile", "Home", new { id = reply.OwnerID })" target="_blank">@userName</a>&nbsp;回复我：</span>
+                                        }
+                                        <a href="@Url.Action("BlogView", "Home", new { id = reply.BlogComment.BlogID, co = reply.BlogComment.Order, ro = reply.Order })" target="_blank" style="text-decoration:none">
+                                            @Html.Raw(reply.Content.MaxByteLength(60))
+                                        </a>
+                                    </div>
                                     <div class="fs2" style="float:right">
-                                        <span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToString("yyyy-MM-dd HH:mm")
+                                        <span title="回复日期"><span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToBlurDate()</span>
                                     </div>
                                 </div>
                             </div>
                         }
-                        break;
-                    case "myreply":
-                        List<BlogCommentReply> MyReplys = ViewBag.MyReplys as List<BlogCommentReply>;
-                        foreach (BlogCommentReply reply in MyReplys)
+                        if (Breplys.Count == 0)
                         {
-                            string userName = string.IsNullOrEmpty(reply.Owner.Name) ? reply.Owner.GitHubLogin : reply.Owner.Name;
-                            <div class="row">
-                                <div class="col-md-12">
-                                    回复 @userName
-                                    <a href="@Url.Action("BlogView", "Home", new { id = reply.BlogComment.BlogID, co = reply.BlogComment.Order, ro = reply.Order })" target="_blank" style="text-decoration:none">@(reply.Content.Length > 35 ? reply.Content.Substring(0, 35) + "……" : reply.Content)</a>
-                                    <div class="fs2" style="float:right">
-                                        <span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToString("yyyy-MM-dd HH:mm")
-                                    </div>
+                            <div class="row" style="padding: 30px 0px">
+                                <div class="col-md-12 text-center">
+                                    没有找到相关数据
                                 </div>
                             </div>
                         }
                         break;
-                    case "mycomment":
-                        List<BlogComment> MyComments = ViewBag.MyComments as List<BlogComment>;
-                        foreach (BlogComment comment in MyComments)
+                    case "Bcomment":
+                        List<BlogComment> Bcomments = ViewBag.Bcomments as List<BlogComment>;
+                        foreach (BlogComment comment in Bcomments)
                         {
-                            string title = comment.Blog.Title;
-                            <div class="row">
+                            HtmlDocument htmlDoc = new HtmlDocument();
+                            htmlDoc.LoadHtml(comment.MDValue);
+                            string innerText = htmlDoc.DocumentNode.InnerText;
+                            string result = innerText.MaxByteLength(60);
+                            <div class="row" style="padding-top: 10px">
                                 <div class="col-md-12">
-                                    评论
-                                    <a href="@Url.Action("BlogView", "Home", new { id = comment.BlogID, co = comment.Order })" target="_blank" style="text-decoration:none">@( title.Length > 35 ? title.Substring(0, 35) + "……" : title)</a>
-                                    <div class="fs2" style="float:right">
-                                        <span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToString("yyyy-MM-dd HH:mm")
+                                    <div style="float:left">
+                                        <span class="fs2"><a href="@Url.Action("BlogView", "Home", new { id = comment.BlogID })" target="_blank">&nbsp;@comment.Blog.Title.MaxByteLength(30)</a>：</span>
+                                        <a href="@Url.Action("BlogView", "Home", new { id = comment.BlogID, co = comment.Order })" target="_blank" style="text-decoration:none">
+                                            @Html.Raw(result)
+                                        </a>
                                     </div>
+                                    <div class="fs2" style="float:right">
+                                        <span title="评论日期"><span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToBlurDate()</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        if (Bcomments.Count == 0)
+                        {
+                            <div class="row" style="padding: 30px 0px">
+                                <div class="col-md-12 text-center">
+                                    没有找到相关数据
+                                </div>
+                            </div>
+                        }
+                        break;
+                    case "Nreply":
+                        List<NewBeeFloorReply> Nreplys = ViewBag.Nreplys as List<NewBeeFloorReply>;
+                        foreach (NewBeeFloorReply reply in Nreplys)
+                        {
+                            string userName = "";
+                            <div class="row" style="padding-top: 10px">
+                                <div class="col-md-12">
+                                    <div style="float:left">
+                                        @if (reply.OwnerID == ViewBag.CUserID)
+                                        {
+                                            userName = string.IsNullOrEmpty(reply.ToUser.Name) ? reply.ToUser.GitHubLogin : reply.ToUser.Name;
+                                            <span class="fs2">我回复&nbsp;<a href="@Url.Action("UserProfile", "Home", new { id = reply.ToUserID })" target="_blank">@userName.MaxByteLength(25)</a>：</span>
+                                        }
+                                        else
+                                        {
+                                            userName = string.IsNullOrEmpty(reply.Owner.Name) ? reply.Owner.GitHubLogin : reply.Owner.Name;
+                                            <span class="fs2"><a href="@Url.Action("UserProfile", "Home", new { id = reply.OwnerID })" target="_blank">@userName</a>&nbsp;回复我：</span>
+                                        }
+                                        <a href="@Url.Action("NewBeeView", "Home", new { id = reply.NewBeeFloor.NewBeeID, co = reply.NewBeeFloor.Order, ro = reply.Order })" target="_blank" style="text-decoration:none">
+                                            @Html.Raw(reply.Content.MaxByteLength(60))
+                                        </a>
+                                    </div>
+                                    <div class="fs2" style="float:right">
+                                        <span title="回复日期"><span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToBlurDate()</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        if (Nreplys.Count == 0)
+                        {
+                            <div class="row" style="padding: 30px 0px">
+                                <div class="col-md-12 text-center">
+                                    没有找到相关数据
+                                </div>
+                            </div>
+                        }
+                        break;
+                    case "Ncomment":
+                        List<NewBeeFloor> Ncomments = ViewBag.Ncomments as List<NewBeeFloor>;
+                        foreach (NewBeeFloor comment in Ncomments)
+                        {
+                            HtmlDocument htmlDoc = new HtmlDocument();
+                            htmlDoc.LoadHtml(comment.MDValue);
+                            string innerText = htmlDoc.DocumentNode.InnerText;
+                            string result = innerText.MaxByteLength(60);
+                            <div class="row" style="padding-top: 10px">
+                                <div class="col-md-12">
+                                    <div style="float:left">
+                                        <span class="fs2"><a href="@Url.Action("NewBeeView", "Home", new { id = comment.NewBeeID })" target="_blank">&nbsp;@comment.NewBee.Title.MaxByteLength(30)</a>：</span>
+                                        <a href="@Url.Action("NewBeeView", "Home", new { id = comment.NewBeeID, co = comment.Order })" target="_blank" style="text-decoration:none">
+                                            @Html.Raw(result)
+                                        </a>
+                                    </div>
+                                    <div class="fs2" style="float:right">
+                                        <span title="评论日期"><span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToBlurDate()</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        if (Ncomments.Count == 0)
+                        {
+                            <div class="row" style="padding: 30px 0px">
+                                <div class="col-md-12 text-center">
+                                    没有找到相关数据
                                 </div>
                             </div>
                         }

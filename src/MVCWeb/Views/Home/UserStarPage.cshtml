@@ -30,7 +30,7 @@
                     <div class="row StarInfo" style="padding: 5px 0px">
                         <div class="col-md-12">
                             <div style="float:left">
-                                <a class="fs3" href="@StarUrl/@star.ObjID" target="_blank" style="text-decoration:none">@(star.Title.GetByteCount() > 70 ? star.Title.SubByteStr(70) + "…" : star.Title)</a>
+                                <a class="fs3" href="@StarUrl/@star.ObjID" target="_blank" style="text-decoration:none">@star.Title.MaxByteLength(70)</a>
                                 &nbsp;
                                 <span style="display:none" id="TxtModify">
                                     <a href="javascript:;" onclick="StarDelete('@star.ID', @ViewBag.CurrentPage, @ViewBag.Type)">删</a>
@@ -39,6 +39,14 @@
                             <div class="fs2" style="float:right">
                                 <span title="收藏日期"><span class="glyphicon glyphicon-time"></span>&nbsp;@star.InsertDate.ToBlurDate()</span>
                             </div>
+                        </div>
+                    </div>
+                }
+                @if (UserStars.Count == 0)
+                {
+                    <div class="row" style="padding: 30px 0px">
+                        <div class="col-md-12 text-center">
+                            没有找到相关数据
                         </div>
                     </div>
                 }

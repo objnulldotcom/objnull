@@ -13,12 +13,12 @@
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="min-width:160px">
             <img class="img-rounded" style="max-width: 32px; margin: -7px 0px" src="@CurrentUser.AvatarUrl&s=32" height="32" width="32" />
-            @CurrentUser.UserName &nbsp;&nbsp;<span class="caret"></span>
+            @CurrentUser.UserName.MaxByteLength(20) &nbsp;&nbsp;<span class="caret"></span>
         </a>
         <ul class="dropdown-menu" role="menu">
             <li><a href="https://github.com/@(CurrentUser.GitHubLogin)" target="_blank">Github</a></li>
             <li><a href="@Url.Action("UserProfile", "Home")">我的主页</a></li>
-            <li><a id="BtnUpdateInfo" href="javascript:;">更新账号</a></li>
+            <li title="就是重新获取你的用户名和头像（信息不同步时点）"><a id="BtnUpdateInfo" href="javascript:;">更新账号</a></li>
             <li><a href="@Url.Action("LogOut", "OAuth")">退出</a></li>
         </ul>
     </li>

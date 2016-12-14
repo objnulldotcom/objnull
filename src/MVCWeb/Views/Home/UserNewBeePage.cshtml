@@ -1,0 +1,41 @@
+﻿@using MVCWeb;
+@using MVCWeb.Model.Models;
+@{
+    List<NewBee> UserNewBees = ViewBag.UserNewBees as List<NewBee>;
+}
+@foreach (NewBee newBee in UserNewBees)
+{
+    <div class="row NewBeeInfo" style="padding: 5px 0px">
+        <div class="col-md-12" style="line-height: 25px; height:25px">
+            <div style="float: left;padding: 0px 5px">
+                <a class="fs3" href="@Url.Action("NewBeeView", "Home", new { id = newBee.ID })" target="_blank" style="text-decoration:none">
+                    @newBee.Title.MaxByteLength(80)
+                </a>&nbsp;
+                @if (ViewBag.Owner)
+                {
+                    <span style="display:none" id="TxtModify">
+                        <a href="javascript:;" onclick="NewBeeDelete('@newBee.ID', @ViewBag.CurrentPage)">删</a>
+                    </span>
+                }
+            </div>
+            <div class="fs2" style="float:right">
+                <span title="查看次数"><span class="glyphicon glyphicon-eye-open"></span>&nbsp;@newBee.ViewCount</span>&nbsp;
+                <span title="评论次数"><span class="glyphicon glyphicon-comment"></span>&nbsp;@newBee.FloorCount</span>&nbsp;
+                <span title="发布日期"><span class="glyphicon glyphicon-time"></span>&nbsp;@newBee.InsertDate.ToBlurDate()</span>
+            </div>
+        </div>
+    </div>
+}
+@if (UserNewBees.Count == 0)
+{
+    <div class="row" style="padding: 30px 0px">
+        <div class="col-md-12 text-center">
+            没有找到相关数据
+        </div>
+    </div>
+}
+<input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
+<input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
+<div class="row" style="margin-bottom: -15px">
+    <div id="UserPager" class="col-md-12 text-center"></div>
+</div>

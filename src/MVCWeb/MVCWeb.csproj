@@ -294,6 +294,7 @@
     <Content Include="Views\Home\NewBeeView.cshtml" />
     <Content Include="Views\Home\NewBeeFloorPage.cshtml" />
     <Content Include="Views\Home\NewBeeFloorReplyPage.cshtml" />
+    <Content Include="Views\Home\UserNewBeePage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

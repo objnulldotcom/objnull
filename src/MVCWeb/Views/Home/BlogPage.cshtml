@@ -12,7 +12,7 @@
     HtmlDocument htmlDoc = new HtmlDocument();
     htmlDoc.LoadHtml(blog.MDValue);
     string innerText = htmlDoc.DocumentNode.InnerText;
-    string result = innerText.GetByteCount() > 350 ? innerText.SubByteStr(350) : innerText;
+    string result = innerText.MaxByteLength(350);
     <div class="row">
         <div class="col-md-12">
             <div class="media" style="padding-bottom: 15px">
@@ -43,11 +43,11 @@
                 </div>
                 <div class="media-body">
                     <div class="media-heading fs1"><a href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank" style="text-decoration:none">@blog.Title</a></div>
-                    <div class="fs2" style="height: 35px; overflow: hidden"><p>@Html.Raw(result)……</p></div>
+                    <div class="fs2" style="height: 35px; overflow: hidden"><p>@Html.Raw(result)</p></div>
                     <div class="fs2" style="padding-top:2px">
                         <span>
                             <span class="glyphicon glyphicon-user"></span>
-                            <a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank">@userName</a> post at&nbsp;
+                            <a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank">@userName.MaxByteLength(20)</a> post at&nbsp;
                         </span>
                         <span title="发布日期"><span class="glyphicon glyphicon-time"></span>@blog.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;</span>
                         <span title="查看次数"><span class="glyphicon glyphicon-eye-open"></span>@blog.ViewCount&nbsp;</span>
