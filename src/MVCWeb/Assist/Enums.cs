@@ -27,4 +27,22 @@ namespace MVCWeb
         查看 = 1,
         点赞 = 2
     }
+
+    public enum EnumActionType
+    {
+        前台 = 1,
+        后台 = 2
+    }
+    
+    public enum EnumUserRole
+    {
+        普通 = 1,
+        管理 = 2
+    }
+    
+    public enum EnumManagerRole
+    {
+        超级 = 1,
+        管理员 = 2
+    }
 }

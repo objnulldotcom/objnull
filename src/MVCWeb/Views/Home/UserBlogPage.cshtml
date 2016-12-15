@@ -8,24 +8,28 @@
     <div class="row BlogInfo" style="padding: 5px 0px">
         <div class="col-md-12" style="line-height: 25px; height:25px">
             <div style="float:left; margin-top: -2px">
-                @switch (blog.Type)
-                {
-                    case (int)EnumBlogType.姿势:
-                        <span class="label label-primary" style="font-weight: 400">姿势</span>
-                        break;
-                    case (int)EnumBlogType.宣传:
-                        <span class="label label-danger" style="font-weight: 400">宣传</span>
-                        break;
-                    case (int)EnumBlogType.心得:
-                        <span class="label label-info" style="font-weight: 400">心得</span>
-                        break;
-                    case (int)EnumBlogType.科普:
-                        <span class="label label-success" style="font-weight: 400">科普</span>
-                        break;
-                    case (int)EnumBlogType.搬运:
-                        <span class="label label-warning" style="font-weight: 400">搬运</span>
-                        break;
+                @{
+                    string className = "";
+                    switch (blog.Type)
+                    {
+                        case (int)EnumBlogType.姿势:
+                            className = "label-primary";
+                            break;
+                        case (int)EnumBlogType.宣传:
+                            className = "label-danger";
+                            break;
+                        case (int)EnumBlogType.心得:
+                            className = "label-info";
+                            break;
+                        case (int)EnumBlogType.科普:
+                            className = "label-success";
+                            break;
+                        case (int)EnumBlogType.搬运:
+                            className = "label-warning";
+                            break;
+                    }
                 }
+                <span class="label @className" style="font-weight: 400">@Enum.GetName(typeof(EnumBlogType), blog.Type)</span>
             </div>
             <div style="float: left;padding: 0px 5px">
                 <a class="fs3" href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank" style="text-decoration:none">

@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Text;
-using System.Text.RegularExpressions;
-using PagedList.Mvc;
+using System.Web.Mvc;
 
 namespace MVCWeb
 {
     public static class Extensions
     {
         #region HttpContextBase扩展
-        
+
         /// <summary>
         /// 写cookie（扩展）
         /// </summary>
@@ -87,7 +86,7 @@ namespace MVCWeb
         }
 
         #endregion
-        
+
         /// <summary>
         /// 简洁时间格式
         /// </summary>
@@ -130,11 +129,11 @@ namespace MVCWeb
         public static string SubByteStr(this string text, int length)
         {
             string result = "";
-            foreach(char c in text.ToCharArray())
+            foreach (char c in text.ToCharArray())
             {
                 int cbc = c.ToString().GetByteCount();
                 int rbc = result.GetByteCount();
-                if(rbc + cbc > length)
+                if (rbc + cbc > length)
                 {
                     break;
                 }
@@ -152,6 +151,30 @@ namespace MVCWeb
         public static string MaxByteLength(this string text, int length)
         {
             return text.GetByteCount() > length ? text.SubByteStr(length) + "…" : text;
+        }
+
+        /// <summary>
+        /// 通过Enum类型生成select
+        /// </summary>
+        /// <param name="html"></param>
+        /// <param name="enumType">Enum类型</param>
+        /// <param name="name">select的name</param>
+        /// <param name="className">select的class</param>
+        /// <param name="selectFirst">是否选中第一个</param>
+        /// <returns></returns>
+        public static MvcHtmlString GetSelectByEnum(this HtmlHelper html, Type enumType, string name, string className, bool selectFirst, string id = "")
+        {
+            string result = "";
+            result += "<select id=\"" + id + "\" name=\"" + name + "\" class=\"" + className + "\">";
+            int i = 0;
+            foreach (object value in Enum.GetValues(enumType))
+            {
+                string selected = i == 0 && selectFirst ? " selected=\"selected\" " : " ";
+                result += "<option" + selected + "value=\"" + (int)value + "\">" + Enum.GetName(enumType, value) + "</option>";
+                i++;
+            }
+            result += "</select>";
+            return MvcHtmlString.Create(result);
         }
     }
 }

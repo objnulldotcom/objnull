@@ -5,32 +5,71 @@
     IEnumerable<ActionRule> Rules = ViewBag.ActionRules as IEnumerable<ActionRule>;
     IEnumerable<Manager> Managers = ViewBag.Managers as IEnumerable<Manager>;
 }
+@section head{
+    <script>
+        function Edit(btn, atype) {
+            $("input[name=controller]").val($(btn).parent().parent().find(".Controller").html());
+            $("input[name=action]").val($(btn).parent().parent().find(".Action").html());
+            $("input[name=allowRoles]").val($(btn).parent().parent().find(".AllowRoles").html());
+            $("select[name=aType]").find("option").each(function () {
+                $(this).prop("selected", false);
+                if ($(this).val() == atype) {
+                    $(this).prop("selected", true);
+                }
+            });
+            $(document).scrollTop(0);
+        }
+    </script>
+}
 <h3>ActionRule</h3>
+<div class="row" style="padding: 10px 0px">
+    <div class="col-md-12">
+        <a class="btn btn-default" href="@Url.Action("OnkeyRules", "Manager")">一键生成ActionRule</a>
+    </div>
+</div>
 <div class="row">
+    <div class="col-md-12 text-right">
+        前台：
+        @foreach (object value in Enum.GetValues(typeof(EnumUserRole)))
+        {
+            @Html.Raw(Enum.GetName(typeof(EnumUserRole), value) + (int)value + ",")
+        }
+        &nbsp;&nbsp;&nbsp;&nbsp;后台：
+        @foreach (object value in Enum.GetValues(typeof(EnumManagerRole)))
+        {
+            @Html.Raw(Enum.GetName(typeof(EnumManagerRole), value) + (int)value + ",")
+        }
+    </div>
+</div>
+<div class="row" style="padding: 10px 0px">
     <form action="@Url.Action("AddActionRule", "Manager")" method="post">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <input name="controller" class="form-control" type="text" placeholder="controller" />
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <input name="action" class="form-control" type="text" placeholder="action" />
         </div>
-        <div class="col-md-3">
-            <input name="allow" class="form-control" type="text" placeholder="allow" />
+        <div class="col-md-2">
+            @Html.GetSelectByEnum(typeof(EnumActionType), "aType", "form-control", true)
         </div>
-        <div class="col-md-1">
-            <input class="btn btn-default" type="submit" value="Add" />
+        <div class="col-md-2">
+            <input name="allowRoles" class="form-control" type="text" placeholder="AllowRoles" />
+        </div>
+        <div class="col-md-2">
+            <input class="btn btn-default" type="submit" value="添加或修改" />
         </div>
     </form>
 </div>
-<div class="row">
+<div class="row" style="padding: 10px 0px">
     <div class="col-md-12">
         <table class="table table-hover">
             <thead>
                 <tr>
                     <th>Controller</th>
                     <th>Action</th>
+                    <th>ActionType</th>
                     <th>AllowRole</th>
-                    <th>Delete</th>
+                    <th>操作</th>
                 </tr>
             </thead>
             @if (Rules != null)
@@ -38,10 +77,14 @@
                 foreach (ActionRule rule in Rules)
                 {
                     <tr>
-                        <td>@rule.Controller</td>
-                        <td>@rule.Action</td>
-                        <td>@rule.AllowRoles</td>
-                        <td><a href="@Url.Action("DeleteActionRule", "Manager", new { id = rule.ID.ToString() })">Delete</a></td>
+                        <td class="Controller">@rule.Controller</td>
+                        <td class="Action">@rule.Action</td>
+                        <td>@Enum.GetName(typeof(EnumActionType), rule.ActionType)</td>
+                        <td class="AllowRoles">@(rule.AllowRoles != null && rule.AllowRoles.Length > 0 ? string.Join(",", rule.AllowRoles) : "")</td>
+                        <td>
+                            <button href="javascript:;" onclick="Edit(this, @rule.ActionType)">修改</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a href="@Url.Action("DeleteActionRule", "Manager", new { id = rule.ID.ToString() })">删除</a>
+                        </td>
                     </tr>
                 }
             }
@@ -58,10 +101,10 @@
         <div class="col-md-4">
             <input name="value" class="form-control" type="text" placeholder="value" />
         </div>
-        <div class="col-md-3">
-            <input name="role" class="form-control" type="text" placeholder="role" />
+        <div class="col-md-2">
+            @Html.GetSelectByEnum(typeof(EnumManagerRole), "role", "form-control", true)
         </div>
-        <div class="col-md-1">
+        <div class="col-md-2">
             <input class="btn btn-default" type="submit" value="Add" />
         </div>
     </form>
@@ -84,7 +127,7 @@
                     <tr>
                         <td>@manager.Key</td>
                         <td>@manager.Value</td>
-                        <td>@manager.Role</td>
+                        <td>@Enum.GetName(typeof(EnumManagerRole), manager.Role)</td>
                         <td><a href="@Url.Action("DeleteManager", "Manager", new { id = manager.ID.ToString() })">Delete</a></td>
                     </tr>
                 }

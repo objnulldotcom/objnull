@@ -23,7 +23,28 @@
         @Blog.Title
     </div>
     <div class="col-md-2 text-right">
-        <span id="LblBType" class="label label-primary" style="font-weight: 400"></span>
+        @{
+            string className = "";
+            switch (Blog.Type)
+            {
+                case (int)EnumBlogType.姿势:
+                    className = "label-primary";
+                    break;
+                case (int)EnumBlogType.宣传:
+                    className = "label-danger";
+                    break;
+                case (int)EnumBlogType.心得:
+                    className = "label-info";
+                    break;
+                case (int)EnumBlogType.科普:
+                    className = "label-success";
+                    break;
+                case (int)EnumBlogType.搬运:
+                    className = "label-warning";
+                    break;
+            }
+        }
+        <span class="label @className" style="font-weight: 400">@Enum.GetName(typeof(EnumBlogType), Blog.Type)</span>
     </div>
 </div>
 <div class="row" style="padding-top: 15px">

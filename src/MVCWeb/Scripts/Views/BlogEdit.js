@@ -23,7 +23,6 @@ $(function () {
     });
 
     UpateMDV();
-    ShowType();
 
     //实时更新
     $("#TxtTitle").bind("input propertychange", function () {
@@ -112,30 +111,3 @@ $(function () {
         });
     });
 });
-
-//显示类型
-function ShowType() {
-    var type = $("#ValBlogType").val();
-    switch (type) {
-        case "0":
-            $("#LblBType").attr("class", "label label-primary");
-            $("#LblBType").html("姿势");
-            break;
-        case "1":
-            $("#LblBType").attr("class", "label label-danger");
-            $("#LblBType").html("宣传");
-            break;
-        case "2":
-            $("#LblBType").attr("class", "label label-info");
-            $("#LblBType").html("心得");
-            break;
-        case "3":
-            $("#LblBType").attr("class", "label label-success");
-            $("#LblBType").html("科普");
-            break;
-        case "4":
-            $("#LblBType").attr("class", "label label-warning");
-            $("#LblBType").html("搬运");
-            break;
-    }
-}

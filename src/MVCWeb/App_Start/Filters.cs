@@ -61,57 +61,81 @@ namespace MVCWeb
 
         public override void OnAuthorization(AuthorizationContext filterContext)
         {
-            //CurrentUser
-            string loginType = filterContext.HttpContext.ReadCookie("LoginType");
-            if (loginType == "github")
-            {
-                Guid id = Guid.Parse(filterContext.HttpContext.ReadCookie("UID"));
-                string name = filterContext.HttpContext.ReadCookie("UName");
-                string avatar = filterContext.HttpContext.ReadCookie("UAvatar");
-                string login = filterContext.HttpContext.ReadCookie("GLogin");
-                string sKEY = filterContext.HttpContext.ReadCookie("SKEY");
-                if(sKEY != Utils.RijndaelEncrypt(id.ToString()))//SKEY检查
-                {
-                    filterContext.HttpContext.Response.RedirectToRoute(new { controller = "OAuth", action = "LogOut" });
-                    return;
-                }
-                filterContext.HttpContext.User = new CurrentUser() { ID = id, Name = name, AvatarUrl = avatar, LoginType = loginType, GitHubLogin = login };
-            }
-
             //权限控制
             string controller = filterContext.HttpContext.Request.RequestContext.RouteData.Values["controller"].ToString();
             string action = filterContext.HttpContext.Request.RequestContext.RouteData.Values["action"].ToString();
             ActionRule rule = MyRedisDB.GetSet<ActionRule>(MyRedisKeys.ActionRules).Where(r => r.Controller.ToLower() == controller.ToLower() && r.Action.ToLower() == action.ToLower()).FirstOrDefault();
-            //当前action有rule
-            if (rule != null)
+            if(rule == null || rule.ActionType == 0)
             {
-                if(string.IsNullOrEmpty(rule.AllowRoles))//allowrole为空 限制未登录用户
+                throw new Exception("请求：/" + controller + "/" + action + " 未受控制");
+            }
+            else if (rule.ActionType == (int)EnumActionType.前台)
+            {
+                #region 前台
+                int role = 0;
+
+                //CurrentUser
+                string uid = filterContext.HttpContext.ReadCookie("UID");
+                if (!string.IsNullOrEmpty(uid))//已登录
                 {
-                    if (string.IsNullOrEmpty(loginType))//未登录
+                    string loginType = filterContext.HttpContext.ReadCookie("LoginType");
+                    string name = filterContext.HttpContext.ReadCookie("UName");
+                    string avatar = filterContext.HttpContext.ReadCookie("UAvatar");
+                    string login = filterContext.HttpContext.ReadCookie("GLogin");
+
+                    string sKEY = filterContext.HttpContext.ReadCookie("SKEY");
+                    if (sKEY != Utils.RijndaelEncrypt(uid))//SKEY检查
                     {
-                        filterContext.HttpContext.Response.RedirectToRoute(new { controller = "Home", action = "Error" });
+                        filterContext.HttpContext.Response.RedirectToRoute(new { controller = "OAuth", action = "LogOut" });
                         return;
-                    }
-                }
-                else//allowrole不为空 修改当前用户为CurrentManager
-                {
-                    //CurrentManager
-                    string mRole = "";
-                    string mid = filterContext.HttpContext.ReadEncodeCookie("MID");
-                    if (!string.IsNullOrEmpty(mid))
-                    {
-                        Manager manager = MyRedisDB.GetSet<Manager>(MyRedisKeys.Managers).Where(m => m.ID == Guid.Parse(mid)).FirstOrDefault();
-                        filterContext.HttpContext.User = new CurrentManager() { ID = Guid.Parse(mid), key = manager.Key, Role = manager.Role };
-                        mRole = manager.Role;
                     }
 
-                    if (string.IsNullOrEmpty(mRole) || !rule.AllowRoles.Contains(mRole))
+                    string[] rolecookie = Utils.RijndaelDecrypt(filterContext.HttpContext.ReadCookie("Role")).Split(';');
+                    if (rolecookie.Length != 2 || rolecookie[0] != uid)//角色检查
                     {
-                        //不是管理员且不是允许角色 不允许访问
-                        filterContext.HttpContext.Response.RedirectToRoute(new { controller = "Home", action = "Error" });
+                        filterContext.HttpContext.Response.RedirectToRoute(new { controller = "OAuth", action = "LogOut" });
                         return;
                     }
+
+                    role = int.Parse(rolecookie[1]);
+                    filterContext.HttpContext.User = new CurrentUser() { ID = Guid.Parse(uid), Name = name, AvatarUrl = avatar, LoginType = loginType, GitHubLogin = login, Role = role };
                 }
+                else
+                {
+                    uid = "null";
+                }
+                
+                //角色控制
+                if (rule.AllowRoles != null && rule.AllowRoles.Length > 0 && !rule.AllowRoles.Contains(role))
+                {
+                    throw new Exception("用户" + uid + "请求：/" + controller + "/" + action + " 没有权限");
+                }
+                #endregion
+            }
+            else if (rule.ActionType == (int)EnumActionType.后台)
+            {
+                #region 后台
+                int mRole = 0;
+
+                //CurrentManager 
+                string mid = filterContext.HttpContext.ReadEncodeCookie("MID");
+                if (!string.IsNullOrEmpty(mid))//已登录
+                {
+                    Manager manager = MyRedisDB.GetSet<Manager>(MyRedisKeys.Managers).Where(m => m.ID == Guid.Parse(mid)).FirstOrDefault();
+                    mRole = manager.Role;
+                    filterContext.HttpContext.User = new CurrentManager() { ID = Guid.Parse(mid), key = manager.Key, Role = mRole };
+                }
+                else
+                {
+                    mid = "null";
+                }
+
+                //角色控制
+                if (rule.AllowRoles != null && rule.AllowRoles.Length > 0 && !rule.AllowRoles.Contains(mRole))
+                {
+                    throw new Exception("用户" + mid + "请求：/" + controller + "/" + action + " 没有权限");
+                }
+                #endregion
             }
         }
     }

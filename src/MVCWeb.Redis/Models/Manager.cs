@@ -19,6 +19,6 @@ namespace MVCWeb.Redis.Models
 
         public string Value { get; set; }
 
-        public string Role { get; set; }
+        public int Role { get; set; }
     }
 }

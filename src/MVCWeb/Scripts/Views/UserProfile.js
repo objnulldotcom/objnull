@@ -6,6 +6,7 @@ function BlogDelete(id, page) {
         showCancelButton: true,
         confirmButtonColor: "#337ab7",
         confirmButtonText: "确定",
+        cancelButtonText: "取消",
         closeOnConfirm: true
     }, function () {
         $.ajax({
@@ -70,6 +71,7 @@ function NewBeeDelete(id, page) {
         showCancelButton: true,
         confirmButtonColor: "#337ab7",
         confirmButtonText: "确定",
+        cancelButtonText: "取消",
         closeOnConfirm: true
     }, function () {
         $.ajax({
@@ -135,6 +137,7 @@ function StarDelete(id, page, type) {
         showCancelButton: true,
         confirmButtonColor: "#337ab7",
         confirmButtonText: "确定",
+        cancelButtonText: "取消",
         closeOnConfirm: true
     }, function () {
         $.ajax({

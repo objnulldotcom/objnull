@@ -63,6 +63,21 @@ namespace MVCWeb.Model.Models
         /// 最后登录日期
         /// </summary>
         public DateTime LastLoginDate { get; set; }
+        
+        /// <summary>
+        /// 最后登录IP
+        /// </summary>
+        public string LastLoginIP { get; set; }
+
+        /// <summary>
+        /// 角色
+        /// </summary>
+        public int Role { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public int Status { get; set; }
 
         /// <summary>
         /// 姿势集合

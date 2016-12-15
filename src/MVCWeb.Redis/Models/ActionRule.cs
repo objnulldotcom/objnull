@@ -19,6 +19,8 @@ namespace MVCWeb.Redis.Models
 
         public string Action { get; set; }
 
-        public string AllowRoles { get; set; }
+        public int ActionType { get; set; }
+
+        public int[] AllowRoles { get; set; }
     }
 }

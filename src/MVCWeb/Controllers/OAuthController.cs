@@ -27,6 +27,7 @@ namespace MVCWeb.Controllers
                 {
                     NullUser user = NullUserDataSvc.GetByID(CurrentUser.ID);
                     user.LastLoginDate = DateTime.Now;
+                    user.LastLoginIP = HttpContext.Request.UserHostAddress;
                     NullUserDataSvc.Update(user);
                     HttpContext.WriteCookie("LastLogin", DateTime.Now.ToString(), DateTime.Now.AddDays(1).Date);
                 }
@@ -58,6 +59,8 @@ namespace MVCWeb.Controllers
             HttpContext.WriteCookie("LoginType", "", DateTime.Now.AddDays(-1));
             HttpContext.WriteCookie("GLogin", "", DateTime.Now.AddDays(-1));
             HttpContext.WriteCookie("SKEY", "", DateTime.Now.AddDays(-1));
+            HttpContext.WriteCookie("LastLogin", "", DateTime.Now.AddDays(-1));
+            HttpContext.WriteCookie("Role", "", DateTime.Now.AddDays(-1));
             return RedirectToAction("Index", "Home");
         }
 
@@ -81,6 +84,7 @@ namespace MVCWeb.Controllers
                     user.AvatarUrl = githubUser.avatar_url;
                     user.GitHubLogin = githubUser.login;
                     user.GitHubID = githubUser.id;
+                    user.Role = (int)EnumUserRole.普通;
                     NullUserDataSvc.Add(user);
                 }
                 else
@@ -99,6 +103,7 @@ namespace MVCWeb.Controllers
                 HttpContext.WriteCookie("LoginType", user.LoginType, DateTime.Now.AddYears(3));
                 HttpContext.WriteCookie("GLogin", githubUser.login, DateTime.Now.AddYears(3));
                 HttpContext.WriteCookie("SKEY", Utils.RijndaelEncrypt(user.ID.ToString()), DateTime.Now.AddYears(3));
+                HttpContext.WriteCookie("Role", Utils.RijndaelEncrypt(user.ID.ToString() + ";" + user.Role.ToString()), DateTime.Now.AddYears(3));
             }
             return true;
         }
