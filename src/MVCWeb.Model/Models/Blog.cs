@@ -59,11 +59,6 @@ namespace MVCWeb.Model.Models
         public int ProCount { get; set; }
 
         /// <summary>
-        /// 状态
-        /// </summary>
-        public int Status { get; set; }
-
-        /// <summary>
         /// 发布人ID
         /// </summary>
         public Guid OwnerID { get; set; }

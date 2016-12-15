@@ -27,7 +27,7 @@ namespace MVCWeb
         查看 = 1,
         点赞 = 2
     }
-
+    
     public enum EnumActionType
     {
         前台 = 1,

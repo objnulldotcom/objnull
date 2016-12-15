@@ -44,6 +44,11 @@ namespace MVCWeb.Model.Models
         public int Order { get; set; }
 
         /// <summary>
+        /// 垃圾评论
+        /// </summary>
+        public bool Delete { get; set; }
+
+        /// <summary>
         /// 发布人ID
         /// </summary>
         public Guid OwnerID { get; set; }

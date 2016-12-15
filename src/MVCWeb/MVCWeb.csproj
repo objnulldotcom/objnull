@@ -233,6 +233,7 @@
     <Content Include="Scripts\Views\BlogEdit.js" />
     <Content Include="Scripts\Views\BlogNew.js" />
     <Content Include="Scripts\Views\BlogView.js" />
+    <Content Include="Scripts\Views\DataManage.js" />
     <Content Include="Scripts\Views\LayoutMain.js" />
     <Content Include="Scripts\Views\NewBeeList.js" />
     <Content Include="Scripts\Views\NewBeeView.js" />
@@ -295,6 +296,8 @@
     <Content Include="Views\Home\NewBeeFloorPage.cshtml" />
     <Content Include="Views\Home\NewBeeFloorReplyPage.cshtml" />
     <Content Include="Views\Home\UserNewBeePage.cshtml" />
+    <Content Include="Views\Manager\DataManage.cshtml" />
+    <Content Include="Views\Manager\UserPage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

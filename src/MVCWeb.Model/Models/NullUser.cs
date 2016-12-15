@@ -75,11 +75,6 @@ namespace MVCWeb.Model.Models
         public int Role { get; set; }
 
         /// <summary>
-        /// 状态
-        /// </summary>
-        public int Status { get; set; }
-
-        /// <summary>
         /// 姿势集合
         /// </summary>
         public virtual ICollection<Blog> Blogs { get; set; }

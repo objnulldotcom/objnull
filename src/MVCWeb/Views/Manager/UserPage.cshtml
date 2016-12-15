@@ -1,0 +1,39 @@
+﻿@using MVCWeb;
+@using MVCWeb.Model.Models;
+@{
+    List<NullUser> UserList = ViewBag.UserList as List<NullUser>;
+}
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Github登录名</th>
+            <th>最后登录日期</th>
+            <th>最后登录IP</th>
+            <th>最后登录地址</th>
+            <th>角色</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    @foreach (NullUser user in UserList)
+    {
+        <tr>
+            <td>@user.GitHubLogin</td>
+            <td>@user.LastLoginDate</td>
+            <td>@user.LastLoginIP</td>
+            <td></td>
+            <td>@Enum.GetName(typeof(EnumUserRole), user.Role)</td>
+            <td></td>
+            <td>
+                <button onclick="">封禁</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                <button onclick="">启用</button>
+            </td>
+        </tr>
+    }
+</table>
+
+<input type="hidden" id="UserTotalCount" value="@ViewBag.TotalCount" />
+<input type="hidden" id="UserCurrentPage" value="@ViewBag.CurrentPage" />
+<div class="row" style="margin-bottom: -15px">
+    <div id="UserPager" class="col-md-12 text-center"></div>
+</div>

@@ -7,12 +7,14 @@ using System.Reflection;
 using System.Diagnostics;
 using MVCWeb.Redis.Base;
 using MVCWeb.Redis.Models;
+using MVCWeb.DataSvc.Svc;
 
 namespace MVCWeb.Controllers
 {
     public class ManagerController : Controller
     {
         public IMyRedisDB MyRedisDB { get; set; }
+        public INullUserDataSvc NullUserDataSvc { get; set; }
 
         #region Login&Out
 
@@ -168,5 +170,22 @@ namespace MVCWeb.Controllers
         }
 
         #endregion
+
+        //数据管理
+        public ActionResult DataManage()
+        {
+            return View();
+        }
+        
+        //用户列表
+        [HttpPost]
+        public ActionResult UserPage(int pageSize, int pageNum = 1)
+        {
+            int totalCount;
+            ViewBag.UserList = NullUserDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => true, u => u.InsertDate, true, out totalCount).ToList();
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            return View();
+        }
     }
 }
