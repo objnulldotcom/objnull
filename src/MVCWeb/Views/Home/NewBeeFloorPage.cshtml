@@ -28,7 +28,7 @@
                     <a id="ShowReply@(floor.Order)" class="BtnShowReply" href="javascript:;" style="text-decoration:none" onclick="ShowReply(@floor.Order, 1)" recount="@floor.ReplyCount">
                         @if (floor.ReplyCount > 0)
                         { @Html.Raw(floor.ReplyCount + "条回复") }
-                        else if (ViewBag.Login)
+                        else if (ViewBag.Login && string.IsNullOrEmpty(ViewBag.DisableMsg))
                         { @Html.Raw("回复") }
                     </a>&nbsp;
                     <span><span class="glyphicon glyphicon-list"></span>&nbsp;@floor.Order 楼</span>&nbsp;
@@ -43,18 +43,21 @@
                     <div class="row">
                         @if (ViewBag.Login)
                         {
-                            <div class="col-md-10">
-                                <div class="input-group">
-                                    <div class="input-group-addon">
-                                        <span id="ReplyToUser@(floor.Order)">@@@userName.MaxByteLength(20) </span>
-                                        <a id="DefaultUser@(floor.Order)" href="javascript:;" style="display:none" onclick="ReplyDefault(@floor.Order,'@userName.MaxByteLength(20)','@floor.Owner.ID')"><span class="badge">x</span></a>
+                            if (string.IsNullOrEmpty(ViewBag.DisableMsg))
+                            {
+                                <div class="col-md-10">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <span id="ReplyToUser@(floor.Order)">@@@userName.MaxByteLength(20) </span>
+                                            <a id="DefaultUser@(floor.Order)" href="javascript:;" style="display:none" onclick="ReplyDefault(@floor.Order,'@userName.MaxByteLength(20)','@floor.Owner.ID')"><span class="badge">x</span></a>
+                                        </div>
+                                        <input id="ReplyTxt@(floor.Order)" type="text" class="form-control" touser="@floor.OwnerID" />
                                     </div>
-                                    <input id="ReplyTxt@(floor.Order)" type="text" class="form-control" touser="@floor.OwnerID" />
                                 </div>
-                            </div>
-                            <div class="col-md-2 text-right">
-                                <button class="btn btn-default" onclick="AddReply(@floor.Order)">确定</button>
-                            </div>
+                                <div class="col-md-2 text-right">
+                                    <button class="btn btn-default" onclick="AddReply(@floor.Order)">确定</button>
+                                </div>
+                            }
                         }
                     </div>
                 </div>

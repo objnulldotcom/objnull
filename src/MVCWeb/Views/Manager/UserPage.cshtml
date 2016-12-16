@@ -1,7 +1,9 @@
 ﻿@using MVCWeb;
 @using MVCWeb.Model.Models;
+@using MVCWeb.Redis.Models;
 @{
     List<NullUser> UserList = ViewBag.UserList as List<NullUser>;
+    IEnumerable<DisabledUser> DisabledUsers = ViewBag.DisabledUsers as IEnumerable<DisabledUser>;
 }
 <table class="table table-hover">
     <thead>
@@ -23,10 +25,26 @@
             <td>@user.LastLoginIP</td>
             <td></td>
             <td>@Enum.GetName(typeof(EnumUserRole), user.Role)</td>
-            <td></td>
+            <td style="width: 240px">
+                @foreach(DisabledUser du in DisabledUsers.Where(d => d.UserID == user.ID && d.AbleDate > DateTime.Now))
+                {
+                    <div>禁-@(Enum.GetName(typeof(EnumObjectType), du.ObjectType))至@(du.AbleDate)</div>
+                }
+            </td>
             <td>
-                <button onclick="">封禁</button>&nbsp;&nbsp;&nbsp;&nbsp;
-                <button onclick="">启用</button>
+                @foreach (object value in Enum.GetValues(typeof(EnumObjectType)))
+                {
+                    if (DisabledUsers.Where(d => d.UserID == user.ID && d.ObjectType == (int)value && d.AbleDate > DateTime.Now).Count() > 0)
+                    {
+                        <button onclick="UserOperate('启', '@user.ID', @((int)value))">启-@(Enum.GetName(typeof(EnumObjectType), value))</button>
+                    }
+                    else
+                    {
+                        <button onclick="UserOperate('禁', '@user.ID', @((int)value))">禁-@(Enum.GetName(typeof(EnumObjectType), value))</button>
+                    }
+                    <span>&nbsp;</span>
+                }
+                <input id="TxtDisableDay" type="text" style="width: 30px" />天
             </td>
         </tr>
     }

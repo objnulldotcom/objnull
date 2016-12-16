@@ -19,7 +19,10 @@
                     <a href="@Url.Action("UserProfile", "Home", new { id = reply.Owner.ID })" target="_blank">@userName.MaxByteLength(20)</a>&nbsp;回复&nbsp;
                     <a href="@Url.Action("UserProfile", "Home", new { id = reply.ToUserID })" target="_blank">@toUserName.MaxByteLength(20)</a>&nbsp;
                     <span title="回复时间"><span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToBlurDate()</span>&nbsp;
-                    <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.COrder, '@userName.MaxByteLength(20)', '@reply.Owner.ID')">回复</a>
+                    @if (ViewBag.Login && string.IsNullOrEmpty(ViewBag.DisableMsg))
+                    {
+                        <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.COrder, '@userName.MaxByteLength(20)', '@reply.Owner.ID')">回复</a>
+                    }
                 </span>
                 <p>@Html.Raw(reply.Content)</p>
             </div>

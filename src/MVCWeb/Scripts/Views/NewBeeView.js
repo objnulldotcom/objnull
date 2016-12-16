@@ -54,7 +54,7 @@ function NewBeeFloorPage(index) {
                 }
             });
             $(".BtnShowReply").each(function () {
-                if ($(this).html().trim() != "回复") {
+                if ($(this).html().trim().length > 2) {
                     $(this).click();
                 }
             });

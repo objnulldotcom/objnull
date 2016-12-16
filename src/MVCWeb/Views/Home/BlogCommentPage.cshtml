@@ -17,12 +17,12 @@
                 <a href="@Url.Action("UserProfile", "Home", new { id = comment.Owner.ID })" target="_blank" style="text-decoration:none">
                     <img class="img-rounded" style="max-width: 32px" src="@comment.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName">
                 </a>
-                <a href="@Url.Action("UserProfile", "Home", new { id = comment.Owner.ID })" target="_blank" >@userName.MaxByteLength(20)</a>
+                <a href="@Url.Action("UserProfile", "Home", new { id = comment.Owner.ID })" target="_blank">@userName.MaxByteLength(20)</a>
                 <span class="fs2" title="评论时间"><span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToBlurDate()</span>
                 <a id="ShowReply@(comment.Order)" href="javascript:;" style="text-decoration:none" onclick="ShowReply(@comment.Order, 1)" recount="@comment.ReplyCount">
                     @if (comment.ReplyCount > 0)
                     { @Html.Raw(comment.ReplyCount + "条回复") }
-                    else if (ViewBag.Login)
+                    else if (ViewBag.Login && string.IsNullOrEmpty(ViewBag.DisableMsg))
                     { @Html.Raw("回复") }
                 </a>
             </div>
@@ -33,7 +33,7 @@
                     <div id="Replys@(comment.Order)" class="col-md-12">
                     </div>
                 </div>
-                @if (ViewBag.Login)
+                @if (ViewBag.Login && string.IsNullOrEmpty(ViewBag.DisableMsg))
                 {
                     <div class="row">
                         <div class="col-md-11">

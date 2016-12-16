@@ -38,22 +38,26 @@ namespace MVCWeb.Controllers
         public ActionResult UserProfile(string id = null)
         {
             Guid userID = id == null ? CurrentUser.ID : Guid.Parse(id);
-            ViewBag.Owner = userID == CurrentUser.ID;
             NullUser user = NullUserDataSvc.GetByID(userID);
             ViewBag.User = user;
-            NullUser cuser = NullUserDataSvc.GetByID(CurrentUser.ID);
-            ViewBag.Token = cuser.GitHubAccessToken;
 
-            ViewBag.ShowPro = false;
-            string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
-            IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
-            if (userRecords.Count() == 0)
+            ViewBag.Login = CurrentUser != null;
+            ViewBag.Owner = ViewBag.Login ? userID == CurrentUser.ID : false;
+            if (ViewBag.Login)
             {
-                ViewBag.ShowPro = true;
-            }
-            else if (userRecords.Where(r => r.ObjID == userID && r.type == (int)EnumRecordType.点赞).Count() == 0)
-            {
-                ViewBag.ShowPro = true;
+                NullUser cuser = NullUserDataSvc.GetByID(CurrentUser.ID);
+                ViewBag.Token = cuser.GitHubAccessToken;
+                ViewBag.ShowPro = false;
+                string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
+                IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
+                if (userRecords.Count() == 0)
+                {
+                    ViewBag.ShowPro = true;
+                }
+                else if (userRecords.Where(r => r.ObjID == userID && r.type == (int)EnumRecordType.点赞).Count() == 0)
+                {
+                    ViewBag.ShowPro = true;
+                }
             }
 
             return View();
@@ -63,7 +67,7 @@ namespace MVCWeb.Controllers
         [HttpPost]
         public ActionResult UserBlogPage(Guid uid, int pageSize, int pageNum = 1)
         {
-            ViewBag.Owner = uid == CurrentUser.ID;
+            ViewBag.Owner = CurrentUser == null ? false : uid == CurrentUser.ID;
             int totalCount;
             ViewBag.UserBlogs = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, b => b.OwnerID == uid, b => b.InsertDate, true, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
@@ -75,7 +79,7 @@ namespace MVCWeb.Controllers
         [HttpPost]
         public ActionResult UserNewBeePage(Guid uid, int pageSize, int pageNum = 1)
         {
-            ViewBag.Owner = uid == CurrentUser.ID;
+            ViewBag.Owner = CurrentUser == null ? false : uid == CurrentUser.ID;
             int totalCount;
             ViewBag.UserNewBees = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, b => b.OwnerID == uid, b => b.InsertDate, true, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
@@ -196,6 +200,11 @@ namespace MVCWeb.Controllers
                 Blog draft = JsonConvert.DeserializeObject<Blog>(draftval);
                 ViewBag.DraftBlog = draft;
             }
+            DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.姿势 && d.AbleDate > DateTime.Now).FirstOrDefault();
+            if (user != null)
+            {
+                ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
+            }
             return View();
         }
 
@@ -231,6 +240,11 @@ namespace MVCWeb.Controllers
         [ValidateInput(false)]
         public ActionResult BlogNew(int type, string title, string mdTxt, string mdValue)
         {
+            DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.姿势 && d.AbleDate > DateTime.Now).FirstOrDefault();
+            if (user != null)
+            {
+                return Json(new { msg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss") });
+            }
             if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
             {
                 return Json(new { msg = "参数错误" });
@@ -389,6 +403,15 @@ namespace MVCWeb.Controllers
             }
             #endregion
 
+            if(ViewBag.Login)
+            {
+                DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.姿势 && d.AbleDate > DateTime.Now).FirstOrDefault();
+                if (user != null)
+                {
+                    ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
+                }
+            }
+
             return View();
         }
 
@@ -486,6 +509,11 @@ namespace MVCWeb.Controllers
         [ValidateInput(false)]
         public ActionResult AddBlogComment(Guid blogID, string mdTxt, string mdValue)
         {
+            DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.姿势 && d.AbleDate > DateTime.Now).FirstOrDefault();
+            if (user != null)
+            {
+                return Json(new { msg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss") });
+            }
             if (string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
             {
                 return Json(new { msg = "参数错误" });
@@ -543,6 +571,16 @@ namespace MVCWeb.Controllers
             ViewBag.BlogCommentList = BlogCommentDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogID == blogID && !it.Delete, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
+
+            if(ViewBag.Login)
+            {
+                DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.姿势 && d.AbleDate > DateTime.Now).FirstOrDefault();
+                if (user != null)
+                {
+                    ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
+                }
+            }
+
             return View();
         }
 
@@ -551,6 +589,11 @@ namespace MVCWeb.Controllers
         [ValidateInput(false)]
         public ActionResult AddBlogCommentReply(Guid commentID, Guid toUserID, string txt)
         {
+            DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.姿势 && d.AbleDate > DateTime.Now).FirstOrDefault();
+            if (user != null)
+            {
+                return Json(new { msg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss") });
+            }
             if (string.IsNullOrEmpty(txt))
             {
                 return Json(new { msg = "参数错误" });
@@ -595,10 +638,21 @@ namespace MVCWeb.Controllers
         public ActionResult BlogCommentReplyPage(Guid commentID, int corder, int pageSize, int pageNum = 1)
         {
             int totalCount;
+            ViewBag.Login = CurrentUser != null;
             ViewBag.BlogCommentReplyList = BlogCommentReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogCommentID == commentID && !it.Delete, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             ViewBag.COrder = corder;
+
+            if (ViewBag.Login)
+            {
+                DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.姿势 && d.AbleDate > DateTime.Now).FirstOrDefault();
+                if (user != null)
+                {
+                    ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
+                }
+            }
+
             return View();
         }
 
@@ -610,6 +664,14 @@ namespace MVCWeb.Controllers
         public ActionResult NewBeeList()
         {
             ViewBag.Login = CurrentUser != null;
+            if(ViewBag.Login)
+            {
+                DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.NewBee && d.AbleDate > DateTime.Now).FirstOrDefault();
+                if (user != null)
+                {
+                    ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
+                }
+            }
             return View();
         }
 
@@ -618,6 +680,11 @@ namespace MVCWeb.Controllers
         [ValidateInput(false)]
         public ActionResult NewNewBee(string title, string mdTxt, string mdValue)
         {
+            DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.NewBee && d.AbleDate > DateTime.Now).FirstOrDefault();
+            if (user != null)
+            {
+                return Json(new { msg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss") });
+            }
             if (string.IsNullOrEmpty(title) || string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
             {
                 return Json(new { msg = "参数错误" });
@@ -716,6 +783,12 @@ namespace MVCWeb.Controllers
                 {
                     ViewBag.ShowStar = false;
                 }
+
+                DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.NewBee && d.AbleDate > DateTime.Now).FirstOrDefault();
+                if (user != null)
+                {
+                    ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
+                }
             }
 
             return View();
@@ -790,6 +863,11 @@ namespace MVCWeb.Controllers
         [ValidateInput(false)]
         public ActionResult AddNewBeeFloor(Guid NewBeeID, string mdTxt, string mdValue)
         {
+            DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.NewBee && d.AbleDate > DateTime.Now).FirstOrDefault();
+            if (user != null)
+            {
+                return Json(new { msg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss") });
+            }
             if (string.IsNullOrEmpty(mdTxt) || string.IsNullOrEmpty(mdValue))
             {
                 return Json(new { msg = "参数错误" });
@@ -849,6 +927,15 @@ namespace MVCWeb.Controllers
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             ViewBag.ShowPager = totalCount > pageSize;
+
+            if(ViewBag.Login)
+            {
+                DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.NewBee && d.AbleDate > DateTime.Now).FirstOrDefault();
+                if (user != null)
+                {
+                    ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
+                }
+            }
             return View();
         }
 
@@ -857,6 +944,11 @@ namespace MVCWeb.Controllers
         [ValidateInput(false)]
         public ActionResult AddNewBeeFloorReply(Guid floorID, Guid toUserID, string txt)
         {
+            DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.NewBee && d.AbleDate > DateTime.Now).FirstOrDefault();
+            if (user != null)
+            {
+                return Json(new { msg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss") });
+            }
             if (string.IsNullOrEmpty(txt))
             {
                 return Json(new { msg = "参数错误" });
@@ -901,10 +993,20 @@ namespace MVCWeb.Controllers
         public ActionResult NewBeeFloorReplyPage(Guid floorID, int corder, int pageSize, int pageNum = 1)
         {
             int totalCount;
+            ViewBag.Login = CurrentUser != null;
             ViewBag.NewBeeFloorReplyList = NewBeeFloorReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.NewBeeFloorID == floorID && !it.Delete, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             ViewBag.COrder = corder;
+
+            if (ViewBag.Login)
+            {
+                DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.NewBee && d.AbleDate > DateTime.Now).FirstOrDefault();
+                if (user != null)
+                {
+                    ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
+                }
+            }
             return View();
         }
         #endregion
@@ -912,11 +1014,11 @@ namespace MVCWeb.Controllers
         #region Msg
 
         //未读消息数量
-        public string GetMsgCount()
+        public ActionResult GetMsgCount()
         {
             string Ckey = MyRedisKeys.Pre_CMsg + CurrentUser.ID;
             string Rkey = MyRedisKeys.Pre_RMsg + CurrentUser.ID;
-            return (MyRedisDB.RedisDB.SetLength(Ckey) + MyRedisDB.RedisDB.SetLength(Rkey)).ToString();
+            return Content((MyRedisDB.RedisDB.SetLength(Ckey) + MyRedisDB.RedisDB.SetLength(Rkey)).ToString());
         }
 
         //未读消息

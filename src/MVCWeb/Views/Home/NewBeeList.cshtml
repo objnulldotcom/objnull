@@ -29,40 +29,62 @@
     </div>
 </div>
 <hr />
-<div class="row">
-    <div class="col-md-8 col-md-offset-2">
-        <div class="row" style="padding-bottom: 10px">
-            <div class="col-md-12">
-                <input id="TxtTitle" class="form-control" type="text" placeholder="标题" />
-            </div>
-        </div>
-        <div class="row" style="padding-bottom: 10px">
-            <div class="col-md-3">
-                <ul class="nav nav-pills" role="tablist">
-                    <li role="presentation" class="active"><a href="javascript:;" id="BtnCmt">内容</a></li>
-                    <li role="presentation"><a href="javascript:;" id="BtnPre">预览</a></li>
-                </ul>
-            </div>
-            <div class="col-md-9 text-right" style="line-height: 40px">
-                <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法，</a></span>
-                <input id="JqueryUpload" class="uploader" type="file" name="upFile" data-url="@Url.Action("JqueryUploadImg", "File", new { pt = (int)EnumObjectType.NewBee })" style="display:none">
-                <span>拖拽或<a id="TxtChoseFile" href="javascript:;">选择图片</a>上传（chrome内核支持截图粘贴）</span>
-                <span id="UpPercent" style="color:#ff6a00"></span>
-            </div>
-            <input id="ValPt" type="hidden" value="@((int)EnumObjectType.NewBee)" />
-        </div>
+@if (ViewBag.Login)
+{
+    if (string.IsNullOrEmpty(ViewBag.DisableMsg))
+    {
         <div class="row">
-            <div id="PreBox" class="col-md-12 mdv" style="min-height: 50px">
-            </div>
-            <div id="EditBox" class="col-md-12">
-                <textarea id="CmtTxt" class="form-control" rows="5" style="resize:vertical;"></textarea>
+            <div class="col-md-8 col-md-offset-2">
+                <div class="row" style="padding-bottom: 10px">
+                    <div class="col-md-12">
+                        <input id="TxtTitle" class="form-control" type="text" placeholder="标题" />
+                    </div>
+                </div>
+                <div class="row" style="padding-bottom: 10px">
+                    <div class="col-md-3">
+                        <ul class="nav nav-pills" role="tablist">
+                            <li role="presentation" class="active"><a href="javascript:;" id="BtnCmt">内容</a></li>
+                            <li role="presentation"><a href="javascript:;" id="BtnPre">预览</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-9 text-right" style="line-height: 40px">
+                        <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法，</a></span>
+                        <input id="JqueryUpload" class="uploader" type="file" name="upFile" data-url="@Url.Action("JqueryUploadImg", "File", new { pt = (int)EnumObjectType.NewBee })" style="display:none">
+                        <span>拖拽或<a id="TxtChoseFile" href="javascript:;">选择图片</a>上传（chrome内核支持截图粘贴）</span>
+                        <span id="UpPercent" style="color:#ff6a00"></span>
+                    </div>
+                    <input id="ValPt" type="hidden" value="@((int)EnumObjectType.NewBee)" />
+                </div>
+                <div class="row">
+                    <div id="PreBox" class="col-md-12 mdv" style="min-height: 50px">
+                    </div>
+                    <div id="EditBox" class="col-md-12">
+                        <textarea id="CmtTxt" class="form-control" rows="5" style="resize:vertical;"></textarea>
+                    </div>
+                </div>
+                <div class="row" style="padding: 10px 0px">
+                    <div class="col-md-12 text-center">
+                        <button id="BtnConfirm" class="btn btn-default">确定</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row" style="padding: 10px 0px">
-            <div class="col-md-12 text-center">
-                <button id="BtnConfirm" class="btn btn-default">确定</button>
+    }
+    else
+    {
+        <div class="row" style="padding: 30px 0px">
+            <div class="col-md-8 col-md-offset-2 text-center">
+                @ViewBag.DisableMsg
             </div>
+        </div>
+    }
+}
+else
+{
+    <div class="row" style="padding: 30px 0px">
+        <div class="col-md-8 col-md-offset-2 text-center">
+            请登录后TreeNewBee
         </div>
     </div>
-</div>
+}
 

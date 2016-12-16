@@ -179,13 +179,59 @@ namespace MVCWeb.Controllers
         
         //用户列表
         [HttpPost]
-        public ActionResult UserPage(int pageSize, int pageNum = 1)
+        public ActionResult UserPage(int pageSize, int pageNum = 1, string condition = "")
         {
             int totalCount;
-            ViewBag.UserList = NullUserDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => true, u => u.InsertDate, true, out totalCount).ToList();
+            if(string.IsNullOrEmpty(condition))
+            {
+                ViewBag.UserList = NullUserDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => true, u => u.InsertDate, true, out totalCount).ToList();
+            }
+            else
+            {
+                Guid id = Guid.Empty;
+                if(Guid.TryParse(condition, out id))
+                {
+                    ViewBag.UserList = NullUserDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => u.ID == id, u => u.InsertDate, true, out totalCount).ToList();
+                }
+                else
+                {
+                    ViewBag.UserList = NullUserDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => u.GitHubLogin.Contains(condition), u => u.InsertDate, true, out totalCount).ToList();
+                }
+            }
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
+            ViewBag.DisabledUsers = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers);
             return View();
+        }
+
+        //启禁用户
+        [HttpPost]
+        public ActionResult UserOperate(string type, Guid uid, int objectType, int days = 0)
+        {
+            if(type == "启")
+            {
+                DisabledUser du = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == uid && d.ObjectType == objectType).FirstOrDefault();
+                MyRedisDB.SetRemove(MyRedisKeys.DisabledUsers, du);
+            }
+            else
+            {
+                DisabledUser du = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == uid && d.ObjectType == objectType).FirstOrDefault();
+                if(du == null)
+                {
+                    du = new DisabledUser();
+                    du.UserID = uid;
+                    du.ObjectType = objectType;
+                    du.AbleDate = DateTime.Now.AddDays(days);
+                    MyRedisDB.SetAdd(MyRedisKeys.DisabledUsers, du);
+                }
+                else
+                {
+                    MyRedisDB.SetRemove(MyRedisKeys.DisabledUsers, du);
+                    du.AbleDate = DateTime.Now.AddDays(days);
+                    MyRedisDB.SetAdd(MyRedisKeys.DisabledUsers, du);
+                }
+            }
+            return Json(new { msg = "done" });
         }
     }
 }

@@ -52,6 +52,7 @@
     <Compile Include="Base\MyRedisDB.cs" />
     <Compile Include="Base\MyRedisDBFactory.cs" />
     <Compile Include="Base\MyRedisKeys.cs" />
+    <Compile Include="Models\DisabledUser.cs" />
     <Compile Include="Models\UserStarCache.cs" />
     <Compile Include="Models\UserRecord.cs" />
     <Compile Include="Models\RMsg.cs" />

@@ -51,13 +51,13 @@
 </div>
 <div id="Status" class="row" style="margin-top: 15px">
     <div class="col-md-6" style="line-height: 40px; height: 40px">
-        @{ 
+        @{
             string userName = string.IsNullOrEmpty(Blog.Owner.Name) ? Blog.Owner.GitHubLogin : Blog.Owner.Name;
         }
         <a href="@Url.Action("UserProfile", "Home", new { id = Blog.Owner.ID })" target="_blank" style="text-decoration:none">
             <img class="img-rounded" style="max-width: 32px" src="@Blog.Owner.AvatarUrl&s=32" height="32" width="32" alt="@userName" title="@userName">
         </a>
-        <span><a href="@Url.Action("UserProfile", "Home", new { id = Blog.Owner.ID })" target="_blank">@userName.MaxByteLength(20)</a> post at&nbsp;</span> 
+        <span><a href="@Url.Action("UserProfile", "Home", new { id = Blog.Owner.ID })" target="_blank">@userName.MaxByteLength(20)</a> post at&nbsp;</span>
         <span title="发布日期"><span class="glyphicon glyphicon-time"></span>@Blog.InsertDate.ToString("yyyy-MM-dd HH:mm")&nbsp;</span>
         <span title="查看次数"><span class="glyphicon glyphicon-eye-open"></span>@Blog.ViewCount&nbsp;</span>
         <span title="评论次数"><span class="glyphicon glyphicon-comment"></span><span id="CommentCount">@Blog.CommentCount</span>&nbsp;</span>
@@ -122,17 +122,27 @@
 
     </div>
     <div id="EditBox" class="col-md-12">
-        <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法</a></span>
-        <textarea id="CmtTxt" class="form-control" rows="5" style="resize:vertical;"></textarea>
+        @if (string.IsNullOrEmpty(ViewBag.DisableMsg))
+        {
+            <span>查看&nbsp;<a href="http://mvc.objnull.com/zh/Demo/MarkDownSyntax" target="_blank">MarkDown语法</a></span>
+            <textarea id="CmtTxt" class="form-control" rows="5" style="resize:vertical;"></textarea>
+        }
+        else
+        {
+            @ViewBag.DisableMsg
+        }
     </div>
 </div>
 <div class="row CommentBox" style="padding: 10px 0px">
-    <div class="col-md-5 text-right">
-        <button id="BtnConfirm" class="btn btn-default">确定</button>
-    </div>
-    <div class="col-md-5 col-md-offset-2 text-left">
-        <button id="BtnCancel" class="btn btn-default">取消</button>
-    </div>
+    @if (string.IsNullOrEmpty(ViewBag.DisableMsg))
+    {
+        <div class="col-md-5 text-right">
+            <button id="BtnConfirm" class="btn btn-default">确定</button>
+        </div>
+        <div class="col-md-5 col-md-offset-2 text-left">
+            <button id="BtnCancel" class="btn btn-default">取消</button>
+        </div>
+    }
 </div>
 <input id="ValBlogID" type="hidden" value="@Blog.ID" />
 <input id="ValBlogOwnerID" type="hidden" value="@Blog.OwnerID" />
