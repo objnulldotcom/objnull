@@ -35,8 +35,8 @@ function UserPage(index) {
 }
 
 //操作用户
-function UserOperate(type, uid, ot) {
-    var days = $("#TxtDisableDay").val();
+function UserOperate(type, uid, ot, i) {
+    var days = $("#TxtDisableDay" + i).val();
     if (type == "启") {
         days = 0;
     }
@@ -51,6 +51,7 @@ function UserOperate(type, uid, ot) {
         success: function (result) {
             if (result.msg == "done") {
                 UserPage($("#UserCurrentPage").val());
+                SendNewMsg(uid);
             } else {
                 swal("系统错误");
             }
@@ -58,6 +59,19 @@ function UserOperate(type, uid, ot) {
     });
 }
 
+var MsgHub;
+//发送更新消息
+function SendNewMsg(id) {
+    MsgHub.server.sendToUser(id, "NewMsg");
+}
+
 $(function () {
+    //SignalR消息
+    MsgHub = $.connection.MsgHub;
+    //启动SignalR不可少
+    $.connection.hub.start().done(function () {
+
+    });
+
     UserPage(1);
 })

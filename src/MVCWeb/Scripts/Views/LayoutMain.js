@@ -37,6 +37,7 @@ $(function () {
             UpdateMsgCount();
         }
     };
+    //启动SignalR不可少
     $.connection.hub.start().done(function () {
 
     });
@@ -158,6 +159,21 @@ function DelRMsg(objID, co, ro, order) {
 function CheckRMsg(url, objID, co, ro) {
     DelRMsg(objID, co, ro, 0);
     window.location.href = url;
+}
+
+//删除系统消息
+function DelSysMsg(date, order) {
+    $.ajax({
+        url: "/Home/DeleteSysMsg",
+        type: "post",
+        data: { date: date },
+        success: function (result) {
+            UpdateMsgCount();
+            if (order > 0) {
+                $("#SysMsgBar" + order).remove();
+            }
+        }
+    });
 }
 
 //清空消息

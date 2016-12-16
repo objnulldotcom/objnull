@@ -17,8 +17,12 @@
             <th>操作</th>
         </tr>
     </thead>
+    @{ 
+        int i = 0;
+    }
     @foreach (NullUser user in UserList)
     {
+        i++;
         <tr>
             <td>@user.GitHubLogin</td>
             <td>@user.LastLoginDate</td>
@@ -36,15 +40,15 @@
                 {
                     if (DisabledUsers.Where(d => d.UserID == user.ID && d.ObjectType == (int)value && d.AbleDate > DateTime.Now).Count() > 0)
                     {
-                        <button onclick="UserOperate('启', '@user.ID', @((int)value))">启-@(Enum.GetName(typeof(EnumObjectType), value))</button>
+                        <button onclick="UserOperate('启', '@user.ID', @((int)value), @i)">启-@(Enum.GetName(typeof(EnumObjectType), value))</button>
                     }
                     else
                     {
-                        <button onclick="UserOperate('禁', '@user.ID', @((int)value))">禁-@(Enum.GetName(typeof(EnumObjectType), value))</button>
+                        <button onclick="UserOperate('禁', '@user.ID', @((int)value), @i)">禁-@(Enum.GetName(typeof(EnumObjectType), value))</button>
                     }
                     <span>&nbsp;</span>
                 }
-                <input id="TxtDisableDay" type="text" style="width: 30px" />天
+                <input id="TxtDisableDay@(i)" type="text" style="width: 30px" />天
             </td>
         </tr>
     }

@@ -78,27 +78,35 @@ namespace MVCWeb
                 string uid = filterContext.HttpContext.ReadCookie("UID");
                 if (!string.IsNullOrEmpty(uid))//已登录
                 {
-                    string loginType = filterContext.HttpContext.ReadCookie("LoginType");
-                    string name = filterContext.HttpContext.ReadCookie("UName");
-                    string avatar = filterContext.HttpContext.ReadCookie("UAvatar");
-                    string login = filterContext.HttpContext.ReadCookie("GLogin");
-
-                    string sKEY = filterContext.HttpContext.ReadCookie("SKEY");
-                    if (sKEY != Utils.RijndaelEncrypt(uid))//SKEY检查
+                    try
                     {
-                        filterContext.HttpContext.Response.RedirectToRoute(new { controller = "OAuth", action = "LogOut" });
-                        return;
-                    }
+                        string loginType = filterContext.HttpContext.ReadCookie("LoginType");
+                        string name = filterContext.HttpContext.ReadCookie("UName");
+                        string avatar = filterContext.HttpContext.ReadCookie("UAvatar");
+                        string login = filterContext.HttpContext.ReadCookie("GLogin");
 
-                    string[] rolecookie = Utils.RijndaelDecrypt(filterContext.HttpContext.ReadCookie("Role")).Split(';');
-                    if (rolecookie.Length != 2 || rolecookie[0] != uid)//角色检查
+                        string sKEY = filterContext.HttpContext.ReadCookie("SKEY");
+                        if (sKEY != Utils.RijndaelEncrypt(uid))//SKEY检查
+                        {
+                            filterContext.HttpContext.Response.RedirectToRoute(new { controller = "OAuth", action = "LogOut" });
+                            return;
+                        }
+
+                        string[] rolecookie = Utils.RijndaelDecrypt(filterContext.HttpContext.ReadCookie("Role")).Split(';');
+                        if (rolecookie.Length != 2 || rolecookie[0] != uid)//角色检查
+                        {
+                            filterContext.HttpContext.Response.RedirectToRoute(new { controller = "OAuth", action = "LogOut" });
+                            return;
+                        }
+
+                        role = int.Parse(rolecookie[1]);
+                        filterContext.HttpContext.User = new CurrentUser() { ID = Guid.Parse(uid), Name = name, AvatarUrl = avatar, LoginType = loginType, GitHubLogin = login, Role = role };
+                    }
+                    catch
                     {
+                        //读取cookie错误时清除cookie
                         filterContext.HttpContext.Response.RedirectToRoute(new { controller = "OAuth", action = "LogOut" });
-                        return;
                     }
-
-                    role = int.Parse(rolecookie[1]);
-                    filterContext.HttpContext.User = new CurrentUser() { ID = Guid.Parse(uid), Name = name, AvatarUrl = avatar, LoginType = loginType, GitHubLogin = login, Role = role };
                 }
                 else
                 {

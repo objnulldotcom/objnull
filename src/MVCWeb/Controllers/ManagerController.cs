@@ -212,6 +212,13 @@ namespace MVCWeb.Controllers
             {
                 DisabledUser du = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == uid && d.ObjectType == objectType).FirstOrDefault();
                 MyRedisDB.SetRemove(MyRedisKeys.DisabledUsers, du);
+                SysMsg msg = new SysMsg();
+                msg.Date = DateTime.Now;
+                msg.Title = "你的账号已解封";
+                msg.Msg = "你的账号在" + Enum.GetName(typeof(EnumObjectType), objectType) + "版块中已解封";
+                string key = MyRedisKeys.Pre_SysMsg + uid;
+                MyRedisDB.SetAdd(key, msg);
+
             }
             else
             {
@@ -230,6 +237,13 @@ namespace MVCWeb.Controllers
                     du.AbleDate = DateTime.Now.AddDays(days);
                     MyRedisDB.SetAdd(MyRedisKeys.DisabledUsers, du);
                 }
+
+                SysMsg msg = new SysMsg();
+                msg.Date = DateTime.Now;
+                msg.Title = "你的账号被封禁";
+                msg.Msg = "你在" + Enum.GetName(typeof(EnumObjectType), objectType) + "版块被封禁至" + du.AbleDate.ToString("yyyy-MM-dd HH:mm");
+                string key = MyRedisKeys.Pre_SysMsg + uid;
+                MyRedisDB.SetAdd(key, msg);
             }
             return Json(new { msg = "done" });
         }

@@ -2,10 +2,27 @@
 @{
     IEnumerable<CMsg> NewComments = ViewBag.NewComments;
     IEnumerable<RMsg> NewReplys = ViewBag.NewReplys;
+    IEnumerable<SysMsg> SysMsgs = ViewBag.SysMsgs;
     int i = 0;
     int j = 0;
 }
 <div class="fs2" style="padding-left: 5px; padding-right: 5px; min-width: 250px; max-height: 500px; overflow:auto;">
+    @foreach (SysMsg msg in SysMsgs)
+    {
+        i++;
+        <div id="SysMsgBar@(i)" class="MsgBar">
+            <div>
+                <span style="color:red">@msg.Title</span>
+                <span style="float:right">
+                    <a id="BtnDelMsg" style="display:none; text-decoration:none" href="javascript:;" onclick="DelSysMsg('@msg.Date', @i)">删除</a>
+                    @msg.Date.ToBlurDate()
+                </span>
+            </div>
+            <div style="border-bottom: 1px solid #eee;">
+                @msg.Msg
+            </div>
+        </div>
+    }
     @foreach (CMsg msg in NewComments)
     {
         i++;

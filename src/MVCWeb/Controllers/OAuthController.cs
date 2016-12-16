@@ -22,7 +22,8 @@ namespace MVCWeb.Controllers
             if (CurrentUser != null)
             {
                 ViewBag.User = CurrentUser;
-                ViewBag.MsgCount = MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_CMsg + CurrentUser.ID) + MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_RMsg + CurrentUser.ID);
+                ViewBag.MsgCount = MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_CMsg + CurrentUser.ID) 
+                    + MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_RMsg + CurrentUser.ID) + MyRedisDB.RedisDB.SetLength(MyRedisKeys.Pre_SysMsg + CurrentUser.ID);
                 if (string.IsNullOrEmpty(HttpContext.ReadCookie("LastLogin")))
                 {
                     NullUser user = NullUserDataSvc.GetByID(CurrentUser.ID);

@@ -1018,7 +1018,8 @@ namespace MVCWeb.Controllers
         {
             string Ckey = MyRedisKeys.Pre_CMsg + CurrentUser.ID;
             string Rkey = MyRedisKeys.Pre_RMsg + CurrentUser.ID;
-            return Content((MyRedisDB.RedisDB.SetLength(Ckey) + MyRedisDB.RedisDB.SetLength(Rkey)).ToString());
+            string SysKey = MyRedisKeys.Pre_SysMsg + CurrentUser.ID;
+            return Content((MyRedisDB.RedisDB.SetLength(Ckey) + MyRedisDB.RedisDB.SetLength(Rkey) + MyRedisDB.RedisDB.SetLength(SysKey)).ToString());
         }
 
         //未读消息
@@ -1026,19 +1027,23 @@ namespace MVCWeb.Controllers
         {
             string Ckey = MyRedisKeys.Pre_CMsg + CurrentUser.ID;
             string Rkey = MyRedisKeys.Pre_RMsg + CurrentUser.ID;
+            string SysKey = MyRedisKeys.Pre_SysMsg + CurrentUser.ID;
             ViewBag.NewComments = MyRedisDB.GetSet<CMsg>(Ckey).OrderByDescending(m => m.Date);
             ViewBag.NewReplys = MyRedisDB.GetSet<RMsg>(Rkey).OrderByDescending(m => m.Date);
+            ViewBag.SysMsgs = MyRedisDB.GetSet<SysMsg>(SysKey).OrderByDescending(m => m.Date);
             return View();
         }
 
-        //清空未读
+        //清空消息
         [HttpPost]
         public ActionResult ClearMsg()
         {
             string Ckey = MyRedisKeys.Pre_CMsg + CurrentUser.ID;
             string Rkey = MyRedisKeys.Pre_RMsg + CurrentUser.ID;
+            string SysKey = MyRedisKeys.Pre_SysMsg + CurrentUser.ID;
             MyRedisDB.DelKey(Ckey);
             MyRedisDB.DelKey(Rkey);
+            MyRedisDB.DelKey(SysKey);
             return Json(new { msg = "done" });
         }
 
@@ -1057,6 +1062,16 @@ namespace MVCWeb.Controllers
         {
             string Rkey = MyRedisKeys.Pre_RMsg + CurrentUser.ID;
             MyRedisDB.SetRemove(Rkey, MyRedisDB.GetSet<RMsg>(Rkey).Where(r => r.ObjID == objID && r.COrder == co && r.ROrder == ro).FirstOrDefault());
+            return Json(new { msg = "done" });
+        }
+        
+        //删除系统消息
+        [HttpPost]
+        public ActionResult DeleteSysMsg(DateTime date)
+        {
+            string SysKey = MyRedisKeys.Pre_SysMsg + CurrentUser.ID;
+            SysMsg msg = MyRedisDB.GetSet<SysMsg>(SysKey).Where(s => s.Date.ToString("yyyyMMddHHmmss") == date.ToString("yyyyMMddHHmmss")).FirstOrDefault();
+            MyRedisDB.SetRemove(SysKey, msg);
             return Json(new { msg = "done" });
         }
 
