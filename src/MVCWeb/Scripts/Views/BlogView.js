@@ -69,6 +69,32 @@ function GetCommentPage(index) {
     });
 }
 
+//删除评论
+function DeleteComment(id, page) {
+    swal({
+        title: "确定删除？",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#337ab7",
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        closeOnConfirm: true
+    }, function () {
+        $.ajax({
+            url: "/Home/BlogCommentDelete",
+            type: "Post",
+            data: { id: id },
+            success: function (result) {
+                if (result.msg == "done") {
+                    GetCommentPage(page);
+                } else {
+                    alert(result.msg);
+                }
+            }
+        });
+    });
+}
+
 //显示回复
 function ShowReply(corder, index) {
     if ($("#ShowReply" + corder).html() == "收起回复") {
@@ -156,6 +182,32 @@ function GetCommentReplyPage(index, corder) {
                 }
             });
         }
+    });
+}
+
+//删除回复
+function DeleteReply(id, co, page) {
+    swal({
+        title: "确定删除？",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#337ab7",
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        closeOnConfirm: true
+    }, function () {
+        $.ajax({
+            url: "/Home/BlogCommentReplyDelete",
+            type: "Post",
+            data: { id: id },
+            success: function (result) {
+                if (result.msg == "done") {
+                    GetCommentReplyPage(page, co);
+                } else {
+                    alert(result.msg);
+                }
+            }
+        });
     });
 }
 

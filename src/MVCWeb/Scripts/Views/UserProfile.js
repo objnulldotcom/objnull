@@ -128,7 +128,6 @@ function UserNewBeePage(index) {
     });
 }
 
-
 //删除收藏
 function StarDelete(id, page, type) {
     swal({

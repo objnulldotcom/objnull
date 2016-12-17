@@ -5,6 +5,15 @@
 
 @foreach (NewBeeFloorReply reply in NewBeeFloorReplyList)
 {
+    if (reply.Delete)
+    {
+        <div class="row" style="padding: 10px 0px">
+            <div class="col-md-12 text-center fs2">
+                回复已删除
+            </div>
+        </div>
+        continue;
+    }
     string userName = string.IsNullOrEmpty(reply.Owner.Name) ? reply.Owner.GitHubLogin : reply.Owner.Name;
     string toUserName = string.IsNullOrEmpty(reply.ToUser.Name) ? reply.ToUser.GitHubLogin : reply.ToUser.Name;
     <div class="row">
@@ -19,6 +28,11 @@
                     <a href="@Url.Action("UserProfile", "Home", new { id = reply.Owner.ID })" target="_blank">@userName.MaxByteLength(20)</a>&nbsp;回复&nbsp;
                     <a href="@Url.Action("UserProfile", "Home", new { id = reply.ToUserID })" target="_blank">@toUserName.MaxByteLength(20)</a>&nbsp;
                     <span title="回复时间"><span class="glyphicon glyphicon-time"></span>@reply.InsertDate.ToBlurDate()</span>&nbsp;
+                    @if (ViewBag.Login && ViewBag.CUID == reply.OwnerID)
+                    {
+                        <a href="javascript:;" style="text-decoration:none" onclick="DeleteReply('@reply.ID',@ViewBag.COrder, @ViewBag.CurrentPage)">删除</a>
+                    }
+                    &nbsp;
                     @if (ViewBag.Login && string.IsNullOrEmpty(ViewBag.DisableMsg))
                     {
                         <a id="BtnReply" style="display:none" href="javascript:;" onclick="ReplyToUser(@ViewBag.COrder, '@userName.MaxByteLength(20)', '@reply.Owner.ID')">回复</a>

@@ -6,6 +6,16 @@
 {
     foreach (BlogComment comment in CommentList)
     {
+        if(comment.Delete)
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    评论已删除
+                </div>
+            </div>
+            <hr style="margin: 10px 0px" />
+            continue;
+        }
         string userName = string.IsNullOrEmpty(comment.Owner.Name) ? comment.Owner.GitHubLogin : comment.Owner.Name;
         <div class="row">
             <div id="Comment@(comment.Order)" class="col-md-12" cmid="@comment.ID">
@@ -19,6 +29,11 @@
                 </a>
                 <a href="@Url.Action("UserProfile", "Home", new { id = comment.Owner.ID })" target="_blank">@userName.MaxByteLength(20)</a>
                 <span class="fs2" title="评论时间"><span class="glyphicon glyphicon-time"></span>@comment.InsertDate.ToBlurDate()</span>
+                @if (ViewBag.Login && ViewBag.CUID == comment.OwnerID)
+                {
+                    <a href="javascript:;" style="text-decoration:none" onclick="DeleteComment('@comment.ID', @ViewBag.CurrentPage)">删除</a>
+                }
+                &nbsp;
                 <a id="ShowReply@(comment.Order)" href="javascript:;" style="text-decoration:none" onclick="ShowReply(@comment.Order, 1)" recount="@comment.ReplyCount">
                     @if (comment.ReplyCount > 0)
                     { @Html.Raw(comment.ReplyCount + "条回复") }
@@ -54,7 +69,7 @@
                 }
             </div>
         </div>
-        <hr style="margin: 5px 0px 10px 0px" />
+        <hr style="margin: 10px 0px" />
     }
 }
 else

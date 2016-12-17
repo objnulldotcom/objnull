@@ -1,0 +1,37 @@
+﻿@using MVCWeb;
+@using MVCWeb.Model.Models;
+@{
+    List<Blog> BlogList = ViewBag.BlogList as List<Blog>;
+}
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>作者</th>
+            <th>标题</th>
+            <th>日期</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    @{ 
+        int i = 0;
+    }
+    @foreach (Blog blog in BlogList)
+    {
+        i++;
+        <tr>
+            <td><a href="@Url.Action("UserProfile", "Home", new { id = blog.Owner.ID })" target="_blank">@blog.Owner.GitHubLogin</a></td>
+            <td><a href="@Url.Action("BlogView", "Home", new { id = blog.ID })" target="_blank">@blog.Title</a></td>
+            <td>@blog.InsertDate</td>
+            <td>
+                <button onclick="BlogEdit('@blog.ID')">编辑</button>&nbsp;
+                <button onclick="BlogDelete('@blog.ID', '@blog.OwnerID', @ViewBag.CurrentPage)">删除</button>
+            </td>
+        </tr>
+    }
+</table>
+
+<input type="hidden" id="BlogTotalCount" value="@ViewBag.TotalCount" />
+<input type="hidden" id="BlogCurrentPage" value="@ViewBag.CurrentPage" />
+<div class="row" style="margin-bottom: -15px">
+    <div id="BlogPager" class="col-md-12 text-center"></div>
+</div>

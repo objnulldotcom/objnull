@@ -27,7 +27,7 @@ function UserPage(index) {
                 listStyle: "pagination pagination-sm",
                 hrefTextPrefix: "javascript:;",
                 onPageClick: function (pageNumber, event) {
-                    UserBlogPage(pageNumber);
+                    UserPage(pageNumber);
                 }
             });
         }
@@ -59,6 +59,143 @@ function UserOperate(type, uid, ot, i) {
     });
 }
 
+//查找Blog
+function SearchBlog() {
+    BlogPage(1);
+}
+
+//Blog查询
+function BlogPage(index) {
+    var pageSize = parseInt($("#ValBlogPageSize").val());
+    var condition = $("#TxtBlogCondition").val()
+    var postData = { pageSize: pageSize, pageNum: index, condition: condition }
+    $.ajax({
+        url: "/Manager/BlogPage",
+        type: "Post",
+        data: postData,
+        success: function (result) {
+            $("#BlogData").html(result);
+            var totalCount = parseInt($("#BlogTotalCount").val());
+            if (totalCount <= pageSize) {
+                return;
+            }
+            $("#BlogPager").pagination({
+                items: totalCount,
+                itemsOnPage: pageSize,
+                currentPage: $("#BlogCurrentPage").val(),
+                prevText: "<",
+                nextText: ">",
+                listStyle: "pagination pagination-sm",
+                hrefTextPrefix: "javascript:;",
+                onPageClick: function (pageNumber, event) {
+                    BlogPage(pageNumber);
+                }
+            });
+        }
+    });
+}
+
+//删除Blog
+function BlogDelete(id, uid, page) {
+    swal({
+        title: "确定永久删除？",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#337ab7",
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        closeOnConfirm: true
+    }, function () {
+        $.ajax({
+            url: "/Manager/BlogDelete",
+            type: "Post",
+            data: { id: id },
+            success: function (result) {
+                if (result.msg == "done") {
+                    SendNewMsg(uid);
+                    BlogPage(page);
+                } else {
+                    alert(result.msg);
+                }
+            }
+        });
+    });
+}
+
+//编辑Blog
+function BlogEdit(id) {
+    $.ajax({
+        url: "/Manager/BlogEidt",
+        type: "Post",
+        success: function (result) {
+            window.open("/Home/BlogManagerEdit?id=" + id + "&keyId=" + result.key);
+        }
+    });
+}
+
+//查找NewBee
+function SearchNewBee() {
+    NewBeePage(1);
+}
+
+//NewBee查询
+function NewBeePage(index) {
+    var pageSize = parseInt($("#ValNewBeePageSize").val());
+    var condition = $("#TxtNewBeeCondition").val()
+    var postData = { pageSize: pageSize, pageNum: index, condition: condition }
+    $.ajax({
+        url: "/Manager/NewBeePage",
+        type: "Post",
+        data: postData,
+        success: function (result) {
+            $("#NewBeeData").html(result);
+            var totalCount = parseInt($("#NewBeeTotalCount").val());
+            if (totalCount <= pageSize) {
+                return;
+            }
+            $("#NewBeePager").pagination({
+                items: totalCount,
+                itemsOnPage: pageSize,
+                currentPage: $("#NewBeeCurrentPage").val(),
+                prevText: "<",
+                nextText: ">",
+                listStyle: "pagination pagination-sm",
+                hrefTextPrefix: "javascript:;",
+                onPageClick: function (pageNumber, event) {
+                    NewBeePage(pageNumber);
+                }
+            });
+        }
+    });
+}
+
+//删除NewBee
+function NewBeeDelete(id, uid, page) {
+    swal({
+        title: "确定永久删除？",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#337ab7",
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        closeOnConfirm: true
+    }, function () {
+        $.ajax({
+            url: "/Manager/NewBeeDelete",
+            type: "Post",
+            data: { id: id },
+            success: function (result) {
+                if (result.msg == "done") {
+                    SendNewMsg(uid);
+                    NewBeePage(page);
+                } else {
+                    alert(result.msg);
+                }
+            }
+        });
+    });
+}
+
 var MsgHub;
 //发送更新消息
 function SendNewMsg(id) {
@@ -74,4 +211,6 @@ $(function () {
     });
 
     UserPage(1);
+    BlogPage(1);
+    NewBeePage(1);
 })

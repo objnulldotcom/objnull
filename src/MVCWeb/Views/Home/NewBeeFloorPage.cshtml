@@ -6,6 +6,16 @@
 
 @foreach (NewBeeFloor floor in NewBeeFloorList)
 {
+    if (floor.Delete)
+    {
+        <hr />
+        <div class="row">
+            <div class="col-md-12 text-center">
+                楼层已删除
+            </div>
+        </div>
+        continue;
+    }
     string userName = string.IsNullOrEmpty(floor.Owner.Name) ? floor.Owner.GitHubLogin : floor.Owner.Name;
     <hr />
     <div class="row">
@@ -31,6 +41,11 @@
                         else if (ViewBag.Login && string.IsNullOrEmpty(ViewBag.DisableMsg))
                         { @Html.Raw("回复") }
                     </a>&nbsp;
+                    @if (ViewBag.Login && ViewBag.CUID == floor.OwnerID)
+                    {
+                        <a href="javascript:;" style="text-decoration:none" onclick="DeleteFloor('@floor.ID', @ViewBag.CurrentPage)">删除</a>
+                    }
+                    &nbsp;
                     <span><span class="glyphicon glyphicon-list"></span>&nbsp;@floor.Order 楼</span>&nbsp;
                     <span><span class="glyphicon glyphicon-time"></span>&nbsp;@floor.InsertDate.ToString("yyyy-MM-dd HH:mm")</span>
                 </div>

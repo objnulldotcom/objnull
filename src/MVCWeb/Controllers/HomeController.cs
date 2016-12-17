@@ -279,10 +279,27 @@ namespace MVCWeb.Controllers
             Blog blog = BlogDataSvc.GetByID(id);
             if (blog.OwnerID != CurrentUser.ID)
             {
-                RedirectToAction("Error");
+                return RedirectToAction("Error");
             }
             ViewBag.Blog = blog;
             return View();
+        }
+
+        //管理员编辑姿势
+        public ActionResult BlogManagerEdit(Guid id, Guid keyId)
+        {
+            Guid key = Guid.Empty;
+            if (!Guid.TryParse(MyRedisDB.StringGet("MBEditKey"), out key))
+            {
+                return RedirectToAction("Error");
+            }
+            if(key != keyId)
+            {
+                return RedirectToAction("Error");
+            }
+            Blog blog = BlogDataSvc.GetByID(id);
+            ViewBag.Blog = blog;
+            return View("BlogEdit");
         }
 
         //完成编辑
@@ -568,10 +585,10 @@ namespace MVCWeb.Controllers
         {
             int totalCount;
             ViewBag.Login = CurrentUser != null;
-            ViewBag.BlogCommentList = BlogCommentDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogID == blogID && !it.Delete, it => it.InsertDate, false, out totalCount).ToList();
+            ViewBag.BlogCommentList = BlogCommentDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogID == blogID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
-
+            
             if(ViewBag.Login)
             {
                 DisabledUser user = MyRedisDB.GetSet<DisabledUser>(MyRedisKeys.DisabledUsers).Where(d => d.UserID == CurrentUser.ID && d.ObjectType == (int)EnumObjectType.姿势 && d.AbleDate > DateTime.Now).FirstOrDefault();
@@ -579,9 +596,24 @@ namespace MVCWeb.Controllers
                 {
                     ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
                 }
+                ViewBag.CUID = CurrentUser.ID;
             }
 
             return View();
+        }
+
+        //删除评论
+        [HttpPost]
+        public ActionResult BlogCommentDelete(Guid id)
+        {
+            BlogComment comment = BlogCommentDataSvc.GetByID(id);
+            if(comment.OwnerID != CurrentUser.ID)
+            {
+                return Json(new { msg = "错误" });
+            }
+            comment.Delete = true;
+            BlogCommentDataSvc.Update(comment);
+            return Json(new { msg = "done" });
         }
 
         //添加评论回复
@@ -639,7 +671,7 @@ namespace MVCWeb.Controllers
         {
             int totalCount;
             ViewBag.Login = CurrentUser != null;
-            ViewBag.BlogCommentReplyList = BlogCommentReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogCommentID == commentID && !it.Delete, it => it.InsertDate, false, out totalCount).ToList();
+            ViewBag.BlogCommentReplyList = BlogCommentReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.BlogCommentID == commentID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             ViewBag.COrder = corder;
@@ -651,9 +683,24 @@ namespace MVCWeb.Controllers
                 {
                     ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
                 }
+                ViewBag.CUID = CurrentUser.ID;
             }
 
             return View();
+        }
+
+        //删除回复
+        [HttpPost]
+        public ActionResult BlogCommentReplyDelete(Guid id)
+        {
+            BlogCommentReply reply = BlogCommentReplyDataSvc.GetByID(id);
+            if (reply.OwnerID != CurrentUser.ID)
+            {
+                return Json(new { msg = "错误" });
+            }
+            reply.Delete = true;
+            BlogCommentReplyDataSvc.Update(reply);
+            return Json(new { msg = "done" });
         }
 
         #endregion
@@ -923,7 +970,7 @@ namespace MVCWeb.Controllers
         {
             int totalCount = 0;
             ViewBag.Login = CurrentUser != null;
-            ViewBag.NewBeeFloorList = NewBeeFloorDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.NewBeeID == nbID && !it.Delete, it => it.InsertDate, false, out totalCount).ToList();
+            ViewBag.NewBeeFloorList = NewBeeFloorDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.NewBeeID == nbID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             ViewBag.ShowPager = totalCount > pageSize;
@@ -935,8 +982,23 @@ namespace MVCWeb.Controllers
                 {
                     ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
                 }
+                ViewBag.CUID = CurrentUser.ID;
             }
             return View();
+        }
+
+        //删除Floor
+        [HttpPost]
+        public ActionResult NewBeeFloorDelete(Guid id)
+        {
+            NewBeeFloor floor = NewBeeFloorDataSvc.GetByID(id);
+            if (floor.OwnerID != CurrentUser.ID)
+            {
+                return Json(new { msg = "错误" });
+            }
+            floor.Delete = true;
+            NewBeeFloorDataSvc.Update(floor);
+            return Json(new { msg = "done" });
         }
 
         //添加楼层回复
@@ -994,7 +1056,7 @@ namespace MVCWeb.Controllers
         {
             int totalCount;
             ViewBag.Login = CurrentUser != null;
-            ViewBag.NewBeeFloorReplyList = NewBeeFloorReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.NewBeeFloorID == floorID && !it.Delete, it => it.InsertDate, false, out totalCount).ToList();
+            ViewBag.NewBeeFloorReplyList = NewBeeFloorReplyDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => it.NewBeeFloorID == floorID, it => it.InsertDate, false, out totalCount).ToList();
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             ViewBag.COrder = corder;
@@ -1006,9 +1068,25 @@ namespace MVCWeb.Controllers
                 {
                     ViewBag.DisableMsg = "你被封禁至" + user.AbleDate.ToString("yyyy-MM-dd HH:ss");
                 }
+                ViewBag.CUID = CurrentUser.ID;
             }
             return View();
         }
+        
+        //删除NewBee回复
+        [HttpPost]
+        public ActionResult NewBeeFloorReplyDelete(Guid id)
+        {
+            NewBeeFloorReply reply = NewBeeFloorReplyDataSvc.GetByID(id);
+            if (reply.OwnerID != CurrentUser.ID)
+            {
+                return Json(new { msg = "错误" });
+            }
+            reply.Delete = true;
+            NewBeeFloorReplyDataSvc.Update(reply);
+            return Json(new { msg = "done" });
+        }
+
         #endregion
 
         #region Msg

@@ -121,11 +121,13 @@ namespace MVCWeb
         }
 
         /// <summary>
+        /// 请使用MaxByteLength直接限制最大长度
         /// 按字节数从头截取字符串
         /// </summary>
         /// <param name="text"></param>
         /// <param name="length"></param>
         /// <returns></returns>
+        [Obsolete]
         public static string SubByteStr(this string text, int length)
         {
             string result = "";

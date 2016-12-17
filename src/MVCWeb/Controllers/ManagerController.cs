@@ -4,10 +4,10 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Reflection;
-using System.Diagnostics;
 using MVCWeb.Redis.Base;
 using MVCWeb.Redis.Models;
 using MVCWeb.DataSvc.Svc;
+using MVCWeb.Model.Models;
 
 namespace MVCWeb.Controllers
 {
@@ -15,6 +15,8 @@ namespace MVCWeb.Controllers
     {
         public IMyRedisDB MyRedisDB { get; set; }
         public INullUserDataSvc NullUserDataSvc { get; set; }
+        public IBlogDataSvc BlogDataSvc { get; set; }
+        public INewBeeDataSvc NewBeeDataSvc { get; set; }
 
         #region Login&Out
 
@@ -72,7 +74,7 @@ namespace MVCWeb.Controllers
                     int actionType = (int)EnumActionType.前台;
                     if (controller == "Manager")
                     {
-                        actionType = (int)EnumActionType.后台;
+                        actionType = (int)EnumActionType.Manager;
                     }
                     foreach (MethodInfo method in type.GetMethods())
                     {
@@ -171,6 +173,8 @@ namespace MVCWeb.Controllers
 
         #endregion
 
+        #region 数据管理
+
         //数据管理
         public ActionResult DataManage()
         {
@@ -247,5 +251,102 @@ namespace MVCWeb.Controllers
             }
             return Json(new { msg = "done" });
         }
+        
+        //姿势列表
+        [HttpPost]
+        public ActionResult BlogPage(int pageSize, int pageNum = 1, string condition = "")
+        {
+            int totalCount;
+            if (string.IsNullOrEmpty(condition))
+            {
+                ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => true, u => u.InsertDate, true, out totalCount).ToList();
+            }
+            else
+            {
+                Guid id = Guid.Empty;
+                if (Guid.TryParse(condition, out id))
+                {
+                    ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => u.ID == id, u => u.InsertDate, true, out totalCount).ToList();
+                }
+                else
+                {
+                    ViewBag.BlogList = BlogDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => u.Title.Contains(condition) || u.Owner.GitHubLogin.Contains(condition), u => u.InsertDate, true, out totalCount).ToList();
+                }
+            }
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            return View();
+        }
+
+        //删除姿势
+        [HttpPost]
+        public ActionResult BlogDelete(Guid id)
+        {
+            Blog blog = BlogDataSvc.GetByID(id);
+            BlogDataSvc.DeleteByID(id);
+
+            SysMsg msg = new SysMsg();
+            msg.Date = DateTime.Now;
+            msg.Title = "你的姿势被删除";
+            msg.Msg = blog.Title.MaxByteLength(30);
+            string key = MyRedisKeys.Pre_SysMsg + blog.OwnerID;
+            MyRedisDB.SetAdd(key, msg);
+
+            return Json(new { msg = "done" });
+        }
+
+        //编辑姿势
+        [HttpPost]
+        public ActionResult BlogEidt()
+        {
+            Guid key = Guid.NewGuid();
+            MyRedisDB.RedisDB.StringSet("MBEditKey", key.ToString(), new TimeSpan(0, 0, 10));
+            return Json(new { key = key.ToString() });
+        }
+
+        //NewBee列表
+        [HttpPost]
+        public ActionResult NewBeePage(int pageSize, int pageNum = 1, string condition = "")
+        {
+            int totalCount;
+            if (string.IsNullOrEmpty(condition))
+            {
+                ViewBag.NewBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => true, u => u.InsertDate, true, out totalCount).ToList();
+            }
+            else
+            {
+                Guid id = Guid.Empty;
+                if (Guid.TryParse(condition, out id))
+                {
+                    ViewBag.NewBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => u.ID == id, u => u.InsertDate, true, out totalCount).ToList();
+                }
+                else
+                {
+                    ViewBag.NewBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, u => u.Title.Contains(condition) || u.Owner.GitHubLogin.Contains(condition), u => u.InsertDate, true, out totalCount).ToList();
+                }
+            }
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            return View();
+        }
+
+        //删除NewBee
+        [HttpPost]
+        public ActionResult NewBeeDelete(Guid id)
+        {
+            NewBee newBee = NewBeeDataSvc.GetByID(id);
+            NewBeeDataSvc.DeleteByID(id);
+
+            SysMsg msg = new SysMsg();
+            msg.Date = DateTime.Now;
+            msg.Title = "你的NewBee被删除";
+            msg.Msg = newBee.Title.MaxByteLength(30);
+            string key = MyRedisKeys.Pre_SysMsg + newBee.OwnerID;
+            MyRedisDB.SetAdd(key, msg);
+
+            return Json(new { msg = "done" });
+        }
+
+        #endregion
     }
 }

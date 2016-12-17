@@ -298,6 +298,8 @@
     <Content Include="Views\Home\UserNewBeePage.cshtml" />
     <Content Include="Views\Manager\DataManage.cshtml" />
     <Content Include="Views\Manager\UserPage.cshtml" />
+    <Content Include="Views\Manager\BlogPage.cshtml" />
+    <Content Include="Views\Manager\NewBeePage.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

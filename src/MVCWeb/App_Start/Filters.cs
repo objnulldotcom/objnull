@@ -120,7 +120,7 @@ namespace MVCWeb
                 }
                 #endregion
             }
-            else if (rule.ActionType == (int)EnumActionType.后台)
+            else if (rule.ActionType == (int)EnumActionType.Manager)
             {
                 #region 后台
                 int mRole = 0;

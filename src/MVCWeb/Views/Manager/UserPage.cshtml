@@ -24,7 +24,7 @@
     {
         i++;
         <tr>
-            <td>@user.GitHubLogin</td>
+            <td><a href="@Url.Action("UserProfile", "Home", new { id = user.ID })" target="_blank">@user.GitHubLogin</a></td>
             <td>@user.LastLoginDate</td>
             <td>@user.LastLoginIP</td>
             <td></td>
