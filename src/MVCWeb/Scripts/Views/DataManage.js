@@ -3,6 +3,26 @@ function Search() {
     UserPage(1);
 }
 
+//查询p地址
+function ShowIPAddr() {
+    $(".IP").each(function () {
+        var ip = $(this).html();
+        var addrTd = $(this).parent().find("#TxtIPAddr");
+        if (ip.length > 7) {
+            $.ajax({
+                url: "http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=" + ip,
+                type: "get",
+                dataType: 'jsonp',
+                async: false,
+                complete: function (event, xhr, options) {
+                    var addr = remote_ip_info.province + remote_ip_info.city + remote_ip_info.district;
+                    $(addrTd).html(addr);
+                }
+            });
+        }
+    });
+}
+
 //用户查询
 function UserPage(index) {
     var pageSize = parseInt($("#ValUserPageSize").val());

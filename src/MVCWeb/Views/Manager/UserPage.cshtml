@@ -26,8 +26,8 @@
         <tr>
             <td><a href="@Url.Action("UserProfile", "Home", new { id = user.ID })" target="_blank">@user.GitHubLogin</a></td>
             <td>@user.LastLoginDate</td>
-            <td>@user.LastLoginIP</td>
-            <td></td>
+            <td class="IP">@user.LastLoginIP</td>
+            <td id="TxtIPAddr"></td>
             <td>@Enum.GetName(typeof(EnumUserRole), user.Role)</td>
             <td style="width: 240px">
                 @foreach(DisabledUser du in DisabledUsers.Where(d => d.UserID == user.ID && d.AbleDate > DateTime.Now))
