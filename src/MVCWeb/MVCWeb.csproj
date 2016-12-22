@@ -309,6 +309,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="StaticHtml\Page0\" />
+    <Folder Include="StaticHtml\Page1\" />
+    <Folder Include="StaticHtml\Page2\" />
+    <Folder Include="StaticHtml\PageCodes\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MVCWeb.DataSvc\MVCWeb.DataSvc.csproj">

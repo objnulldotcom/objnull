@@ -1,7 +1,38 @@
 ﻿
 @{
-    ViewBag.Title = "象空 - 面朝大海，对象为空";
+    ViewBag.Title = "Github用户基地 - 象空";
     Layout = "~/Views/Shared/_LayoutMain.cshtml";
 }
-
+<div class="row" style="padding: 15px 0px">
+    <div class="col-md-12" style="height: 500px;">
+        <iframe src="~/StaticHtml/Page0/index.html" frameborder="0" height="100%" width="100%" scrolling="no"></iframe>
+        <div style="position: absolute; top: 10%; left:5%;color: #fff;font-weight: 600; font-family: 'Microsoft YaHei';width:50%">
+            <h1>Github用户基地</h1>
+            <h4>Millions of developers use GitHub to build personal projects, support their businesses, and work together on open source technologies.</h4>
+            <h4>And they can TreeNewBee & ZhangZiShi here.</h4>
+        </div>
+        <div style="position: absolute; top: 5%; left:85%;font-weight: 600; font-family: 'Microsoft YaHei';width:30%;font-size: 24px">
+            <img src="~/Images/favicon-32x32.png" height="30" width="30" title="象空 - 面朝大海，对象为空" style="margin: -5px 5px 0px 0px" />象空
+        </div>
+        @if (!ViewBag.Login)
+            {
+            <div style="position: absolute; top: 60%; left:5%;color: #fff;width:50%">
+                <a class="btn btn-success" href="https://github.com/login/oauth/authorize?client_id=b89774f9a3a874e349ce&redirect_uri=http://objnull.com/OAuth/GitHubLogin&scope=user,public_repo&state=12345">Github登录</a>
+            </div>
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 text-center" style="font-family: 'Microsoft YaHei'">
+        <div>
+            欢迎回家，开发者
+        </div>
+        <div>
+            象空旨在打造一个简洁、易用以及高效的Github用户交流平台
+        </div>
+        <div>
+            让我们一起进步
+        </div>
+    </div>
+</div>
 

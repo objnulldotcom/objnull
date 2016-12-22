@@ -29,6 +29,7 @@ namespace MVCWeb.Controllers
         //首页
         public ActionResult Index()
         {
+            ViewBag.Login = CurrentUser != null;
             return View();
         }
 
