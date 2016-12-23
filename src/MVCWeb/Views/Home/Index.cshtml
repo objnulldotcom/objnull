@@ -1,21 +1,21 @@
 ﻿
 @{
-    ViewBag.Title = "Github用户基地 - 象空";
+    ViewBag.Title = "How developers xixi haha - 象空";
     Layout = "~/Views/Shared/_LayoutMain.cshtml";
 }
 <div class="row" style="padding: 15px 0px">
     <div class="col-md-12" style="height: 500px;">
         <iframe src="~/StaticHtml/Page0/index.html" frameborder="0" height="100%" width="100%" scrolling="no"></iframe>
-        <div style="position: absolute; top: 10%; left:5%;color: #fff;font-weight: 600; font-family: 'Microsoft YaHei';width:50%">
-            <h1>Github用户基地</h1>
+        <div style="position: absolute; top: 15%; left:5%;color: #fff;font-weight: 600; font-family: 'Microsoft YaHei';width:40%">
+            <h1>How developers xixi haha</h1>
             <h4>Millions of developers use GitHub to build personal projects, support their businesses, and work together on open source technologies.</h4>
             <h4>And they can TreeNewBee & ZhangZiShi here.</h4>
         </div>
-        <div style="position: absolute; top: 5%; left:85%;font-weight: 600; font-family: 'Microsoft YaHei';width:30%;font-size: 24px">
+        <div style="position: absolute; top: 10%; right:5%;font-weight: 600; font-family: 'Microsoft YaHei';font-size: 24px">
             <img src="~/Images/favicon-32x32.png" height="30" width="30" title="象空 - 面朝大海，对象为空" style="margin: -5px 5px 0px 0px" />象空
         </div>
         @if (!ViewBag.Login)
-            {
+        {
             <div style="position: absolute; top: 60%; left:5%;color: #fff;width:50%">
                 <a class="btn btn-success" href="https://github.com/login/oauth/authorize?client_id=b89774f9a3a874e349ce&redirect_uri=http://objnull.com/OAuth/GitHubLogin&scope=user,public_repo&state=12345">Github登录</a>
             </div>
@@ -24,15 +24,33 @@
 </div>
 <div class="row">
     <div class="col-md-12 text-center" style="font-family: 'Microsoft YaHei'">
-        <div>
+        <div style="font-size: 24px;padding-top: 30px">
             欢迎回家，开发者
         </div>
-        <div>
+        <div style="font-size: 20px">
             象空旨在打造一个简洁、易用以及高效的Github用户交流平台
         </div>
-        <div>
+        <div style="font-size: 20px;padding-bottom: 30px">
             让我们一起进步
         </div>
     </div>
 </div>
-
+<div class="row" style="padding-bottom: 30px">
+    <div class="col-md-12" style="font-family: 'Microsoft YaHei';">
+        <div style="padding: 15px;width: 50%; float:left; border-right: 1px solid #eee;border-top: 1px solid #eee; border-bottom: 1px solid #eee;">
+            <a href="@Url.Action("NewBeeList", "Home")"><img src="~/Images/Index/TreeNewBee.png" style="float:left; width: 50%" /></a>
+            <h4>TreeNewBee</h4>
+            <p>在这里畅(chui)所(niu)欲(bi)言。连Github账号都没有还好意思发言，我真是键盘都笑掉了。</p>
+        </div>
+        <div style="padding: 15px;width: 50%; float:left;border-top: 1px solid #eee; border-bottom: 1px solid #eee;">
+            <a href="@Url.Action("BlogList", "Home")"><img src="~/Images/Index/ZhangZiShi.png" style="float:left; width: 50%" /></a>
+            <h4>涨姿势</h4>
+            <p>在这里分享你的知识，宣传你的项目，不再闭门造车，有车大家一起做。人人都是老司机。</p>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 text-center">
+        <iframe src="~/StaticHtml/Page0.1/index.html" frameborder="0" height="300" width="300" scrolling="no"></iframe>
+    </div>
+</div>

@@ -52,6 +52,7 @@
     <Compile Include="Base\BaseDataSvc.cs" />
     <Compile Include="Svc\BlogCommentDataSvc.cs" />
     <Compile Include="Svc\BlogCommentReplyDataSvc.cs" />
+    <Compile Include="Svc\FeedbackDataSvc.cs" />
     <Compile Include="Svc\NewBeeFloorReplyDataSvc.cs" />
     <Compile Include="Svc\NewBeeFloorDataSvc.cs" />
     <Compile Include="Svc\NewBeeDataSvc.cs" />

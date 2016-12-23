@@ -94,4 +94,13 @@ namespace MVCWeb.Model.DBContext
             HasRequired(it => it.ToUser).WithMany(that => that.ReceivedNewBeeFloorReplys).HasForeignKey(it => it.ToUserID);
         }
     }
+
+    public class FeedbackMapping : EntityTypeConfiguration<Feedback>
+    {
+        public FeedbackMapping()
+        {
+            ToTable("Feedback");
+            HasKey(that => that.ID);
+        }
+    }
 }

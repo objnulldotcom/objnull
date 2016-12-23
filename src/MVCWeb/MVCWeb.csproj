@@ -186,6 +186,8 @@
     <Content Include="Images\favicon-16x16.png" />
     <Content Include="Images\favicon-32x32.png" />
     <Content Include="Images\favicon-96x96.png" />
+    <Content Include="Images\Index\TreeNewBee.png" />
+    <Content Include="Images\Index\ZhangZiShi.png" />
     <Content Include="Images\LOGO.png" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
@@ -235,6 +237,7 @@
     <Content Include="Scripts\Views\BlogView.js" />
     <Content Include="Scripts\Views\DataManage.js" />
     <Content Include="Scripts\Views\LayoutMain.js" />
+    <Content Include="Scripts\Views\Feedback.js" />
     <Content Include="Scripts\Views\NewBeeList.js" />
     <Content Include="Scripts\Views\NewBeeView.js" />
     <Content Include="Scripts\Views\UserProfile.js" />
@@ -300,6 +303,9 @@
     <Content Include="Views\Manager\UserPage.cshtml" />
     <Content Include="Views\Manager\BlogPage.cshtml" />
     <Content Include="Views\Manager\NewBeePage.cshtml" />
+    <Content Include="Views\Home\Feedback.cshtml" />
+    <Content Include="Views\Home\FeedbackPage.cshtml" />
+    <Content Include="Views\Home\About.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -309,6 +315,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="StaticHtml\Page0.1\" />
     <Folder Include="StaticHtml\Page0\" />
     <Folder Include="StaticHtml\Page1\" />
     <Folder Include="StaticHtml\Page2\" />

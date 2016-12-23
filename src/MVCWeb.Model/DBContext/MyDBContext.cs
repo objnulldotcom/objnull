@@ -5,9 +5,16 @@ namespace MVCWeb.Model.DBContext
 {
     public class MyDBContext : DbContext
     {
-        //实体集（不用定义，BaseDataSvc中动态构造）
-        //public IDbSet<NullUser> Users { get; set; }
-        //public IDbSet<Blog> Blogs { get; set; }
+        //实体集
+        public IDbSet<NullUser> Users { get; set; }
+        public IDbSet<Blog> Blogs { get; set; }
+        public IDbSet<BlogComment> BlogComments { get; set; }
+        public IDbSet<BlogCommentReply> BlogCommentReplys { get; set; }
+        public IDbSet<NewBee> NewBees { get; set; }
+        public IDbSet<NewBeeFloor> NewBeeFloors { get; set; }
+        public IDbSet<NewBeeFloorReply> NewBeeFloorReplys { get; set; }
+        public IDbSet<UserStar> UserStars { get; set; }
+        public IDbSet<Feedback> Feedbacks { get; set; }
 
         public MyDBContext() : base("MySQLConnection")
         {
@@ -32,6 +39,7 @@ namespace MVCWeb.Model.DBContext
             modelBuilder.Configurations.Add(new NewBeeMapping());
             modelBuilder.Configurations.Add(new NewBeeFloorMapping());
             modelBuilder.Configurations.Add(new NewBeeFloorReplyMapping());
+            modelBuilder.Configurations.Add(new FeedbackMapping());
         }
     }
 }

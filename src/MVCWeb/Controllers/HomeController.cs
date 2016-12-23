@@ -22,6 +22,7 @@ namespace MVCWeb.Controllers
         public INewBeeDataSvc NewBeeDataSvc { get; set; }
         public INewBeeFloorDataSvc NewBeeFloorDataSvc { get; set; }
         public INewBeeFloorReplyDataSvc NewBeeFloorReplyDataSvc { get; set; }
+        public IFeedbackDataSvc FeedbackDataSvc { get; set; }
         public IMyRedisDB MyRedisDB { get; set; }
 
         public HtmlSanitizer HtmlST = new HtmlSanitizer();
@@ -1155,6 +1156,57 @@ namespace MVCWeb.Controllers
         }
 
         #endregion
+
+        #region Feedback
+
+        public ActionResult Feedback()
+        {
+            ViewBag.Login = CurrentUser != null;
+            return View();
+        }
+
+        //Feedback分页
+        [HttpPost]
+        public ActionResult FeedbackPage(int pageSize, int pageNum = 1)
+        {
+            int totalCount = 0;
+            List<Feedback> FeedbackList = FeedbackDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.InsertDate, true, out totalCount).ToList();
+            ViewBag.FeedbackList = FeedbackList;
+            ViewBag.TotalCount = totalCount;
+            ViewBag.CurrentPage = pageNum;
+            ViewBag.ShowPager = totalCount > pageSize;
+            return View();
+        }
+
+        //添加feedback
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult AddFeedback(string txt)
+        {
+            if (string.IsNullOrEmpty(txt))
+            {
+                return Json(new { msg = "参数错误" });
+            }
+            if (txt.GetByteCount() > 400)
+            {
+                return Json(new { msg = "参数太长" });
+            }
+
+            Feedback fb = new Feedback();
+            fb.UserName = CurrentUser.UserName;
+            fb.Content = HttpUtility.HtmlEncode(txt);
+            FeedbackDataSvc.Add(fb);
+
+            return Json(new { msg = "done" });
+        }
+
+        #endregion
+
+        //关于
+        public ActionResult About()
+        {
+            return View();
+        }
 
         //错误
         public ActionResult Error()

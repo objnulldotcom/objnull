@@ -1,0 +1,23 @@
+﻿@using MVCWeb.Model.Models;
+@{
+    List<Feedback> FeedbackList = ViewBag.FeedbackList as List<Feedback>;
+}
+
+@foreach (Feedback feedback in FeedbackList)
+{
+    <hr style="margin: 5px;" />
+    <div class="row">
+        <div class="col-md-12">
+            <p><span class="glyphicon glyphicon-time"></span> @feedback.InsertDate.ToBlurDate() @feedback.UserName : @feedback.Content</p>
+        </div>
+    </div>
+}
+<input type="hidden" id="TotalCount" value="@ViewBag.TotalCount" />
+<input type="hidden" id="CurrentPage" value="@ViewBag.CurrentPage" />
+@if (ViewBag.ShowPager)
+{
+    <div class="row" style="margin-bottom: -20px">
+        <div id="FBPager" class="col-md-8 col-md-offset-2 text-center">
+        </div>
+    </div>
+}

@@ -52,6 +52,7 @@
     <Compile Include="DBContext\MyDBContext.cs" />
     <Compile Include="DBContext\MyDBInitializer.cs" />
     <Compile Include="DBContext\MyDBMapping.cs" />
+    <Compile Include="Models\Feedback.cs" />
     <Compile Include="Models\NewBeeFloorReply.cs" />
     <Compile Include="Models\NewBeeFloor.cs" />
     <Compile Include="Models\NewBee.cs" />
