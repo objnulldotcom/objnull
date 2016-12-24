@@ -18,8 +18,8 @@ namespace MVCWeb.Model.DBContext
 
         public MyDBContext() : base("MySQLConnection")
         {
-            Database.SetInitializer(new MyDBInitializer());
-            //Database.SetInitializer<MyDBContext>(null);
+            //Database.SetInitializer(new MyDBInitializer());
+            Database.SetInitializer<MyDBContext>(null);
 
             //延迟加载开关，默认开启，注意实体中集合属性必须是virtual类型才生效
             //Configuration.LazyLoadingEnabled = false;

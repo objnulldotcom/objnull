@@ -67,7 +67,7 @@ namespace MVCWeb
             ActionRule rule = MyRedisDB.GetSet<ActionRule>(MyRedisKeys.ActionRules).Where(r => r.Controller.ToLower() == controller.ToLower() && r.Action.ToLower() == action.ToLower()).FirstOrDefault();
             if(rule == null || rule.ActionType == 0)
             {
-                //throw new Exception("请求：/" + controller + "/" + action + " 未受控制");
+                throw new Exception("请求：/" + controller + "/" + action + " 未受控制");
             }
             else if (rule.ActionType == (int)EnumActionType.前台)
             {
