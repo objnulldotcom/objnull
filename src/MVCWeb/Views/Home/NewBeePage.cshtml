@@ -17,12 +17,12 @@
     //提取前三张图片
     string[] imgtags = new string[3];
     HtmlNodeCollection fimgs = htmlDoc.DocumentNode.SelectNodes("//img");
-    if(fimgs != null)
+    if (fimgs != null)
     {
         int i = 0;
-        foreach(HtmlNode node in fimgs)
+        foreach (HtmlNode node in fimgs)
         {
-            if(i > 2)
+            if (i > 2)
             {
                 break;
             }
@@ -32,7 +32,7 @@
             i++;
         }
     }
-    <hr style="margin: 5px;" />
+    <hr style="margin: 5px 0px" />
     <div class="row">
         <div class="col-md-2 text-left fs2">
             <span class="glyphicon glyphicon-user"></span>

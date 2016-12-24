@@ -183,6 +183,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Images\Error\Error.jpg" />
     <Content Include="Images\favicon-16x16.png" />
     <Content Include="Images\favicon-32x32.png" />
     <Content Include="Images\favicon-96x96.png" />
@@ -319,6 +320,7 @@
     <Folder Include="StaticHtml\Page0\" />
     <Folder Include="StaticHtml\Page1\" />
     <Folder Include="StaticHtml\Page2\" />
+    <Folder Include="StaticHtml\Page3\" />
     <Folder Include="StaticHtml\PageCodes\" />
   </ItemGroup>
   <ItemGroup>

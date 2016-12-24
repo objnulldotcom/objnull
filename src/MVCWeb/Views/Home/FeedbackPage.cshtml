@@ -5,10 +5,11 @@
 
 @foreach (Feedback feedback in FeedbackList)
 {
-    <hr style="margin: 5px;" />
     <div class="row">
         <div class="col-md-12">
-            <p><span class="glyphicon glyphicon-time"></span> @feedback.InsertDate.ToBlurDate() @feedback.UserName : @feedback.Content</p>
+            <div style="padding-top: 10px; border-top: 1px solid #eee">
+                <p><span class="glyphicon glyphicon-time"></span> @feedback.InsertDate.ToBlurDate() <span style="color: #ff6a00">@feedback.UserName</span> : @feedback.Content</p>
+            </div>
         </div>
     </div>
 }
