@@ -134,7 +134,7 @@ namespace MVCWeb.Controllers
             //添加用户或更新用户信息
             UpdateUserInfo("github", token.access_token);
 
-            return RedirectToAction("NewBeeList", "Home");
+            return RedirectToAction("Index", "Home");
         }
 
         #endregion
