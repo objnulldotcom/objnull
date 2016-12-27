@@ -29,12 +29,12 @@ namespace MVCWeb.Controllers
                 case (int)EnumObjectType.NewBee:
                     upPath = ConfigurationManager.AppSettings["NewBeeFilePath"];
                     break;
-                case (int)EnumObjectType.问题:
-                    upPath = ConfigurationManager.AppSettings["QuestionFilePath"];
-                    break;
-                case (int)EnumObjectType.笔记:
-                    upPath = ConfigurationManager.AppSettings["NoteFilePath"];
-                    break;
+                //case (int)EnumObjectType.问题:
+                //    upPath = ConfigurationManager.AppSettings["QuestionFilePath"];
+                //    break;
+                //case (int)EnumObjectType.笔记:
+                //    upPath = ConfigurationManager.AppSettings["NoteFilePath"];
+                //    break;
                 default:
                     upPath = ConfigurationManager.AppSettings["NewBeeFilePath"];
                     break;
@@ -64,12 +64,12 @@ namespace MVCWeb.Controllers
                 case (int)EnumObjectType.NewBee:
                     fPath = ConfigurationManager.AppSettings["NewBeeFilePath"];
                     break;
-                case (int)EnumObjectType.问题:
-                    fPath = ConfigurationManager.AppSettings["QuestionFilePath"];
-                    break;
-                case (int)EnumObjectType.笔记:
-                    fPath = ConfigurationManager.AppSettings["NoteFilePath"];
-                    break;
+                //case (int)EnumObjectType.问题:
+                //    fPath = ConfigurationManager.AppSettings["QuestionFilePath"];
+                //    break;
+                //case (int)EnumObjectType.笔记:
+                //    fPath = ConfigurationManager.AppSettings["NoteFilePath"];
+                //    break;
                 default:
                     fPath = ConfigurationManager.AppSettings["NewBeeFilePath"];
                     break;
