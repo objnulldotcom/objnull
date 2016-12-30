@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using MVCWeb.DataSvc.Svc;
 using MVCWeb.Model.Models;
 using MVCWeb.Redis.Base;
+using MVCWeb.Redis.Models;
 
 namespace MVCWeb.Controllers
 {
@@ -86,7 +87,18 @@ namespace MVCWeb.Controllers
                     user.GitHubLogin = githubUser.login;
                     user.GitHubID = githubUser.id;
                     user.Role = (int)EnumUserRole.普通;
+                    user.Email = githubUser.email;
                     NullUserDataSvc.Add(user);
+
+                    if(string.IsNullOrEmpty(user.Email))
+                    {
+                        SysMsg msg = new SysMsg();
+                        msg.Date = DateTime.Now;
+                        msg.Title = "您还未设置邮箱";
+                        msg.Msg = "请到<a href=\"/Home/UserProfile\">我的主页</a>设置或修改<a href=\"https://github.com/settings/profile\" target=\"_blank\">GitHub</a>邮箱显示后更新账号。";
+                        string key = MyRedisKeys.Pre_SysMsg + user.ID;
+                        MyRedisDB.SetAdd(key, msg);
+                    }
                 }
                 else
                 {
@@ -95,6 +107,7 @@ namespace MVCWeb.Controllers
                     user.GitHubID = githubUser.id;
                     user.GitHubLogin = githubUser.login;
                     user.GitHubAccessToken = token;
+                    user.Email = githubUser.email;
                     NullUserDataSvc.Update(user);
                 }
                 
@@ -129,7 +142,7 @@ namespace MVCWeb.Controllers
             }
             if(token.access_token == null)
             {
-                throw new Exception("获取token失败");
+                throw new Exception("获取token失败：code=" + code + " state=" + state);
             }
             //添加用户或更新用户信息
             UpdateUserInfo("github", token.access_token);

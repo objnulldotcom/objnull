@@ -21,6 +21,34 @@
             <div class="fs1" style="word-break:break-all">@User.Name</div>
             <div style="font-size:18px; color:#666; font-weight:300">@User.GitHubLogin</div>
         </div>
+        <div style="padding-bottom: 5px" id="DivEmail">
+            <span class="glyphicon glyphicon-envelope"></span>&nbsp;
+            @if (ViewBag.Login && ViewBag.Owner)
+            {
+                if (string.IsNullOrEmpty(User.Email))
+                {
+                    <a href="javascript:;" onclick="EmailEdit()">设置</a>
+                }
+                else
+                {
+                    <span>@User.Email&nbsp;&nbsp;</span>
+                    <a id="BtnEdit" href="javascript:;" onclick="EmailEdit()">修改</a>
+                }
+            }
+            else
+            {
+                <span>@(string.IsNullOrEmpty(User.Email) ? "未设置显示" : User.Email)</span>
+            }
+        </div>
+        @if (ViewBag.Login && ViewBag.Owner)
+        {
+            <div style="padding-bottom: 5px; display:none" id="DivEmailEdit">
+                <span class="glyphicon glyphicon-envelope"></span>&nbsp;
+                <input type="text" id="TxtNewEmail" style="width: 150px" />
+                <button id="BtnSetEmail" class="btn btn-success btn-sm" onclick="SetNewEmail()">√</button>
+                <button class="btn btn-danger btn-sm" onclick="EmailCancelEdit()">×</button>
+            </div>
+        }
         <div style="padding-bottom: 5px">
             <span class="glyphicon glyphicon-time"></span>&nbsp;
             <span>@User.InsertDate.ToString("yyyy-MM-dd") 加入</span>

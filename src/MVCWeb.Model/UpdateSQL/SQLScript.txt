@@ -1,0 +1,11 @@
+#161229
+CREATE TABLE githubzhuser
+(UID VARCHAR(100),
+Email VARCHAR(100),
+InsertDate DATETIME,
+LastSendDate DATETIME,
+Joined BOOL);
+
+alter table githubzhuser add checked tinyint(1);
+
+alter table nulluser add Email varchar(100);

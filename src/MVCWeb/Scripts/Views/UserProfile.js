@@ -223,6 +223,36 @@ function UserMsgPage(index, type) {
     });
 }
 
+//修改邮箱
+function EmailEdit() {
+    $("#DivEmail").hide();
+    $("#DivEmailEdit").show();
+}
+
+//取消修改邮箱
+function EmailCancelEdit() {
+    $("#DivEmail").show();
+    $("#DivEmailEdit").hide();
+}
+
+//设置邮箱
+function SetNewEmail() {
+    $("#BtnSetEmail").attr("disabled", true);
+    $.ajax({
+        url: "/Home/SetEmail",
+        type: "Post",
+        data: { email: $("#TxtNewEmail").val() },
+        success: function (result) {
+            $("#BtnSetEmail").attr("disabled", false);
+            if (result.msg == "done") {
+                window.location.reload();
+            } else {
+                swal(result.msg);
+            }
+        }
+    });
+}
+
 $(function () {
     //检查是否已关注
     if ($("#ValOwner").val() == "0") {
@@ -325,4 +355,11 @@ $(function () {
 
     //显示姿势
     $("#BtnBlog").click();
+
+    //悬停显示修改邮箱
+    $("#DivEmail").hover(function () {
+        $("#DivEmail").find("#BtnEdit").show();
+    }, function () {
+        $("#DivEmail").find("#BtnEdit").hide();
+    });
 });

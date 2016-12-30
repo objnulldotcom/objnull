@@ -28,14 +28,30 @@ namespace MVCWeb
         {
             //异常处理 日志记录 Logger
 #if Release
-            Log.Error("-------------------------------------------------------------");
-            Log.Error("Exception: " + filterContext.Exception.Message);
-            Log.Error("StackTrace: " + filterContext.Exception.StackTrace);
-            Exception innerE = filterContext.Exception.InnerException;
-            if (innerE != null)
+            if(filterContext.Exception.Message.Contains("未将对象引用设置到对象的实例"))
             {
-                Log.Error("InnerException: " + innerE.Message);
-                Log.Error("InnerStackTrace: " + innerE.StackTrace);
+                Log.Warn("-------------------------------------------------------------");
+                Log.Warn("警告: " + filterContext.Exception.Message);
+                Log.Warn("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"] + " " + filterContext.RouteData.Values.ToString());
+            }
+            else if(filterContext.Exception.Message.Contains("参数字典包含一个 null 项"))
+            {
+                Log.Warn("-------------------------------------------------------------");
+                Log.Warn("警告: " + filterContext.Exception.Message);
+                Log.Warn("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"] + " " + filterContext.RouteData.Values.ToString());
+            }
+            else
+            {
+                Log.Error("-------------------------------------------------------------");
+                Log.Error("Exception: " + filterContext.Exception.Message);
+                Log.Error("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"] + " " + filterContext.RouteData.Values.ToString());
+                Log.Error("StackTrace: " + filterContext.Exception.StackTrace);
+                Exception innerE = filterContext.Exception.InnerException;
+                if (innerE != null)
+                {
+                    Log.Error("InnerException: " + innerE.Message);
+                    Log.Error("InnerStackTrace: " + innerE.StackTrace);
+                }
             }
 #endif
             filterContext.ExceptionHandled = true;

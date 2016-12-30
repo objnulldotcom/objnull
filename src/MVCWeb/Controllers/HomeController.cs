@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Ganss.XSS;
 using MVCWeb.Model.Models;
@@ -186,6 +187,31 @@ namespace MVCWeb.Controllers
             NullUser user = NullUserDataSvc.GetByID(id);
             user.ProCount += 1;
             NullUserDataSvc.Update(user);
+        }
+
+        //设置邮箱
+        [HttpPost]
+        public ActionResult SetEmail(string email)
+        {
+            NullUser user = NullUserDataSvc.GetByID(CurrentUser.ID);
+            if (string.IsNullOrEmpty(email))
+            {
+                user.Email = email;
+                NullUserDataSvc.Update(user);
+                return Json(new { msg = "done" });
+            }
+            if(email.Length > 100)
+            {
+                return Json(new { msg = "邮箱最多100个字符" });
+            }
+            Regex re = new Regex(@"[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?");
+            if(!re.IsMatch(email))
+            {
+                return Json(new { msg = "邮箱格式不正确" });
+            }
+            user.Email = email;
+            NullUserDataSvc.Update(user);
+            return Json(new { msg = "done" });
         }
 
         #endregion
