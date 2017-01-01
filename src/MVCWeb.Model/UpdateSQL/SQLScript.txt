@@ -9,3 +9,8 @@ Joined BOOL);
 alter table githubzhuser add checked tinyint(1);
 
 alter table nulluser add Email varchar(100);
+
+#161231
+alter table githubzhuser add FirstRepo varchar(100);
+ALTER TABLE `githubzhuser` CHANGE COLUMN `checked` `Checked` TINYINT(1) NULL DEFAULT NULL AFTER `Joined`;
+alter table githubzhuser add Issued tinyint(1);

@@ -32,19 +32,22 @@ namespace MVCWeb
             {
                 Log.Warn("-------------------------------------------------------------");
                 Log.Warn("警告: " + filterContext.Exception.Message);
-                Log.Warn("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"] + " " + filterContext.RouteData.Values.ToString());
+                Log.Warn("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"]);
+                Log.Warn("IP: " + filterContext.HttpContext.Request.UserHostAddress);
             }
             else if(filterContext.Exception.Message.Contains("参数字典包含一个 null 项"))
             {
                 Log.Warn("-------------------------------------------------------------");
                 Log.Warn("警告: " + filterContext.Exception.Message);
-                Log.Warn("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"] + " " + filterContext.RouteData.Values.ToString());
+                Log.Warn("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"]);
+                Log.Warn("IP: " + filterContext.HttpContext.Request.UserHostAddress);
             }
             else
             {
                 Log.Error("-------------------------------------------------------------");
                 Log.Error("Exception: " + filterContext.Exception.Message);
-                Log.Error("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"] + " " + filterContext.RouteData.Values.ToString());
+                Log.Error("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"]);
+                Log.Error("IP: " + filterContext.HttpContext.Request.UserHostAddress);
                 Log.Error("StackTrace: " + filterContext.Exception.StackTrace);
                 Exception innerE = filterContext.Exception.InnerException;
                 if (innerE != null)

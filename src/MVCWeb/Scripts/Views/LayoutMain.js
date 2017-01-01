@@ -18,6 +18,24 @@ function getBt(str) {
     return char.length;
 }
 
+//收藏本站
+function FavoriteSite() {
+    var url = "http://objnull.com/Home/NewBeeList";
+    var title = "象空 - GitHub用户交流平台";
+    var ctrl = (window.navigator.userAgent.toLowerCase()).indexOf('mac') !== -1 ? 'Command' : 'Ctrl';
+    var info = "有本事再按下 " + ctrl + "+D";
+
+    try {
+        window.external.addFavorite(url, title);
+    } catch (ex) {
+        try {
+            window.sidebar.addPanel(url, title, "");
+        } catch (exs) {
+            swal(info);
+        }
+    }
+}
+
 var MsgHub;
 //发送更新消息
 function SendNewMsg(id) {

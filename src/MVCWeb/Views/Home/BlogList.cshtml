@@ -9,7 +9,8 @@
     <script src="~/Scripts/Views/BlogList.js"></script>
 }
 <div class="row">
-    <div class="col-md-12">在这里分享你的姿势，我是资瓷的。</div>
+    <div class="col-md-6">在这里分享你的姿势，我是资瓷的。</div>
+    <div class="col-md-6 text-right"><a href="javascript:;" title="我叫你一声" onclick="FavoriteSite()">你敢点一下吗</a></div>
 </div>
 <div class="row" style="padding-bottom: 15px">
     <div class="col-md-12" style="height: 100px;">
@@ -28,7 +29,7 @@
     <div class="col-md-6 text-right" style="height: 40px; line-height: 40px">
         @if (ViewBag.Login)
         {
-            <a class="btn btn-primary" href="@Url.Action("BlogNew", "Home")"><span class="glyphicon glyphicon-pencil"></span> 新姿势</a>
+            <a class="btn btn-success" href="@Url.Action("BlogNew", "Home")"><span class="glyphicon glyphicon-pencil"></span> 新姿势</a>
         }
     </div>
 </div>
