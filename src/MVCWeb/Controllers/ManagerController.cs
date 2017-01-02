@@ -287,7 +287,7 @@ namespace MVCWeb.Controllers
 
             SysMsg msg = new SysMsg();
             msg.Date = DateTime.Now;
-            msg.Title = "你的姿势被删除";
+            msg.Title = "你的" + Enum.GetName(typeof(EnumObjectType), 1) + "被删除";
             msg.Msg = blog.Title.MaxByteLength(30);
             string key = MyRedisKeys.Pre_SysMsg + blog.OwnerID;
             MyRedisDB.SetAdd(key, msg);
@@ -339,7 +339,7 @@ namespace MVCWeb.Controllers
 
             SysMsg msg = new SysMsg();
             msg.Date = DateTime.Now;
-            msg.Title = "你的NewBee被删除";
+            msg.Title = "你的" + Enum.GetName(typeof(EnumObjectType), 2) + "被删除";
             msg.Msg = newBee.Title.MaxByteLength(30);
             string key = MyRedisKeys.Pre_SysMsg + newBee.OwnerID;
             MyRedisDB.SetAdd(key, msg);
@@ -347,6 +347,16 @@ namespace MVCWeb.Controllers
             return Json(new { msg = "done" });
         }
 
+        //置顶NewBee
+        [HttpPost]
+        public ActionResult NewBeeTop(Guid id)
+        {
+            NewBee newBee = NewBeeDataSvc.GetByID(id);
+            newBee.Top = newBee.Top ? false : true;
+            NewBeeDataSvc.Update(newBee);
+
+            return Json(new { msg = "done" });
+        }
         #endregion
     }
 }

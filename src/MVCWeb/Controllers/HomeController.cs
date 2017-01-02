@@ -393,25 +393,28 @@ namespace MVCWeb.Controllers
             ViewBag.COrder = co;
             ViewBag.ROrder = ro;
 
+            blog.ViewCount += 1;
+            BlogDataSvc.Update(blog);
+
             #region 查看点赞收藏是否显示
             if (CurrentUser != null)
             {
                 //查看次数
                 string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
                 IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
-                if (userRecords.Count() == 0)
-                {
-                    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = blog.ID, type = (int)EnumRecordType.查看 });
-                    MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
-                    blog.ViewCount += 1;
-                    BlogDataSvc.Update(blog);
-                }
-                else if (userRecords.Where(r => r.ObjID == blog.ID && r.type == (int)EnumRecordType.查看).Count() == 0)
-                {
-                    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = blog.ID, type = (int)EnumRecordType.查看 });
-                    blog.ViewCount += 1;
-                    BlogDataSvc.Update(blog);
-                }
+                //if (userRecords.Count() == 0)
+                //{
+                //    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = blog.ID, type = (int)EnumRecordType.查看 });
+                //    MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
+                //    blog.ViewCount += 1;
+                //    BlogDataSvc.Update(blog);
+                //}
+                //else if (userRecords.Where(r => r.ObjID == blog.ID && r.type == (int)EnumRecordType.查看).Count() == 0)
+                //{
+                //    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = blog.ID, type = (int)EnumRecordType.查看 });
+                //    blog.ViewCount += 1;
+                //    BlogDataSvc.Update(blog);
+                //}
 
                 //点赞
                 ViewBag.ShowPro = false;
@@ -775,6 +778,7 @@ namespace MVCWeb.Controllers
             nb.Title = title;
             nb.FloorCount = 1;
             nb.LastFloorDate = DateTime.Now;
+            nb.Top = false;
             NewBeeDataSvc.Add(nb);
 
             NewBeeFloor nbf = new NewBeeFloor();
@@ -793,13 +797,18 @@ namespace MVCWeb.Controllers
         public ActionResult NewBeePage(int pageSize, int pageNum = 1)
         {
             int totalCount = 0;
-            List<NewBee> NewBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => true, it => it.LastFloorDate, true, out totalCount).ToList();
-            ViewBag.NewBeeList = NewBeeList;
+            List<NewBee> newBeeList = NewBeeDataSvc.GetPagedEntitys(ref pageNum, pageSize, it => !it.Top, it => it.LastFloorDate, true, out totalCount).ToList();
+            if(pageNum == 1)
+            {
+                List<NewBee> topNewBee = NewBeeDataSvc.GetByCondition(n => n.Top).ToList();
+                newBeeList = topNewBee.Concat(newBeeList).OrderByDescending(n => n.Top).ThenByDescending(n => n.LastFloorDate).ToList();
+            }
+            ViewBag.NewBeeList = newBeeList;
             ViewBag.TotalCount = totalCount;
             ViewBag.CurrentPage = pageNum;
             ViewBag.ShowPager = totalCount > pageSize;
 
-            IEnumerable<Guid> NewBeeIDs = NewBeeList.Select(n => n.ID);
+            IEnumerable<Guid> NewBeeIDs = newBeeList.Select(n => n.ID);
             ViewBag.FirstFloors = NewBeeFloorDataSvc.GetByCondition(f => NewBeeIDs.Contains(f.NewBeeID) && f.Order == 1).ToList();
             return View();
         }
@@ -814,24 +823,26 @@ namespace MVCWeb.Controllers
             ViewBag.COrder = co;
             ViewBag.ROrder = ro;
 
+            newBee.ViewCount += 1;
+            NewBeeDataSvc.Update(newBee);
             if (CurrentUser != null)
             {
-                //查看次数
-                string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
-                IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
-                if (userRecords.Count() == 0)
-                {
-                    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = newBee.ID, type = (int)EnumRecordType.查看 });
-                    MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
-                    newBee.ViewCount += 1;
-                    NewBeeDataSvc.Update(newBee);
-                }
-                else if (userRecords.Where(r => r.ObjID == newBee.ID && r.type == (int)EnumRecordType.查看).Count() == 0)
-                {
-                    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = newBee.ID, type = (int)EnumRecordType.查看 });
-                    newBee.ViewCount += 1;
-                    NewBeeDataSvc.Update(newBee);
-                }
+                //查看次数 暂时不用户统计
+                //string key = MyRedisKeys.Pre_UserRecord + CurrentUser.ID;
+                //IEnumerable<UserRecord> userRecords = MyRedisDB.GetSet<UserRecord>(key);
+                //if (userRecords.Count() == 0)
+                //{
+                //    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = newBee.ID, type = (int)EnumRecordType.查看 });
+                //    MyRedisDB.RedisDB.KeyExpire(key, DateTime.Now.AddDays(1));
+                //    newBee.ViewCount += 1;
+                //    NewBeeDataSvc.Update(newBee);
+                //}
+                //else if (userRecords.Where(r => r.ObjID == newBee.ID && r.type == (int)EnumRecordType.查看).Count() == 0)
+                //{
+                //    MyRedisDB.SetAdd(key, new UserRecord() { ObjID = newBee.ID, type = (int)EnumRecordType.查看 });
+                //    newBee.ViewCount += 1;
+                //    NewBeeDataSvc.Update(newBee);
+                //}
 
                 //收藏
                 ViewBag.ShowStar = true;

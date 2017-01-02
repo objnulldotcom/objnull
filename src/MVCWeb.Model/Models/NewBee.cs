@@ -39,6 +39,11 @@ namespace MVCWeb.Model.Models
         public int ViewCount { get; set; }
 
         /// <summary>
+        /// 置顶
+        /// </summary>
+        public bool Top { get; set; }
+
+        /// <summary>
         /// 最后盖楼日期
         /// </summary>
         public DateTime LastFloorDate { get; set; }

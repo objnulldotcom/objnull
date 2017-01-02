@@ -3,7 +3,7 @@ function Search() {
     UserPage(1);
 }
 
-//查询p地址
+//查询ip地址
 function ShowIPAddr() {
     $(".IP").each(function () {
         var ip = $(this).html();
@@ -207,6 +207,32 @@ function NewBeeDelete(id, uid, page) {
             success: function (result) {
                 if (result.msg == "done") {
                     SendNewMsg(uid);
+                    NewBeePage(page);
+                } else {
+                    alert(result.msg);
+                }
+            }
+        });
+    });
+}
+
+//置顶NewBee
+function NewBeeTop(id, page) {
+    swal({
+        title: "确定置顶？",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#337ab7",
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        closeOnConfirm: true
+    }, function () {
+        $.ajax({
+            url: "/Manager/NewBeeTop",
+            type: "Post",
+            data: { id: id },
+            success: function (result) {
+                if (result.msg == "done") {
                     NewBeePage(page);
                 } else {
                     alert(result.msg);

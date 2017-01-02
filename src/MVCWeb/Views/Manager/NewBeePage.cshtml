@@ -23,6 +23,7 @@
             <td><a href="@Url.Action("NewBeeView", "Home", new { id = newBee.ID })" target="_blank">@newBee.Title</a></td>
             <td>@newBee.InsertDate</td>
             <td>
+                <button onclick="NewBeeTop('@newBee.ID', @ViewBag.CurrentPage)">@(newBee.Top ? "取消置顶" : "置顶")</button>
                 <button onclick="NewBeeDelete('@newBee.ID', '@newBee.OwnerID', @ViewBag.CurrentPage)">删除</button>
             </td>
         </tr>

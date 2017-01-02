@@ -34,6 +34,7 @@ namespace MVCWeb
                 Log.Warn("警告: " + filterContext.Exception.Message);
                 Log.Warn("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"]);
                 Log.Warn("IP: " + filterContext.HttpContext.Request.UserHostAddress);
+                Log.Warn("StackTrace: " + filterContext.Exception.StackTrace);
             }
             else if(filterContext.Exception.Message.Contains("参数字典包含一个 null 项"))
             {
@@ -41,6 +42,7 @@ namespace MVCWeb
                 Log.Warn("警告: " + filterContext.Exception.Message);
                 Log.Warn("链接: " + filterContext.RouteData.Values["controller"] + "/" + filterContext.RouteData.Values["action"]);
                 Log.Warn("IP: " + filterContext.HttpContext.Request.UserHostAddress);
+                Log.Warn("StackTrace: " + filterContext.Exception.StackTrace);
             }
             else
             {

@@ -18,8 +18,6 @@ namespace MVCWeb
     {
         姿势 = 1,
         NewBee = 2
-        //笔记 = 3,
-        //问题 = 4
     }
     
     public enum EnumRecordType
