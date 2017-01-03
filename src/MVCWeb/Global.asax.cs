@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Configuration;
+using System.IO;
 
 namespace MVCWeb
 {
@@ -17,9 +19,12 @@ namespace MVCWeb
             DependencyResolver.SetResolver(Autofac.GetDependecyResolver());
             //注册过滤器
             Filters.RegisterFilters(GlobalFilters.Filters);
-            //设置加解密向量和秘钥
-            Utils.RijndaelIV = "ObjectIsNull@001";
-            Utils.RijndaelKey = "kowfswiefx*@&JX13d9:fawxf3j34x%1";
+
+            string configPath = ConfigurationManager.AppSettings["NewBeeFilePath"].Replace("NewBeeFile\\", "") + "Config.txt";
+            string[] configTxt = File.OpenText(configPath).ReadToEnd().Split(new string[]{ Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            Utils.RijndaelIV = configTxt[0];
+            Utils.RijndaelKey = configTxt[1];
         }
     }
 }
